@@ -35,6 +35,13 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
   bool isSelected = false;
   int curIndex = -1;
+  List<String> namelist = [];
+
+  @override
+  void initState() {
+    namelist.clear();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -347,7 +354,7 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                             const SizedBox(width: 6),
                                                                             Container(
                                                                               height: 35,
-                                                                              decoration: curIndex == index
+                                                                              decoration:curIndex == index
                                                                                   ? isSelected == true
                                                                                       ? BoxDecoration(
                                                                                           borderRadius: BorderRadius.circular(25),
@@ -396,6 +403,8 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                 onPressed: () async {
                                                                                   // pr4.show();
                                                                                   curIndex = index;
+                                                                                  namelist.add(index.toString());
+                                                                                  print("index $namelist");
 
                                                                                   SharedPreferences pre = await SharedPreferences.getInstance();
                                                                                   final islogin = pre.getBool("islogin") ?? false;
@@ -420,18 +429,21 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                     setState(() {
                                                                                       isSelected = true;
                                                                                     });
+
                                                                                   } else {
                                                                                     //   pr4.hide();
 
                                                                                     Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
                                                                                   }
+
+                                                                                   setState(() {});
                                                                                 },
                                                                                 child: Row(
                                                                                   children: <Widget>[
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/Pin-s.svg',
                                                                                       width: 11,
-                                                                                      color: curIndex == index
+                                                                                      color:curIndex == index
                                                                                           ? isSelected == true
                                                                                               ? Color(0xFF00B8CA)
                                                                                               : Color(0xFFFFFFFFF)

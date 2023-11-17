@@ -98,6 +98,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
   double _radius = 0;
   int curIndex = -1;
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
+  bool isSelected = false;
+  int curIndex1 = -1;
+  List<String> namelist = [];
 
   //String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
   String locationString = "Search delights";
@@ -517,7 +520,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     ProgressDialog pr11 = ProgressDialog(context);
     pr11 = ProgressDialog(context, type: ProgressDialogType.normal);
     pr11.style(
-        message: 'Show Details Wait.....',
+        message: 'Insert Pin Details Wait...',
         borderRadius: 10.0,
         backgroundColor: Colors.white,
         progressWidget: const CircularProgressIndicator(),
@@ -1141,37 +1144,63 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                           width:
                                                                               10),
                                                                       Container(
-                                                                        height:
-                                                                            36,
+                                                                        height: 36,
                                                                         decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(25),
-                                                                          gradient: const LinearGradient(
-                                                                              begin: Alignment.topCenter,
-                                                                              end: Alignment.bottomCenter,
-                                                                              colors: [
-                                                                                Color.fromRGBO(31, 203, 220, 1),
-                                                                                Color.fromRGBO(0, 184, 202, 1)
-                                                                              ]),
-                                                                        ),
+                                                                            curIndex1 == index
+                                                                                  ? isSelected == true
+                                                                                      ? BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                          ]))
+                                                                                      : BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(31, 203, 220, 1),
+                                                                                            Color.fromRGBO(0, 184, 202, 1)
+                                                                                          ]),
+                                                                                        )
+                                                                                  : BoxDecoration(
+                                                                                      borderRadius: BorderRadius.circular(25),
+                                                                                      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                        Color.fromRGBO(31, 203, 220, 1),
+                                                                                        Color.fromRGBO(0, 184, 202, 1)
+                                                                                      ]),
+                                                                                    ),
                                                                         child:
                                                                             TextButton(
                                                                           style:
-                                                                              TextButton.styleFrom(
-                                                                            foregroundColor:
-                                                                                Colors.white,
-                                                                            padding: const EdgeInsets.only(
-                                                                                left: 12,
-                                                                                right: 12,
-                                                                                top: 5.0,
-                                                                                bottom: 5.0),
-                                                                            textStyle:
-                                                                                const TextStyle(fontSize: 13),
-                                                                          ),
+                                                                               curIndex1 == index
+                                                                                    ? isSelected == true
+                                                                                        ? TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(25.0),
+                                                                                            ),
+                                                                                            side: const BorderSide(
+                                                                                              color: Color(0xFFDDE4E4),
+                                                                                            ),
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                        : TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                    : TextButton.styleFrom(
+                                                                                        foregroundColor: Colors.white,
+                                                                                        padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                        textStyle: TextStyle(fontSize: 13.sp),
+                                                                                      ),
                                                                           onPressed:
                                                                               () async {
                                                                             pr4.show();
+
+                                                                                  curIndex1 = index;
+                                                                                  namelist.add(index.toString());
+                                                                                  print("index $namelist");
 
                                                                             SharedPreferences
                                                                                 pre =
@@ -1223,6 +1252,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                               pr4.hide();
 
                                                                               Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                               setState(() {
+                                                                                      isSelected = true;
+                                                                                    });
                                                                             } else {
                                                                               pr4.hide();
 
@@ -1235,14 +1267,24 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                               SvgPicture.asset(
                                                                                 'assets/images/Pin-s.svg',
                                                                                 width: 11,
-                                                                                color: Colors.white,
+                                                                                color: curIndex1 == index
+                                                                                          ? isSelected == true
+                                                                                              ? Color(0xFF00B8CA)
+                                                                                              : Color(0xFFFFFFFFF)
+                                                                                          : Color(0xFFFFFFFFF),
                                                                               ),
                                                                               const SizedBox(
                                                                                 width: 5,
                                                                               ),
-                                                                              const Text(
+                                                                              Text(
                                                                                 "Pinned",
-                                                                                style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
+                                                                                style: TextStyle(fontSize: 13,
+                                                                                    color: curIndex1 == index
+                                                                                          ? isSelected == true
+                                                                                              ? Color(0xFF00B8CA)
+                                                                                              : Color(0xFFFFFFFFF)
+                                                                                          : Color(0xFFFFFFFFF),
+                                                                                    fontWeight: FontWeight.normal),
                                                                               ),
                                                                               // text
                                                                             ],
@@ -1570,21 +1612,58 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                             const SizedBox(width: 10),
                                                                             Container(
                                                                               height: 36,
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(25),
-                                                                                gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                  Color.fromRGBO(31, 203, 220, 1),
-                                                                                  Color.fromRGBO(0, 184, 202, 1)
-                                                                                ]),
-                                                                              ),
+                                                                              decoration: curIndex1 == index
+                                                                                  ? isSelected == true
+                                                                                      ? BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                          ]))
+                                                                                      : BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(31, 203, 220, 1),
+                                                                                            Color.fromRGBO(0, 184, 202, 1)
+                                                                                          ]),
+                                                                                        )
+                                                                                  : BoxDecoration(
+                                                                                      borderRadius: BorderRadius.circular(25),
+                                                                                      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                        Color.fromRGBO(31, 203, 220, 1),
+                                                                                        Color.fromRGBO(0, 184, 202, 1)
+                                                                                      ]),
+                                                                                    ),
                                                                               child: TextButton(
-                                                                                style: TextButton.styleFrom(
-                                                                                  foregroundColor: Colors.white,
-                                                                                  padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                  textStyle: const TextStyle(fontSize: 13),
-                                                                                ),
+                                                                                style: curIndex1 == index
+                                                                                    ? isSelected == true
+                                                                                        ? TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(25.0),
+                                                                                            ),
+                                                                                            side: const BorderSide(
+                                                                                              color: Color(0xFFDDE4E4),
+                                                                                            ),
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                        : TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                    : TextButton.styleFrom(
+                                                                                        foregroundColor: Colors.white,
+                                                                                        padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                        textStyle: TextStyle(fontSize: 13.sp),
+                                                                                      ),
                                                                                 onPressed: () async {
                                                                                   pr4.show();
+
+                                                                                  curIndex1 = index;
+                                                                                  namelist.add(index.toString());
+                                                                                  print("index $namelist");
 
                                                                                   SharedPreferences pre = await SharedPreferences.getInstance();
                                                                                   final islogin = pre.getBool("islogin") ?? false;
@@ -1605,6 +1684,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                     pr4.hide();
 
                                                                                     Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                     setState(() {
+                                                                                      isSelected = true;
+                                                                                    });
                                                                                   } else {
                                                                                     pr4.hide();
 
@@ -1616,14 +1698,24 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/Pin-s.svg',
                                                                                       width: 11,
-                                                                                      color: Colors.white,
+                                                                                      color: curIndex1 == index
+                                                                                          ? isSelected == true
+                                                                                              ? Color(0xFF00B8CA)
+                                                                                              : Color(0xFFFFFFFFF)
+                                                                                          : Color(0xFFFFFFFFF),
                                                                                     ),
                                                                                     const SizedBox(
                                                                                       width: 5,
                                                                                     ),
-                                                                                    const Text(
+                                                                                    Text(
                                                                                       "Pinned",
-                                                                                      style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
+                                                                                      style: TextStyle(fontSize: 13,
+                                                                                          color: curIndex1 == index
+                                                                                              ? isSelected == true
+                                                                                                  ? Color(0xFF00B8CA)
+                                                                                                  : Color(0xFFFFFFFFF)
+                                                                                              : Color(0xFFFFFFFFF),
+                                                                                          fontWeight: FontWeight.normal),
                                                                                     ),
                                                                                     // text
                                                                                   ],
