@@ -195,7 +195,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   List<String> elightlistName = [];
   List<UserInfo> elightlistName1 = [];
   String kename = "", delightId = "", kenameType = "";
-  int delight_Id = 0;
+  int delight_Id = 0, radius = 0;
 
   bool isVisible = false, isTextVisible = false, isListProduct = true;
 
@@ -207,10 +207,33 @@ class _ExploreScreenState extends State<ExploreScreen> {
     SharedPreferences pre = await SharedPreferences.getInstance();
     islogin = pre.getBool("islogin") ?? false;
     userId = pre.getInt("userId") ?? 0;
+    radius = pre.getInt("radius") ?? 0;
     dob_radiusData = pre.getDouble("radiusData") ?? 0.0;
 
-    String radiusData = dob_radiusData.toString();
+    String radiusData = radius.toString();
     _radius3 = radiusData;
+
+    if (_radius3 == "1000") {
+      _radius3 = "5";
+    } else if (_radius3 == "2000") {
+      _radius3 = "10";
+    } else if (_radius3 == "3000") {
+      _radius3 = "15";
+    } else if (_radius3 == "4000") {
+      _radius3 = "20";
+    } else if (_radius3 == "5000") {
+      _radius3 = "25";
+    } else if (_radius3 == "6000") {
+      _radius3 = "30";
+    } else if (_radius3 == "7000") {
+      _radius3 = "35";
+    } else if (_radius3 == "8000") {
+      _radius3 = "40";
+    } else if (_radius3 == "9000") {
+      _radius3 = "45";
+    } else if (_radius3 == "10000") {
+      _radius3 = "50";
+    }
 
     print("dataradis$radiusData");
     print("userIddataradis$userId");
@@ -397,6 +420,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   double _toRadians(double degrees) => degrees * pi / 180;
+
   num _haversin(double radians) => pow(sin(radians / 2), 2);
 
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -415,34 +439,33 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   double calculateDistance1(LatLng start, LatLng end) {
+    const double earthRadius = 6371.0; // Radius of the Earth in kilometers
 
-  const double earthRadius = 6371.0; // Radius of the Earth in kilometers
+    // Convert coordinates to radians
+    final double lat1 = start.latitude * (pi / 180.0);
+    final double lon1 = start.longitude * (pi / 180.0);
+    final double lat2 = end.latitude * (pi / 180.0);
+    final double lon2 = end.longitude * (pi / 180.0);
 
-  // Convert coordinates to radians
-  final double lat1 = start.latitude * (pi / 180.0);
-  final double lon1 = start.longitude * (pi / 180.0);
-  final double lat2 = end.latitude * (pi / 180.0);
-  final double lon2 = end.longitude * (pi / 180.0);
+    // Calculate the differences between the coordinates
+    final double dLat = lat2 - lat1;
+    final double dLon = lon2 - lon1;
 
-  // Calculate the differences between the coordinates
-  final double dLat = lat2 - lat1;
-  final double dLon = lon2 - lon1;
+    // Apply the Haversine formula
+    final double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+    final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    final double distance = earthRadius * c;
 
-  // Apply the Haversine formula
-  final double a = sin(dLat / 2) * sin(dLat / 2) +
-      cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
-  final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  final double distance = earthRadius * c;
+    return distance; // Distance in kilometers, add "*1000" to get meters
+  }
 
-  return distance; // Distance in kilometers, add "*1000" to get meters
-}
-
- double calculateDistance2(lat1, lon1, lat2, lon2){
+  double calculateDistance2(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
     var c = cos;
-    var a = 0.5 - c((lat2 - lat1) * p)/2 +
-        c(lat1 * p) * c(lat2 * p) *
-            (1 - c((lon2 - lon1) * p))/2;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
   }
 
@@ -454,19 +477,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
     showDelightList();
     _determinePosition1();
 
-    double valuedistansce = calculateDistance(20.3533,85.8266,20.3490,85.8077);
+    double valuedistansce =
+        calculateDistance(20.3533, 85.8266, 20.3490, 85.8077);
 
     LatLng latlong1 = new LatLng(20.3533, 85.8266);
     LatLng latlong2 = new LatLng(20.3490, 85.8077);
 
-    double valuedistansce1 = calculateDistance1(latlong1,latlong2);
+    double valuedistansce1 = calculateDistance1(latlong1, latlong2);
 
-    double valuedistansce2 = calculateDistance2(20.3533,85.8266,20.3490,85.8077);
+    double valuedistansce2 =
+        calculateDistance2(20.3533, 85.8266, 20.3490, 85.8077);
 
     print("distanceCalc1   $valuedistansce");
     print("distanceCalc2   $valuedistansce1");
     print("distanceCalc3   $valuedistansce2");
-
   }
 
   @override
@@ -752,7 +776,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   width: 4.w,
                                 ),
                                 Text(
-                                  "${_radius3}Mile",
+                                  "${_radius3} Mile",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 16.sp, color: Colors.grey),
@@ -798,854 +822,880 @@ class _ExploreScreenState extends State<ExploreScreen> {
             //
             // )
           ),
-          Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                    height: Dimensions.size170,
-                    width: Dimensions.size600,
-                    margin: EdgeInsets.only(
-                        left: Dimensions.size7,
-                        top: Dimensions.size100,
-                        right: Dimensions.size10,
-                        bottom: Dimensions.size40),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Container(
-                            height: Dimensions.size150,
-                            width: Dimensions.size600,
-                            margin: const EdgeInsets.all(5),
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                itemCount: nearbyLocations1.length,
-                                itemBuilder:
-                                    (context, int index) => GestureDetector(
-                                          onTap: () async {
-                                            SharedPreferences pre =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            pre.setString(
-                                                "placeId",
-                                                nearbyLocations1[index]
-                                                    .placeId!);
-                                            //save String
-                                            Get.toNamed(
-                                                RouteHelper.getdetailsScreen());
-                                          },
-                                          child: SingleChildScrollView(
-                                            child: Container(
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                  height: Dimensions.size160,
+                  width: Dimensions.size600,
+                 // color: Colors.green,
+                  margin: EdgeInsets.only(
+                      left: Dimensions.size7,
+                      right: Dimensions.size10,
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          height: Dimensions.size150,
+                          width: Dimensions.size600,
+                        //  margin: const EdgeInsets.all(5),
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: nearbyLocations1.length,
+                              itemBuilder:
+                                  (context, int index) => GestureDetector(
+                                        onTap: () async {
+                                          SharedPreferences pre =
+                                              await SharedPreferences
+                                                  .getInstance();
+                                          pre.setString("placeId",
+                                              nearbyLocations1[index].placeId!);
+                                          //save String
+                                          Get.toNamed(
+                                              RouteHelper.getdetailsScreen());
+                                        },
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              margin: const EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                gradient: const LinearGradient(
+                                                    begin: Alignment(
+                                                        6.123234262925839e-17,
+                                                        1),
+                                                    end: Alignment(-1,
+                                                        6.123234262925839e-17),
+                                                    colors: [
+                                                      Color.fromRGBO(
+                                                          255, 255, 255, 255),
+                                                      Color.fromRGBO(
+                                                          255, 255, 255, 255),
+                                                    ]),
+                                              ),
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10, right: 10),
+                                                margin: const EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 0,
+                                                  top: 0,
+                                                  bottom: 10,
+                                                ),
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
-                                                margin: const EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  gradient: const LinearGradient(
-                                                      begin: Alignment(
-                                                          6.123234262925839e-17,
-                                                          1),
-                                                      end: Alignment(-1,
-                                                          6.123234262925839e-17),
-                                                      colors: [
-                                                        Color.fromRGBO(
-                                                            255, 255, 255, 255),
-                                                        Color.fromRGBO(
-                                                            255, 255, 255, 255),
-                                                      ]),
-                                                ),
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 10, right: 10),
-                                                  margin: const EdgeInsets.only(
-                                                    left: 0,
-                                                    right: 0,
-                                                    top: 0,
-                                                    bottom: 10,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    2.5,
+                                                child: Card(
+                                                  elevation: 5,
+                                                  shadowColor: Colors.black12,
+                                                  color: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18),
                                                   ),
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      2.5,
-                                                  child: Card(
-                                                    elevation: 5,
-                                                    shadowColor: Colors.black12,
-                                                    color: Colors.white,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              18),
-                                                    ),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 2, // 20%
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 2, // 20%
+                                                          child: Container(
+                                                            height: 130,
+                                                            decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20)),
+                                                            width: 100,
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    top: 10,
+                                                                    left: 10,
+                                                                    right: 10,
+                                                                    bottom: 10),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              // Image border
+                                                              child: SizedBox
+                                                                  .fromSize(
+                                                                size: const Size
+                                                                    .fromRadius(
+                                                                    48),
+                                                                // Image radius
+                                                                child: nearbyLocations1[index]
+                                                                            .photos?[
+                                                                                0]
+                                                                            .photoReference ==
+                                                                        null
+                                                                    ? Image
+                                                                        .network(
+                                                                        nearbyLocations1[index]
+                                                                            .icon!,
+                                                                        height:
+                                                                            Dimensions.size100,
+                                                                        width: Dimensions
+                                                                            .size100,
+                                                                      )
+                                                                    : getImage(
+                                                                        "${nearbyLocations1[index].photos?[0].photoReference}",
+                                                                        "${nearbyLocations1[index].photos?[0].width}") /*Image.network(nearbyLocations[index].icon!,)*/,
+                                                              ),
+                                                            ),
+                                                          )),
+                                                      Expanded(
+                                                          flex: 3, // 60%
+                                                          child:
+                                                              SingleChildScrollView(
+                                                            scrollDirection:
+                                                                Axis.vertical,
                                                             child: Container(
-                                                              height: 130,
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              20)),
-                                                              width: 100,
                                                               margin:
                                                                   const EdgeInsets
+                                                                      .only(
+                                                                      left: 2,
+                                                                      right: 2,
+                                                                      top: 10),
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          nearbyLocations1[index]
+                                                                              .name!,
+                                                                          style: const TextStyle(
+                                                                              fontSize: 14,
+                                                                              color: Colors.black,
+                                                                              fontWeight: FontWeight.normal),
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        height:
+                                                                            30,
+                                                                        child:
+                                                                            TextButton(
+                                                                          style:
+                                                                              ButtonStyle(
+                                                                            backgroundColor:
+                                                                                MaterialStateProperty.all<Color>(Colors.white),
+                                                                          ),
+                                                                          onPressed:
+                                                                              () {},
+                                                                          child:
+                                                                              Row(
+                                                                            children: <Widget>[
+                                                                              SvgPicture.asset(
+                                                                                'assets/images/star.svg',
+                                                                                width: 18,
+                                                                                color: const Color(0xFFF9BF3A),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 2,
+                                                                              ),
+                                                                              nearbyLocations1[index].rating != null
+                                                                                  ? Text(
+                                                                                      nearbyLocations1[index].rating.toString(),
+                                                                                      style: const TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
+                                                                                    )
+                                                                                  : const Text(
+                                                                                      "0",
+                                                                                      style: TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
+                                                                                    ),
+                                                                              // text
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 2,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        nearbyLocations1[index]
+                                                                            .types![0],
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                Colors.grey[500],
+                                                                            fontWeight: FontWeight.normal),
+                                                                      ),
+                                                                      Text(
+                                                                        "",
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                11,
+                                                                            color:
+                                                                                Colors.grey[500],
+                                                                            fontWeight: FontWeight.normal),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 2,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        nearbyLocations1[index].businessStatus ==
+                                                                                "OPERATIONAL"
+                                                                            ? "open"
+                                                                            : "close",
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                Colors.grey[500],
+                                                                            fontWeight: FontWeight.normal),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        height:
+                                                                            35,
+                                                                        child:
+                                                                            TextButton(
+                                                                          style:
+                                                                              ButtonStyle(
+                                                                            backgroundColor:
+                                                                                MaterialStateProperty.all<Color>(Colors.white),
+                                                                            shape:
+                                                                                MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(50.0),
+                                                                              side: const BorderSide(
+                                                                                color: Color(0xFFDDE4E4),
+                                                                              ),
+                                                                            )),
+                                                                            padding:
+                                                                                MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.only(
+                                                                              left: 12,
+                                                                              right: 12,
+                                                                            )),
+                                                                          ),
+                                                                          onPressed:
+                                                                              () {},
+                                                                          child:
+                                                                              Row(
+                                                                            children: <Widget>[
+                                                                              SvgPicture.asset(
+                                                                                'assets/images/direction-icon.svg',
+                                                                                width: 18,
+                                                                                color: const Color(0xFF00B8CA),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              const Text(
+                                                                                "Directions",
+                                                                                style: TextStyle(fontSize: 11, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
+                                                                              ),
+                                                                              // text
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              10),
+                                                                      Container(
+                                                                        height:
+                                                                            36,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(25),
+                                                                          gradient: const LinearGradient(
+                                                                              begin: Alignment.topCenter,
+                                                                              end: Alignment.bottomCenter,
+                                                                              colors: [
+                                                                                Color.fromRGBO(31, 203, 220, 1),
+                                                                                Color.fromRGBO(0, 184, 202, 1)
+                                                                              ]),
+                                                                        ),
+                                                                        child:
+                                                                            TextButton(
+                                                                          style:
+                                                                              TextButton.styleFrom(
+                                                                            foregroundColor:
+                                                                                Colors.white,
+                                                                            padding: const EdgeInsets.only(
+                                                                                left: 12,
+                                                                                right: 12,
+                                                                                top: 5.0,
+                                                                                bottom: 5.0),
+                                                                            textStyle:
+                                                                                const TextStyle(fontSize: 13),
+                                                                          ),
+                                                                          onPressed:
+                                                                              () async {
+                                                                            pr4.show();
+
+                                                                            SharedPreferences
+                                                                                pre =
+                                                                                await SharedPreferences.getInstance();
+                                                                            final islogin =
+                                                                                pre.getBool("islogin") ?? false;
+                                                                            final userId =
+                                                                                pre.getInt("userId") ?? 0;
+                                                                            final struserId =
+                                                                                userId.toString();
+                                                                            final strlat =
+                                                                                nearbyLocations1[index].geometry?.location?.lat.toString();
+                                                                            final strlng =
+                                                                                nearbyLocations1[index].geometry?.location?.lng.toString();
+                                                                            final placeid =
+                                                                                nearbyLocations1[index].placeId!;
+
+                                                                            http.Response response = await PinPlaces().insertPinPlaces(
+                                                                                struserId,
+                                                                                delightId,
+                                                                                nearbyLocations[index].types![0],
+                                                                                placeid,
+                                                                                strlat!,
+                                                                                strlng!,
+                                                                                nearbyLocations[index].name!,
+                                                                                "",
+                                                                                nearbyLocations[index].vicinity!,
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                "",
+                                                                                nearbyLocations[index].photos![0].photoReference!,
+                                                                                nearbyLocations[index].rating.toString(),
+                                                                                "");
+
+                                                                            print(response);
+
+                                                                            var pinResponse =
+                                                                                jsonDecode(response.body);
+                                                                            var userResponse =
+                                                                                PinThePlace.fromJson(pinResponse);
+
+                                                                            if (userResponse.status ==
+                                                                                "200") {
+                                                                              pr4.hide();
+
+                                                                              Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                            } else {
+                                                                              pr4.hide();
+
+                                                                              Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                            }
+                                                                          },
+                                                                          child:
+                                                                              Row(
+                                                                            children: <Widget>[
+                                                                              SvgPicture.asset(
+                                                                                'assets/images/Pin-s.svg',
+                                                                                width: 11,
+                                                                                color: Colors.white,
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              const Text(
+                                                                                "Pinned",
+                                                                                style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
+                                                                              ),
+                                                                              // text
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),
+                                        ),
+                                      )))
+                    ],
+                  )),
+              /* Visibility(
+                    visible: isTextVisible,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        height: Dimensions.size35,
+                        width: Dimensions.screenWidth,
+                        margin: EdgeInsets.only(left: 30, right: 30, top: 20),
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Text(
+                          "You might be interested in",
+                          textAlign: TextAlign.center,
+                          style:
+                              TextStyle(fontSize: 15, fontFamily: 'Poppins'),
+                        ),
+                      ),
+                    ),
+                  ),*/
+              Visibility(
+                  visible: isListProduct,
+                  child: Container(
+                      height: Dimensions.size165,
+                      width: Dimensions.size600,
+                      //    color: Colors.green,
+                      margin: EdgeInsets.only(
+                          left: Dimensions.size7,
+                          right: Dimensions.size10,),
+                      child: nearbyLocations.isNotEmpty
+                          ? Column(
+                              children: <Widget>[
+                                Container(
+                                    height: Dimensions.size151,
+                                    width: Dimensions.size600,
+                                //    margin: const EdgeInsets.all(5),
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: nearbyLocations.length,
+                                        itemBuilder: (context, int index) =>
+                                            GestureDetector(
+                                              onTap: () async {
+                                                SharedPreferences pre =
+                                                    await SharedPreferences
+                                                        .getInstance();
+                                                pre.setString(
+                                                    "placeId",
+                                                    nearbyLocations[index]
+                                                        .placeId!);
+                                                pre.setString(
+                                                    "delightId", delightId);
+                                                //save String
+                                                Get.toNamed(RouteHelper
+                                                    .getdetailsScreen());
+                                              },
+                                              child: SingleChildScrollView(
+                                                child: Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    margin:
+                                                        const EdgeInsets.all(5),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      gradient: const LinearGradient(
+                                                          begin: Alignment(
+                                                              6.123234262925839e-17,
+                                                              1),
+                                                          end: Alignment(-1,
+                                                              6.123234262925839e-17),
+                                                          colors: [
+                                                            Color.fromRGBO(255,
+                                                                255, 255, 255),
+                                                            Color.fromRGBO(255,
+                                                                255, 255, 255),
+                                                          ]),
+                                                    ),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10,
+                                                              right: 10),
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                        left: 0,
+                                                        right: 0,
+                                                        top: 0,
+                                                        bottom: 10,
+                                                      ),
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width /
+                                                              2.5,
+                                                      child: Card(
+                                                        elevation: 5,
+                                                        shadowColor:
+                                                            Colors.black12,
+                                                        color: Colors.white,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(18),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                                flex: 2, // 20%
+                                                                child:
+                                                                    Container(
+                                                                  height: 130,
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20)),
+                                                                  width: 100,
+                                                                  margin: const EdgeInsets
                                                                       .only(
                                                                       top: 10,
                                                                       left: 10,
                                                                       right: 10,
                                                                       bottom:
                                                                           10),
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
+                                                                  child:
+                                                                      ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
                                                                             20),
-                                                                // Image border
-                                                                child: SizedBox
-                                                                    .fromSize(
-                                                                  size: const Size
-                                                                      .fromRadius(
-                                                                      48),
-                                                                  // Image radius
-                                                                  child: nearbyLocations1[index]
-                                                                              .photos?[
-                                                                                  0]
-                                                                              .photoReference ==
-                                                                          null
-                                                                      ? Image
-                                                                          .network(
-                                                                          nearbyLocations1[index]
-                                                                              .icon!,
-                                                                          height:
-                                                                              Dimensions.size100,
-                                                                          width:
-                                                                              Dimensions.size100,
-                                                                        )
-                                                                      : getImage(
-                                                                          "${nearbyLocations1[index].photos?[0].photoReference}",
-                                                                          "${nearbyLocations1[index].photos?[0].width}") /*Image.network(nearbyLocations[index].icon!,)*/,
-                                                                ),
-                                                              ),
-                                                            )),
-                                                        Expanded(
-                                                            flex: 3, // 60%
-                                                            child:
-                                                                SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              child: Container(
-                                                                margin:
-                                                                    const EdgeInsets
+                                                                    // Image border
+                                                                    child: SizedBox
+                                                                        .fromSize(
+                                                                      size: const Size
+                                                                          .fromRadius(
+                                                                          48),
+                                                                      // Image radius
+                                                                      child: nearbyLocations[index].photos?[0].photoReference ==
+                                                                              null
+                                                                          ? Image
+                                                                              .network(
+                                                                              nearbyLocations[index].icon!,
+                                                                              height: Dimensions.size100,
+                                                                              width: Dimensions.size100,
+                                                                            )
+                                                                          : getImage(
+                                                                              "${nearbyLocations[index].photos?[0].photoReference}",
+                                                                              "${nearbyLocations[index].photos?[0].width}") /*Image.network(nearbyLocations[index].icon!,)*/,
+                                                                    ),
+                                                                  ),
+                                                                )),
+                                                            Expanded(
+                                                                flex: 3, // 60%
+                                                                child:
+                                                                    SingleChildScrollView(
+                                                                  scrollDirection:
+                                                                      Axis.vertical,
+                                                                  child:
+                                                                      Container(
+                                                                    margin: const EdgeInsets
                                                                         .only(
                                                                         left: 2,
                                                                         right:
                                                                             2,
                                                                         top:
                                                                             10),
-                                                                child: Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .max,
-                                                                  children: [
-                                                                    Row(
+                                                                    child:
+                                                                        Column(
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
-                                                                              .spaceBetween,
+                                                                              .start,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .max,
                                                                       children: [
-                                                                        Expanded(
-                                                                          child:
-                                                                              Text(
-                                                                            nearbyLocations1[index].name!,
-                                                                            style: const TextStyle(
-                                                                                fontSize: 14,
-                                                                                color: Colors.black,
-                                                                                fontWeight: FontWeight.normal),
-                                                                          ),
-                                                                        ),
-                                                                        Container(
-                                                                          height:
-                                                                              30,
-                                                                          child:
-                                                                              TextButton(
-                                                                            style:
-                                                                                ButtonStyle(
-                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                nearbyLocations[index].name!,
+                                                                                style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.normal),
+                                                                              ),
                                                                             ),
-                                                                            onPressed:
-                                                                                () {},
-                                                                            child:
-                                                                                Row(
-                                                                              children: <Widget>[
-                                                                                SvgPicture.asset(
-                                                                                  'assets/images/star.svg',
-                                                                                  width: 18,
-                                                                                  color: const Color(0xFFF9BF3A),
+                                                                            Container(
+                                                                              height: 30,
+                                                                              child: TextButton(
+                                                                                style: ButtonStyle(
+                                                                                  backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
                                                                                 ),
-                                                                                const SizedBox(
-                                                                                  width: 2,
+                                                                                onPressed: () {},
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    SvgPicture.asset(
+                                                                                      'assets/images/star.svg',
+                                                                                      width: 18,
+                                                                                      color: const Color(0xFFF9BF3A),
+                                                                                    ),
+                                                                                    const SizedBox(
+                                                                                      width: 2,
+                                                                                    ),
+                                                                                    nearbyLocations[index].rating != null
+                                                                                        ? Text(
+                                                                                            nearbyLocations[index].rating.toString(),
+                                                                                            style: const TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
+                                                                                          )
+                                                                                        : const Text(
+                                                                                            "0",
+                                                                                            style: TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
+                                                                                          ),
+                                                                                    // text
+                                                                                  ],
                                                                                 ),
-                                                                                nearbyLocations1[index].rating != null
-                                                                                    ? Text(
-                                                                                        nearbyLocations1[index].rating.toString(),
-                                                                                        style: const TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
-                                                                                      )
-                                                                                    : const Text(
-                                                                                        "0",
-                                                                                        style: TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
-                                                                                      ),
-                                                                                // text
-                                                                              ],
+                                                                              ),
                                                                             ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 2,
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          nearbyLocations1[index]
-                                                                              .types![0],
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: Colors.grey[500],
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                        Text(
-                                                                          "",
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          style: TextStyle(
-                                                                              fontSize: 11,
-                                                                              color: Colors.grey[500],
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 2,
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          nearbyLocations1[index].businessStatus == "OPERATIONAL"
-                                                                              ? "open"
-                                                                              : "close",
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: Colors.grey[500],
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          10,
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Container(
-                                                                          height:
-                                                                              35,
-                                                                          child:
-                                                                              TextButton(
-                                                                            style:
-                                                                                ButtonStyle(
-                                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(50.0),
-                                                                                side: const BorderSide(
-                                                                                  color: Color(0xFFDDE4E4),
-                                                                                ),
-                                                                              )),
-                                                                              padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.only(
-                                                                                left: 12,
-                                                                                right: 12,
-                                                                              )),
-                                                                            ),
-                                                                            onPressed:
-                                                                                () {},
-                                                                            child:
-                                                                                Row(
-                                                                              children: <Widget>[
-                                                                                SvgPicture.asset(
-                                                                                  'assets/images/direction-icon.svg',
-                                                                                  width: 18,
-                                                                                  color: const Color(0xFF00B8CA),
-                                                                                ),
-                                                                                const SizedBox(
-                                                                                  width: 5,
-                                                                                ),
-                                                                                const Text(
-                                                                                  "Directions",
-                                                                                  style: TextStyle(fontSize: 11, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
-                                                                                ),
-                                                                                // text
-                                                                              ],
-                                                                            ),
-                                                                          ),
+                                                                          ],
                                                                         ),
                                                                         const SizedBox(
-                                                                            width:
-                                                                                10),
-                                                                        Container(
                                                                           height:
-                                                                              36,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(25),
-                                                                            gradient:
-                                                                                const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                              Color.fromRGBO(31, 203, 220, 1),
-                                                                              Color.fromRGBO(0, 184, 202, 1)
-                                                                            ]),
-                                                                          ),
-                                                                          child:
-                                                                              TextButton(
-                                                                            style:
-                                                                                TextButton.styleFrom(
-                                                                              foregroundColor: Colors.white,
-                                                                              padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                              textStyle: const TextStyle(fontSize: 13),
+                                                                              2,
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text(
+                                                                              nearbyLocations[index].types![0],
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
                                                                             ),
-                                                                            onPressed:
-                                                                                () async {
-                                                                              pr4.show();
-
-                                                                              SharedPreferences pre = await SharedPreferences.getInstance();
-                                                                              final islogin = pre.getBool("islogin") ?? false;
-                                                                              final userId = pre.getInt("userId") ?? 0;
-                                                                              final struserId = userId.toString();
-                                                                              final strlat = nearbyLocations1[index].geometry?.location?.lat.toString();
-                                                                              final strlng = nearbyLocations1[index].geometry?.location?.lng.toString();
-                                                                              final placeid = nearbyLocations1[index].placeId!;
-
-                                                                              http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", nearbyLocations[index].photos![0].photoReference!, nearbyLocations[index].rating.toString(), "");
-
-                                                                              print(response);
-
-                                                                              var pinResponse = jsonDecode(response.body);
-                                                                              var userResponse = PinThePlace.fromJson(pinResponse);
-
-                                                                              if (userResponse.status == "200") {
-                                                                                pr4.hide();
-
-                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                              } else {
-                                                                                pr4.hide();
-
-                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                              }
-                                                                            },
-                                                                            child:
-                                                                                Row(
-                                                                              children: <Widget>[
-                                                                                SvgPicture.asset(
-                                                                                  'assets/images/Pin-s.svg',
-                                                                                  width: 11,
-                                                                                  color: Colors.white,
-                                                                                ),
-                                                                                const SizedBox(
-                                                                                  width: 5,
-                                                                                ),
-                                                                                const Text(
-                                                                                  "Pinned",
-                                                                                  style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
-                                                                                ),
-                                                                                // text
-                                                                              ],
+                                                                            Text(
+                                                                              "",
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.normal),
                                                                             ),
-                                                                          ),
+                                                                          ],
+                                                                        ),
+                                                                        const SizedBox(
+                                                                          height:
+                                                                              2,
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text(
+                                                                              nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close",
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        const SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Container(
+                                                                              height: 35,
+                                                                              child: TextButton(
+                                                                                style: ButtonStyle(
+                                                                                  backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                                                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                                                                                    borderRadius: BorderRadius.circular(50.0),
+                                                                                    side: const BorderSide(
+                                                                                      color: Color(0xFFDDE4E4),
+                                                                                    ),
+                                                                                  )),
+                                                                                  padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.only(
+                                                                                    left: 12,
+                                                                                    right: 12,
+                                                                                  )),
+                                                                                ),
+                                                                                onPressed: () {},
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    SvgPicture.asset(
+                                                                                      'assets/images/direction-icon.svg',
+                                                                                      width: 18,
+                                                                                      color: const Color(0xFF00B8CA),
+                                                                                    ),
+                                                                                    const SizedBox(
+                                                                                      width: 5,
+                                                                                    ),
+                                                                                    const Text(
+                                                                                      "Directions",
+                                                                                      style: TextStyle(fontSize: 11, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
+                                                                                    ),
+                                                                                    // text
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            const SizedBox(width: 10),
+                                                                            Container(
+                                                                              height: 36,
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(25),
+                                                                                gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                  Color.fromRGBO(31, 203, 220, 1),
+                                                                                  Color.fromRGBO(0, 184, 202, 1)
+                                                                                ]),
+                                                                              ),
+                                                                              child: TextButton(
+                                                                                style: TextButton.styleFrom(
+                                                                                  foregroundColor: Colors.white,
+                                                                                  padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                  textStyle: const TextStyle(fontSize: 13),
+                                                                                ),
+                                                                                onPressed: () async {
+                                                                                  pr4.show();
+
+                                                                                  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                  final islogin = pre.getBool("islogin") ?? false;
+                                                                                  final userId = pre.getInt("userId") ?? 0;
+                                                                                  final struserId = userId.toString();
+                                                                                  final strlat = nearbyLocations[index].geometry?.location?.lat.toString();
+                                                                                  final strlng = nearbyLocations[index].geometry?.location?.lng.toString();
+                                                                                  final placeid = nearbyLocations[index].placeId!;
+
+                                                                                  http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", nearbyLocations[index].photos![0].photoReference!, nearbyLocations[index].rating.toString(), "");
+
+                                                                                  print(response);
+
+                                                                                  var pinResponse = jsonDecode(response.body);
+                                                                                  var userResponse = PinThePlace.fromJson(pinResponse);
+
+                                                                                  if (userResponse.status == "200") {
+                                                                                    pr4.hide();
+
+                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                  } else {
+                                                                                    pr4.hide();
+
+                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                  }
+                                                                                },
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    SvgPicture.asset(
+                                                                                      'assets/images/Pin-s.svg',
+                                                                                      width: 11,
+                                                                                      color: Colors.white,
+                                                                                    ),
+                                                                                    const SizedBox(
+                                                                                      width: 5,
+                                                                                    ),
+                                                                                    const Text(
+                                                                                      "Pinned",
+                                                                                      style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
+                                                                                    ),
+                                                                                    // text
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            )),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )),
-                                          ),
-                                        )))
-                      ],
-                    )),
-                /* Visibility(
-                      visible: isTextVisible,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          height: Dimensions.size35,
-                          width: Dimensions.screenWidth,
-                          margin: EdgeInsets.only(left: 30, right: 30, top: 20),
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Text(
-                            "You might be interested in",
-                            textAlign: TextAlign.center,
-                            style:
-                                TextStyle(fontSize: 15, fontFamily: 'Poppins'),
-                          ),
-                        ),
-                      ),
-                    ),*/
-                Visibility(
-                    visible: isListProduct,
-                    child: Container(
-                        height: Dimensions.size170,
-                        width: Dimensions.size600,
-                        margin: EdgeInsets.only(
-                            left: Dimensions.size7,
-                            right: Dimensions.size10,
-                            bottom: Dimensions.size40),
-                        child: nearbyLocations.isNotEmpty
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Container(
-                                      height: Dimensions.size150,
-                                      width: Dimensions.size600,
-                                      margin: const EdgeInsets.all(5),
-                                      child: ListView.builder(
-                                          shrinkWrap: true,
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: nearbyLocations.length,
-                                          itemBuilder:
-                                              (context, int index) =>
-                                                  GestureDetector(
-                                                    onTap: () async {
-                                                      SharedPreferences pre =
-                                                          await SharedPreferences
-                                                              .getInstance();
-                                                      pre.setString(
-                                                          "placeId",
-                                                          nearbyLocations[index]
-                                                              .placeId!);
-                                                      pre.setString("delightId",
-                                                          delightId);
-                                                      //save String
-                                                      Get.toNamed(RouteHelper
-                                                          .getdetailsScreen());
-                                                    },
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Container(
-                                                          width: MediaQuery.of(
-                                                                  context)
-                                                              .size
-                                                              .width,
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            gradient: const LinearGradient(
-                                                                begin: Alignment(
-                                                                    6.123234262925839e-17,
-                                                                    1),
-                                                                end: Alignment(
-                                                                    -1,
-                                                                    6.123234262925839e-17),
-                                                                colors: [
-                                                                  Color
-                                                                      .fromRGBO(
-                                                                          255,
-                                                                          255,
-                                                                          255,
-                                                                          255),
-                                                                  Color
-                                                                      .fromRGBO(
-                                                                          255,
-                                                                          255,
-                                                                          255,
-                                                                          255),
-                                                                ]),
-                                                          ),
-                                                          child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    left: 10,
-                                                                    right: 10),
-                                                            margin:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                              left: 0,
-                                                              right: 0,
-                                                              top: 0,
-                                                              bottom: 10,
-                                                            ),
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            height: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width /
-                                                                2.5,
-                                                            child: Card(
-                                                              elevation: 5,
-                                                              shadowColor:
-                                                                  Colors
-                                                                      .black12,
-                                                              color:
-                                                                  Colors.white,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            18),
-                                                              ),
-                                                              child: Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                      flex:
-                                                                          2, // 20%
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            130,
-                                                                        decoration: BoxDecoration(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            borderRadius: BorderRadius.circular(20)),
-                                                                        width:
-                                                                            100,
-                                                                        margin: const EdgeInsets
-                                                                            .only(
-                                                                            top:
-                                                                                10,
-                                                                            left:
-                                                                                10,
-                                                                            right:
-                                                                                10,
-                                                                            bottom:
-                                                                                10),
-                                                                        child:
-                                                                            ClipRRect(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(20),
-                                                                          // Image border
-                                                                          child:
-                                                                              SizedBox.fromSize(
-                                                                            size:
-                                                                                const Size.fromRadius(48),
-                                                                            // Image radius
-                                                                            child: nearbyLocations[index].photos?[0].photoReference == null
-                                                                                ? Image.network(
-                                                                                    nearbyLocations[index].icon!,
-                                                                                    height: Dimensions.size100,
-                                                                                    width: Dimensions.size100,
-                                                                                  )
-                                                                                : getImage("${nearbyLocations[index].photos?[0].photoReference}", "${nearbyLocations[index].photos?[0].width}") /*Image.network(nearbyLocations[index].icon!,)*/,
-                                                                          ),
-                                                                        ),
-                                                                      )),
-                                                                  Expanded(
-                                                                      flex:
-                                                                          3, // 60%
-                                                                      child:
-                                                                          SingleChildScrollView(
-                                                                        scrollDirection:
-                                                                            Axis.vertical,
-                                                                        child:
-                                                                            Container(
-                                                                          margin: const EdgeInsets
-                                                                              .only(
-                                                                              left: 2,
-                                                                              right: 2,
-                                                                              top: 10),
-                                                                          child:
-                                                                              Column(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.start,
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            mainAxisSize:
-                                                                                MainAxisSize.max,
-                                                                            children: [
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: [
-                                                                                  Expanded(
-                                                                                    child: Text(
-                                                                                      nearbyLocations[index].name!,
-                                                                                      style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.normal),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Container(
-                                                                                    height: 30,
-                                                                                    child: TextButton(
-                                                                                      style: ButtonStyle(
-                                                                                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                                                                      ),
-                                                                                      onPressed: () {},
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          SvgPicture.asset(
-                                                                                            'assets/images/star.svg',
-                                                                                            width: 18,
-                                                                                            color: const Color(0xFFF9BF3A),
-                                                                                          ),
-                                                                                          const SizedBox(
-                                                                                            width: 2,
-                                                                                          ),
-                                                                                          nearbyLocations[index].rating != null
-                                                                                              ? Text(
-                                                                                                  nearbyLocations[index].rating.toString(),
-                                                                                                  style: const TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
-                                                                                                )
-                                                                                              : const Text(
-                                                                                                  "0",
-                                                                                                  style: TextStyle(fontSize: 11, color: Color(0xFF616768), fontWeight: FontWeight.normal),
-                                                                                                ),
-                                                                                          // text
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                height: 2,
-                                                                              ),
-                                                                              Row(
-                                                                                children: [
-                                                                                  Text(
-                                                                                    nearbyLocations[index].types![0],
-                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                    style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
-                                                                                  ),
-                                                                                  Text(
-                                                                                    "",
-                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                    style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.normal),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                height: 2,
-                                                                              ),
-                                                                              Row(
-                                                                                children: [
-                                                                                  Text(
-                                                                                    nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close",
-                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                    style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                height: 10,
-                                                                              ),
-                                                                              Row(
-                                                                                children: [
-                                                                                  Container(
-                                                                                    height: 35,
-                                                                                    child: TextButton(
-                                                                                      style: ButtonStyle(
-                                                                                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                                                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                                                                                          borderRadius: BorderRadius.circular(50.0),
-                                                                                          side: const BorderSide(
-                                                                                            color: Color(0xFFDDE4E4),
-                                                                                          ),
-                                                                                        )),
-                                                                                        padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.only(
-                                                                                          left: 12,
-                                                                                          right: 12,
-                                                                                        )),
-                                                                                      ),
-                                                                                      onPressed: () {},
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          SvgPicture.asset(
-                                                                                            'assets/images/direction-icon.svg',
-                                                                                            width: 18,
-                                                                                            color: const Color(0xFF00B8CA),
-                                                                                          ),
-                                                                                          const SizedBox(
-                                                                                            width: 5,
-                                                                                          ),
-                                                                                          const Text(
-                                                                                            "Directions",
-                                                                                            style: TextStyle(fontSize: 11, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
-                                                                                          ),
-                                                                                          // text
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 10),
-                                                                                  Container(
-                                                                                    height: 36,
-                                                                                    decoration: BoxDecoration(
-                                                                                      borderRadius: BorderRadius.circular(25),
-                                                                                      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                        Color.fromRGBO(31, 203, 220, 1),
-                                                                                        Color.fromRGBO(0, 184, 202, 1)
-                                                                                      ]),
-                                                                                    ),
-                                                                                    child: TextButton(
-                                                                                      style: TextButton.styleFrom(
-                                                                                        foregroundColor: Colors.white,
-                                                                                        padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                        textStyle: const TextStyle(fontSize: 13),
-                                                                                      ),
-                                                                                      onPressed: () async {
-                                                                                        pr4.show();
-
-                                                                                        SharedPreferences pre = await SharedPreferences.getInstance();
-                                                                                        final islogin = pre.getBool("islogin") ?? false;
-                                                                                        final userId = pre.getInt("userId") ?? 0;
-                                                                                        final struserId = userId.toString();
-                                                                                        final strlat = nearbyLocations[index].geometry?.location?.lat.toString();
-                                                                                        final strlng = nearbyLocations[index].geometry?.location?.lng.toString();
-                                                                                        final placeid = nearbyLocations[index].placeId!;
-
-                                                                                        http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", nearbyLocations[index].photos![0].photoReference!, nearbyLocations[index].rating.toString(), "");
-
-                                                                                        print(response);
-
-                                                                                        var pinResponse = jsonDecode(response.body);
-                                                                                        var userResponse = PinThePlace.fromJson(pinResponse);
-
-                                                                                        if (userResponse.status == "200") {
-                                                                                          pr4.hide();
-
-                                                                                          Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                                        } else {
-                                                                                          pr4.hide();
-
-                                                                                          Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                                        }
-                                                                                      },
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          SvgPicture.asset(
-                                                                                            'assets/images/Pin-s.svg',
-                                                                                            width: 11,
-                                                                                            color: Colors.white,
-                                                                                          ),
-                                                                                          const SizedBox(
-                                                                                            width: 5,
-                                                                                          ),
-                                                                                          const Text(
-                                                                                            "Pinned",
-                                                                                            style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
-                                                                                          ),
-                                                                                          // text
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      )),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          )),
-                                                    ),
-                                                  )))
-                                ],
-                              )
-                            : Visibility(
-                                visible: isVisible,
-                                child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: ResponsiveSizer(builder:
-                                        (context, orientation, screenType) {
-                                      return Container(
-                                        padding: const EdgeInsets.all(10),
-                                        height: 25.h,
-                                        width: 100.w,
-                                        margin: EdgeInsets.all(0.5.dp),
-                                        decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10))),
-                                        child: Text(
-                                          "$kename  List Not Found",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 23.sp,
-                                              fontFamily: 'Poppins'),
-                                        ),
-                                      );
-                                    })))))
-              ],
-            ),
-          ),
-          Visibility(
-            visible: isTextVisible,
-            child: Container(
-              // height: MediaQuery.of(context).size.height, // Change as per your requirement
-              // width: MediaQuery.of(context).size.width, // Change as per your requirement
-              margin: EdgeInsets.all(10),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton.extended(
-                  onPressed: () {
-                    if (nearbyLocations2.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CustomAlertDialogShow(
-                                nearbyLocations: nearbyLocations2,
-                                delightId: delightId)),
-                      );
-                    }
-                  },
-                  elevation: 10,
-                  label: Text('Recommend'),
-                  hoverColor: Colors.lightBlueAccent,
+                                                                  ),
+                                                                )),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )),
+                                              ),
+                                            )))
+                              ],
+                            )
+                          : Visibility(
+                              visible: isVisible,
+                              child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: ResponsiveSizer(builder:
+                                      (context, orientation, screenType) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(10),
+                                      height: 25.h,
+                                      width: 100.w,
+                                      margin: EdgeInsets.all(0.5.dp),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Text(
+                                        "$kename  List Not Found",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 23.sp,
+                                            fontFamily: 'Poppins'),
+                                      ),
+                                    );
+                                  }))))),
+              Visibility(
+                visible: isTextVisible,
+                child: Container(
+                  // height: MediaQuery.of(context).size.height, // Change as per your requirement
+                  // width: MediaQuery.of(context).size.width, // Change as per your requirement
+                  margin: EdgeInsets.all(10),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton.extended(
+                      onPressed: () {
+                        if (nearbyLocations2.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CustomAlertDialogShow(
+                                    nearbyLocations: nearbyLocations2,
+                                    delightId: delightId)),
+                          );
+                        }
+                      },
+                      elevation: 10,
+                      label: Text('Recommend'),
+                      hoverColor: Colors.lightBlueAccent,
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              )
+            ],
           )
         ],
       ),
@@ -2031,35 +2081,35 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               print("dataradius$radius3");
 
                               if (0 <= radius3 && radius3 <= 5) {
-                                _determinePosition(kenameType, "500");
-                                setRadiousData("500");
-                              } else if (5 <= radius3 && radius3 <= 10) {
                                 _determinePosition(kenameType, "1000");
                                 setRadiousData("1000");
-                              } else if (10 <= radius3 && radius3 <= 15) {
-                                _determinePosition(kenameType, "1500");
-                                setRadiousData("1500");
-                              } else if (15 <= radius3 && radius3 <= 20) {
+                              } else if (5 <= radius3 && radius3 <= 10) {
                                 _determinePosition(kenameType, "2000");
                                 setRadiousData("2000");
-                              } else if (20 <= radius3 && radius3 <= 25) {
-                                _determinePosition(kenameType, "2500");
-                                setRadiousData("2500");
-                              } else if (25 <= radius3 && radius3 <= 30) {
+                              } else if (10 <= radius3 && radius3 <= 15) {
                                 _determinePosition(kenameType, "3000");
                                 setRadiousData("3000");
-                              } else if (30 <= radius3 && radius3 <= 35) {
-                                _determinePosition(kenameType, "3500");
-                                setRadiousData("3500");
-                              } else if (35 <= radius3 && radius3 <= 40) {
+                              } else if (15 <= radius3 && radius3 <= 20) {
                                 _determinePosition(kenameType, "4000");
                                 setRadiousData("4000");
-                              } else if (40 <= radius3 && radius3 <= 45) {
-                                _determinePosition(kenameType, "4500");
-                                setRadiousData("4500");
-                              } else if (45 <= radius3 && radius3 <= 50) {
+                              } else if (20 <= radius3 && radius3 <= 25) {
                                 _determinePosition(kenameType, "5000");
                                 setRadiousData("5000");
+                              } else if (25 <= radius3 && radius3 <= 30) {
+                                _determinePosition(kenameType, "6000");
+                                setRadiousData("6000");
+                              } else if (30 <= radius3 && radius3 <= 35) {
+                                _determinePosition(kenameType, "7000");
+                                setRadiousData("7000");
+                              } else if (35 <= radius3 && radius3 <= 40) {
+                                _determinePosition(kenameType, "8000");
+                                setRadiousData("8000");
+                              } else if (40 <= radius3 && radius3 <= 45) {
+                                _determinePosition(kenameType, "9000");
+                                setRadiousData("9000");
+                              } else if (45 <= radius3 && radius3 <= 50) {
+                                _determinePosition(kenameType, "10000");
+                                setRadiousData("10000");
                               }
                             })
                       ],

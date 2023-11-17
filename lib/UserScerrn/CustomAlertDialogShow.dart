@@ -33,6 +33,8 @@ class CustomAlertDialogShow extends StatefulWidget {
 class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
   bool isVisible = false;
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
+  bool isSelected = false;
+  int curIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,8 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                   height: 20,
                   width: 20,
                 ),
-                onPressed: () =>  Navigator.pop(context)/*Get.toNamed(RouteHelper.getHomeScreenpage())*/,
+                onPressed: () => Navigator.pop(
+                    context) /*Get.toNamed(RouteHelper.getHomeScreenpage())*/,
               ),
               backgroundColor: Colors.white,
               title: Text(
@@ -300,6 +303,10 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                               10,
                                                                         ),
                                                                         Row(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
                                                                           children: [
                                                                             Container(
                                                                               height: 35,
@@ -313,8 +320,8 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                     ),
                                                                                   )),
                                                                                   padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.only(
-                                                                                    left: 12,
-                                                                                    right: 12,
+                                                                                    left: 10,
+                                                                                    right: 10,
                                                                                   )),
                                                                                 ),
                                                                                 onPressed: () {},
@@ -322,39 +329,73 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                   children: <Widget>[
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/direction-icon.svg',
-                                                                                      width: 18,
+                                                                                      width: 15,
                                                                                       color: const Color(0xFF00B8CA),
                                                                                     ),
                                                                                     const SizedBox(
                                                                                       width: 5,
                                                                                     ),
-                                                                                    const Text(
+                                                                                    Text(
                                                                                       "Directions",
-                                                                                      style: TextStyle(fontSize: 11, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
+                                                                                      style: TextStyle(fontSize: 13.sp, color: Color(0xFF00B8CA), fontWeight: FontWeight.normal),
                                                                                     ),
                                                                                     // text
                                                                                   ],
                                                                                 ),
                                                                               ),
                                                                             ),
-                                                                            const SizedBox(width: 10),
+                                                                            const SizedBox(width: 6),
                                                                             Container(
-                                                                              height: 36,
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(25),
-                                                                                gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                  Color.fromRGBO(31, 203, 220, 1),
-                                                                                  Color.fromRGBO(0, 184, 202, 1)
-                                                                                ]),
-                                                                              ),
+                                                                              height: 35,
+                                                                              decoration: curIndex == index
+                                                                                  ? isSelected == true
+                                                                                      ? BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                            Color.fromRGBO(255, 255, 255, 255),
+                                                                                          ]))
+                                                                                      : BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(25),
+                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                            Color.fromRGBO(31, 203, 220, 1),
+                                                                                            Color.fromRGBO(0, 184, 202, 1)
+                                                                                          ]),
+                                                                                        )
+                                                                                  : BoxDecoration(
+                                                                                      borderRadius: BorderRadius.circular(25),
+                                                                                      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                        Color.fromRGBO(31, 203, 220, 1),
+                                                                                        Color.fromRGBO(0, 184, 202, 1)
+                                                                                      ]),
+                                                                                    ),
                                                                               child: TextButton(
-                                                                                style: TextButton.styleFrom(
-                                                                                  foregroundColor: Colors.white,
-                                                                                  padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                  textStyle: const TextStyle(fontSize: 13),
-                                                                                ),
+                                                                                style: curIndex == index
+                                                                                    ? isSelected == true
+                                                                                        ? TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(25.0),
+                                                                                            ),
+                                                                                            side: const BorderSide(
+                                                                                              color: Color(0xFFDDE4E4),
+                                                                                            ),
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                        : TextButton.styleFrom(
+                                                                                            foregroundColor: Colors.white,
+                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                            textStyle: TextStyle(fontSize: 13.sp),
+                                                                                          )
+                                                                                    : TextButton.styleFrom(
+                                                                                        foregroundColor: Colors.white,
+                                                                                        padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                        textStyle: TextStyle(fontSize: 13.sp),
+                                                                                      ),
                                                                                 onPressed: () async {
                                                                                   // pr4.show();
+                                                                                  curIndex = index;
 
                                                                                   SharedPreferences pre = await SharedPreferences.getInstance();
                                                                                   final islogin = pre.getBool("islogin") ?? false;
@@ -375,6 +416,10 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                     //   pr4.hide();
 
                                                                                     Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                    setState(() {
+                                                                                      isSelected = true;
+                                                                                    });
                                                                                   } else {
                                                                                     //   pr4.hide();
 
@@ -386,14 +431,25 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/Pin-s.svg',
                                                                                       width: 11,
-                                                                                      color: Colors.white,
+                                                                                      color: curIndex == index
+                                                                                          ? isSelected == true
+                                                                                              ? Color(0xFF00B8CA)
+                                                                                              : Color(0xFFFFFFFFF)
+                                                                                          : Color(0xFFFFFFFFF) /*Colors.white*/,
                                                                                     ),
                                                                                     const SizedBox(
                                                                                       width: 5,
                                                                                     ),
-                                                                                    const Text(
+                                                                                    Text(
                                                                                       "Pinned",
-                                                                                      style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.normal),
+                                                                                      style: TextStyle(
+                                                                                          fontSize: 13.sp,
+                                                                                          color: curIndex == index
+                                                                                              ? isSelected == true
+                                                                                                  ? Color(0xFF00B8CA)
+                                                                                                  : Color(0xFFFFFFFFF)
+                                                                                              : Color(0xFFFFFFFFF),
+                                                                                          fontWeight: FontWeight.normal),
                                                                                     ),
                                                                                     // text
                                                                                   ],

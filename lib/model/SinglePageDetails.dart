@@ -362,14 +362,14 @@ class EditorialSummary {
 }
 
 class Geometry {
-  Location? location;
+  Location1? location;
   Viewport? viewport;
 
   Geometry({this.location, this.viewport});
 
   Geometry.fromJson(Map<String, dynamic> json) {
     location = json['location'] != null
-        ? new Location.fromJson(json['location'])
+        ? new Location1.fromJson(json['location'])
         : null;
     viewport = json['viewport'] != null
         ? new Viewport.fromJson(json['viewport'])
@@ -388,13 +388,13 @@ class Geometry {
   }
 }
 
-class Location {
+class Location1 {
   double? lat;
   double? lng;
 
-  Location({this.lat, this.lng});
+  Location1({this.lat, this.lng});
 
-  Location.fromJson(Map<String, dynamic> json) {
+  Location1.fromJson(Map<String, dynamic> json) {
     lat = json['lat'];
     lng = json['lng'];
   }
@@ -408,17 +408,17 @@ class Location {
 }
 
 class Viewport {
-  Location? northeast;
-  Location? southwest;
+  Location1? northeast;
+  Location1? southwest;
 
   Viewport({this.northeast, this.southwest});
 
   Viewport.fromJson(Map<String, dynamic> json) {
     northeast = json['northeast'] != null
-        ? new Location.fromJson(json['northeast'])
+        ? new Location1.fromJson(json['northeast'])
         : null;
     southwest = json['southwest'] != null
-        ? new Location.fromJson(json['southwest'])
+        ? new Location1.fromJson(json['southwest'])
         : null;
   }
 

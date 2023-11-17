@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -56,14 +60,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   List<VideoReviewDetails> videoreviewDet = [];
 
   int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0;
-  String placeId = "",
-      strrating = "",
-      reviewlist = "",
-      reviewlist1 = "",
-      reviewlist2 = "",
-      profileImage = "",
-      openHours = "",
-      delightId = "";
+  String placeId = "", strrating = "", reviewlist = "", reviewlist1 = "", reviewlist2 = "",
+      profileImage = "", openHours = "", delightId = "", str_Url = "";
+
+  double startlatitude1 = 0.0, startlongitude1 = 0.0, locationlatitude1 = 0.0, locationlongitude2 = 0.0, valuedistansce2 = 0.0;
 
   bool isVisible = false, isVisible1 = false;
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
@@ -72,12 +72,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
   //String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
 
   VideoPlayerController? controller;
-  String videoUrl =
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
+  String videoUrl = 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
 
   List<Widget> cards = List.generate(5, (i) => CustomCard()).toList();
 
   Future<SinglePageDetails> getSinglePlace() async {
+
     SharedPreferences pre = await SharedPreferences.getInstance();
     placeId = pre.getString("placeId") ?? "";
     delightId = pre.getString("delightId") ?? "";
@@ -99,17 +99,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
     reviewlist = singlePageDetails.result?.reviews?.length.toString() ?? "";
 
     datadouble = singlePageDetails.result?.reviews?.length ?? 0;
-    openHours = singlePageDetails
-            .result?.currentOpeningHours?.periods?[0].close?.time ??
-        "";
+    openHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.time ?? "";
+    str_Url = singlePageDetails.result!.url!;
 
     // SharedPreferences pre1 = await SharedPreferences.getInstance();
     pre.setString("placename", singlePageDetails.result!.name!);
     pre.setString("placeType", singlePageDetails.result!.types![0]);
-    pre.setString("profileImage",
-        singlePageDetails.result?.photos?[0].photoReference ?? "");
-    pre.setInt(
-        "profileImagehight", singlePageDetails.result?.photos?[0].width ?? 0);
+    pre.setString("profileImage", singlePageDetails.result?.photos?[0].photoReference ?? "");
+    pre.setInt("profileImagehight", singlePageDetails.result?.photos?[0].width ?? 0);
 
     if (reviewlist.length == 0) {
       reviewlist1 = "Reviews";
@@ -130,18 +127,71 @@ class _DetailsScreenState extends State<DetailsScreen> {
       isVisible1 = true;
     }
 
-    item1.add(strrating);
-    item1.add("0 km");
-    item1.add("0 pins");
+     _determinePosition1(locationlatitude1,locationlongitude2);
 
-    item2.add(reviewlist1);
-    item2.add("Directions");
-    item2.add("Pins this");
+    bool serviceEnabler;
+    LocationPermission permission;
+
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return Future.error("Location Permission is denide");
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return Future.error("Location Permission is denide");
+      }
+    }
+
+    permission = await Geolocator.checkPermission();
+    Position position = await Geolocator.getCurrentPosition();
+    _locationData = await location.getLocation();
+
+    startlatitude1 = _locationData.latitude!;
+    startlongitude1 = _locationData.longitude!;
+
+     locationlatitude1 = singlePageDetails.result!.geometry!.location!.lat!;
+     locationlongitude2 = singlePageDetails.result!.geometry!.location!.lng!;
+
+     valuedistansce2 = calculateDistance2(startlatitude1,startlongitude1,locationlatitude1,locationlongitude2);
+     String number = valuedistansce2.toStringAsFixed(2);
+     double distance =  double.parse(number);
+
+     item1.add(strrating);
+     item1.add("$distance km");
+     item1.add("0 pins");
+
+     item2.add(reviewlist1);
+     item2.add("Directions");
+     item2.add("Pins this");
+
+
+
+    if (kDebugMode) {
+      print("latitudedetails1 $startlatitude1");
+      print("latitudedetails $startlongitude1");
+
+    }
+    // double value = position12 as double;
+
 
     print(photo);
     print(placeId);
 
     //   Future.delayed( Duration(seconds: 1)).then((value) => setState(() {}));
+
+
 
     return singlePageDetails;
   }
@@ -294,7 +344,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
             color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
         messageTextStyle: const TextStyle(
             color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w600));
-
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -461,51 +510,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                       alignment:
                                                           Alignment.center,
                                                       child: ListView(
-                                                        scrollDirection:
-                                                            Axis.horizontal,
-                                                        children: dataList
-                                                            .map((data) {
+                                                        scrollDirection: Axis.horizontal,
+                                                        children: dataList.map((data) {
                                                           return InkWell(
                                                             onTap: () {
-                                                              if (data.name ==
-                                                                  "Facebook") {
-                                                                onButtonTap(
-                                                                    Share
-                                                                        .facebook,
-                                                                    strData,
-                                                                    strPhotourl);
-                                                              } else if (data
-                                                                      .name ==
-                                                                  "Whatsapp") {
-                                                                onButtonTap(
-                                                                    Share
-                                                                        .whatsapp,
-                                                                    strData,
-                                                                    strPhotourl);
-                                                              } else if (data
-                                                                      .name ==
-                                                                  "Whatsapp Business") {
-                                                                onButtonTap(
-                                                                    Share
-                                                                        .whatsapp_business,
-                                                                    strData,
-                                                                    strPhotourl);
-                                                              } else if (data
-                                                                      .name ==
-                                                                  "Twitter") {
-                                                                onButtonTap(
-                                                                    Share
-                                                                        .twitter,
-                                                                    strData,
-                                                                    strPhotourl);
-                                                              } else if (data
-                                                                      .name ==
-                                                                  "More") {
-                                                                onButtonTap(
-                                                                    Share
-                                                                        .share_system,
-                                                                    strData,
-                                                                    strPhotourl);
+                                                              if (data.name == "Facebook") {onButtonTap(Share.facebook, strData, strPhotourl);
+                                                              } else if (data.name == "Whatsapp") {
+                                                                onButtonTap(Share.whatsapp, strData, strPhotourl);
+                                                              } else if (data.name == "Whatsapp Business") {
+                                                                onButtonTap(Share.whatsapp_business, strData, strPhotourl);
+                                                              } else if (data.name == "Twitter") {
+                                                                onButtonTap(Share.twitter, strData, strPhotourl);
+                                                              } else if (data.name == "More") {
+                                                                onButtonTap(Share.share_system, strData, strPhotourl);
                                                               }
                                                             },
                                                             child: Container(
@@ -562,30 +579,38 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     ),
                                   ],
                                 ),
-                                Row(
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       singlePageDetails.result?.types?[0] ?? "",
                                       style: const TextStyle(
                                           color: Colors.black54, fontSize: 14),
                                     ),
-                                    Text(
-                                      singlePageDetails
-                                                  .result?.businessStatus ==
-                                              "OPERATIONAL"
-                                          ? " open:  "
-                                          : " close",
-                                      style: TextStyle(
-                                          color: Colors.green, fontSize: 14),
-                                    ),
-                                    Text(
-                                      openHours == ""
-                                          ? ""
-                                          : " Close  "
-                                              "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}",
-                                      style: TextStyle(
-                                          color: Colors.black54, fontSize: 14),
-                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          singlePageDetails
+                                                      .result?.businessStatus ==
+                                                  "OPERATIONAL"
+                                              ? " open:  "
+                                              : " close",
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 14),
+                                        ),
+                                        Text(
+                                          openHours == ""
+                                              ? ""
+                                              : " Close  "
+                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}",
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 14),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 )
                               ],
@@ -606,8 +631,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       child: GestureDetector(
                                         onTap: () async {
                                           if (index == 2) {
-
-                                             pr15.show();
+                                            pr15.show();
 
                                             SharedPreferences pre =
                                                 await SharedPreferences
@@ -617,25 +641,45 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             final userId =
                                                 pre.getInt("userId") ?? 0;
                                             final struserId = userId.toString();
-                                            final strlat = singlePageDetails.result!.geometry?.location?.lat.toString();
-                                            final strlng = singlePageDetails.result!.geometry?.location?.lng.toString();
-                                            final placeid = singlePageDetails.result!.placeId!;
+                                            final strlat = singlePageDetails
+                                                .result!.geometry?.location?.lat
+                                                .toString();
+                                            final strlng = singlePageDetails
+                                                .result!.geometry?.location?.lng
+                                                .toString();
+                                            final placeid = singlePageDetails
+                                                .result!.placeId!;
 
                                             http.Response response =
                                                 await PinPlaces()
                                                     .insertPinPlaces(
                                                         struserId,
                                                         delightId,
-                                                        singlePageDetails.result!.types![0],
+                                                        singlePageDetails
+                                                            .result!.types![0],
                                                         placeid,
                                                         strlat!,
                                                         strlng!,
-                                                        singlePageDetails.result!.name!,
+                                                        singlePageDetails
+                                                            .result!.name!,
                                                         "",
-                                                       singlePageDetails.result!.vicinity!,
-                                                        "", "", "", "", "", "", "", "",
-                                                       singlePageDetails.result!.photos![0].photoReference!,
-                                                        singlePageDetails.result!.rating.toString(),
+                                                        singlePageDetails
+                                                            .result!.vicinity!,
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        singlePageDetails
+                                                            .result!
+                                                            .photos![0]
+                                                            .photoReference!,
+                                                        singlePageDetails
+                                                            .result!.rating
+                                                            .toString(),
                                                         "");
 
                                             print(response);
@@ -1874,7 +1918,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Future<void> onButtonTap(
       Share share, String strData, String strPhotourl) async {
     String url = getImage1(strPhotourl);
-    String msg = "$strData, $url";
+    String msg = "$strData, $str_Url";
 
     String? response;
     final FlutterShareMe flutterShareMe = FlutterShareMe();
@@ -1931,6 +1975,64 @@ class _DetailsScreenState extends State<DetailsScreen> {
       duration: const Duration(seconds: 3),
       leftBarIndicatorColor: Colors.red[300],
     ).show(context);
+  }
+
+  _determinePosition1(double latitude, double longitude) async {
+
+    bool serviceEnabler;
+    LocationPermission permission;
+
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return Future.error("Location Permission is denide");
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return Future.error("Location Permission is denide");
+      }
+    }
+
+    permission = await Geolocator.checkPermission();
+    Position position = await Geolocator.getCurrentPosition();
+    _locationData = await location.getLocation();
+
+    startlatitude1 = _locationData.latitude!;
+    startlongitude1 = _locationData.longitude!;
+
+     valuedistansce2 = calculateDistance2(startlatitude1,startlongitude1,latitude,longitude);
+
+
+
+    if (kDebugMode) {
+      print("latitudedetails1 $startlatitude1");
+      print("latitudedetails $startlongitude1");
+
+    }
+
+   // Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+  }
+
+   double calculateDistance2(lat1, lon1, lat2, lon2) {
+
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+
   }
 }
 

@@ -838,8 +838,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                     Container(
                         child: FutureBuilder(
                       future: showAppPin(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
+                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                         if (snapshot.hasData) {
                           return Column(
                             children: [
@@ -1244,7 +1243,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                                               child: Container(
                                                                                   height: MediaQuery.of(context).size.height / 10,
                                                                                   width: MediaQuery.of(context).size.width,
-                                                                                  margin: EdgeInsets.only(top: 20, left: 10, right: 10),
+                                                                                  margin: EdgeInsets.only(left: 10, right: 10,bottom: 10),
                                                                                   decoration: BoxDecoration(
                                                                                     color: Color(0xFFffffff),
                                                                                     boxShadow: [

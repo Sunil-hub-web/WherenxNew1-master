@@ -19,7 +19,11 @@ class AddEventsDetails extends StatefulWidget {
 }
 
 class _AddEventsDetailsState extends State<AddEventsDetails> {
-  TextEditingController textarea = TextEditingController();
+  TextEditingController textYouName = TextEditingController();
+  TextEditingController textYourEventName = TextEditingController();
+  TextEditingController textEventType = TextEditingController();
+  TextEditingController textEventAddress = TextEditingController();
+  TextEditingController textEventDescription = TextEditingController();
   TextEditingController currentDateTime = TextEditingController();
 
   final ImagePicker imgpicker = ImagePicker();
@@ -252,7 +256,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextFormField(
-                      controller: textarea,
+                      controller: textYouName,
                       minLines: 1,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
@@ -275,7 +279,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextFormField(
-                      controller: textarea,
+                      controller: textYourEventName,
                       minLines: 1,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
@@ -298,7 +302,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextFormField(
-                      controller: textarea,
+                      controller: textEventType,
                       minLines: 1,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
@@ -348,7 +352,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextFormField(
-                      controller: textarea,
+                      controller: textEventAddress,
                       minLines: 1,
                       maxLines: 3,
                       keyboardType: TextInputType.multiline,
@@ -371,7 +375,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextFormField(
-                      controller: textarea,
+                      controller: textEventDescription,
                       minLines: 5,
                       maxLines: 5,
                       keyboardType: TextInputType.multiline,

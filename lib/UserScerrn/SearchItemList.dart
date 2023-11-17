@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:flutter_svg/svg.dart';
@@ -122,7 +123,7 @@ class _SearchItemListState extends State<SearchItemList> {
 
   @override
   void initState() {
-    showAppPin();
+  //  showAppPin();
     super.initState();
   }
 
@@ -187,7 +188,14 @@ class _SearchItemListState extends State<SearchItemList> {
                       ),
                     ),
                   ),
-                  Expanded(
+                  Container(
+                    child: FutureBuilder(
+                        future: showAppPin(),
+                        builder: (context,AsyncSnapshot<dynamic> snapshot){
+
+                          if(snapshot.hasData){
+
+                            return  Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
                       itemCount: items.length,
@@ -405,10 +413,10 @@ class _SearchItemListState extends State<SearchItemList> {
                                                       const SizedBox(
                                                         width: 5,
                                                       ),
-                                                      const Text(
+                                                      Text(
                                                         "Directions",
                                                         style: TextStyle(
-                                                            fontSize: 11,
+                                                            fontSize: 13.sp,
                                                             color: Color(
                                                                 0xFF00B8CA),
                                                             fontWeight:
@@ -420,7 +428,7 @@ class _SearchItemListState extends State<SearchItemList> {
                                                   ),
                                                 ),
                                               ),
-                                              const SizedBox(width: 10),
+                                              SizedBox(width: 6),
                                               Container(
                                                 height: 36,
                                                 decoration: BoxDecoration(
@@ -449,8 +457,8 @@ class _SearchItemListState extends State<SearchItemList> {
                                                             right: 12,
                                                             top: 5.0,
                                                             bottom: 5.0),
-                                                    textStyle: const TextStyle(
-                                                        fontSize: 13),
+                                                    textStyle: TextStyle(
+                                                        fontSize: 13.sp),
                                                   ),
                                                   onPressed: () {
                                                     String str_photourl =
@@ -696,7 +704,17 @@ class _SearchItemListState extends State<SearchItemList> {
                         );
                       },
                     ),
-                  ),
+                  );
+
+                          }else{
+
+                            return  Center(child: CircularProgressIndicator());
+                          }
+
+                        }
+                    ),
+                  )
+
                 ],
               ),
             ));

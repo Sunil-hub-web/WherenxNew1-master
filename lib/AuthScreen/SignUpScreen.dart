@@ -1072,10 +1072,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
         SharedPreferences pre =
         await SharedPreferences.getInstance();
-        pre.setString(
-            "name",
-            userRegister
-                .data!.name!); //save integer
+        pre.setString("name", userRegister.data!.name!); //save integer
         pre.setString(
             "email",
             userRegister

@@ -122,25 +122,25 @@ class _UserProfileState extends State<UserProfile> {
 
       String srtRadius = radius.toString();
 
-      if (srtRadius == "500") {
+      if (srtRadius == "1000") {
         dropValue = "0-5";
-      } else if (srtRadius == "1000") {
-        dropValue = "5-10";
-      } else if (srtRadius == "1500") {
-        dropValue = "10-15";
       } else if (srtRadius == "2000") {
-        dropValue = "15-20";
-      } else if (srtRadius == "2500") {
-        dropValue = "20-25";
+        dropValue = "5-10";
       } else if (srtRadius == "3000") {
-        dropValue = "25-30";
-      } else if (srtRadius == "3500") {
-        dropValue = "30-35";
+        dropValue = "10-15";
       } else if (srtRadius == "4000") {
-        dropValue = "35-40";
-      } else if (srtRadius == "4500") {
-        dropValue = "40-45";
+        dropValue = "15-20";
       } else if (srtRadius == "5000") {
+        dropValue = "20-25";
+      } else if (srtRadius == "6000") {
+        dropValue = "25-30";
+      } else if (srtRadius == "7000") {
+        dropValue = "30-35";
+      } else if (srtRadius == "8000") {
+        dropValue = "35-40";
+      } else if (srtRadius == "9000") {
+        dropValue = "40-45";
+      } else if (srtRadius == "10000") {
         dropValue = "45-50";
       }
 
@@ -208,16 +208,16 @@ class _UserProfileState extends State<UserProfile> {
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(value: "500", child: Text("0-5")),
-      const DropdownMenuItem(value: "1000", child: Text("5-10")),
-      const DropdownMenuItem(value: "1500", child: Text("10-15")),
-      const DropdownMenuItem(value: "2000", child: Text("15-20")),
-      const DropdownMenuItem(value: "2500", child: Text("20-25")),
-      const DropdownMenuItem(value: "3000", child: Text("25-30")),
-      const DropdownMenuItem(value: "3500", child: Text("30-35")),
-      const DropdownMenuItem(value: "4000", child: Text("35-40")),
-      const DropdownMenuItem(value: "4500", child: Text("40-45")),
-      const DropdownMenuItem(value: "5000", child: Text("45-50")),
+      const DropdownMenuItem(value: "1000", child: Text("0-5")),
+      const DropdownMenuItem(value: "2000", child: Text("5-10")),
+      const DropdownMenuItem(value: "3000", child: Text("10-15")),
+      const DropdownMenuItem(value: "4000", child: Text("15-20")),
+      const DropdownMenuItem(value: "5000", child: Text("20-25")),
+      const DropdownMenuItem(value: "6000", child: Text("25-30")),
+      const DropdownMenuItem(value: "7000", child: Text("30-35")),
+      const DropdownMenuItem(value: "8000", child: Text("35-40")),
+      const DropdownMenuItem(value: "9000", child: Text("40-45")),
+      const DropdownMenuItem(value: "10000", child: Text("45-50")),
     ];
     return menuItems;
   }
@@ -1097,77 +1097,46 @@ class _UserProfileState extends State<UserProfile> {
                                                                 ),
                                                                 border:
                                                                     OutlineInputBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .all(
-                                                                    Radius
-                                                                        .circular(
-                                                                            12),
+                                                                  borderRadius: BorderRadius.all(Radius.circular(12),
                                                                   ),
                                                                 ),
                                                                 filled: true,
-                                                                fillColor:
-                                                                    Colors
-                                                                        .white,
+                                                                fillColor: Colors.white,
                                                               ),
                                                               // validator: (value) => value == null
                                                               //     ? "Select a country"
                                                               //     : null,
-                                                              dropdownColor:
-                                                                  Colors.white,
-                                                              value:
-                                                                  dropdownCountry,
+                                                              dropdownColor: Colors.white,
+                                                              value: dropdownCountry,
                                                               isExpanded: true,
                                                               itemHeight: null,
-                                                              items:
-                                                                  dropdownItems,
-                                                              onChanged:
-                                                                  (newValue) async {
-                                                                dropdownCountry =
-                                                                    ((newValue ??
-                                                                            "")
-                                                                        as String?)!;
+                                                              items: dropdownItems,
+                                                              onChanged: (newValue) async {
 
-                                                                String
-                                                                    strUserid =
-                                                                    userId
-                                                                        .toString();
+                                                                dropdownCountry = ((newValue ?? "") as String?)!;
 
-                                                                http.Response
-                                                                    response =
-                                                                    await AddKMRadius().addkmRadius(
-                                                                        strUserid,
-                                                                        dropdownCountry!);
-                                                                var jsonResponse =
-                                                                    jsonDecode(
-                                                                        response
-                                                                            .body);
-                                                                var userResponse =
-                                                                    SuccessResponseKM
-                                                                        .fromJson(
-                                                                            jsonResponse);
+                                                                String strUserid = userId.toString();
 
-                                                                if (userResponse
-                                                                        .status ==
-                                                                    "success") {
+                                                                http.Response response = await AddKMRadius().addkmRadius(strUserid, dropdownCountry!);
+                                                                var jsonResponse = jsonDecode(response.body);
+                                                                var userResponse = SuccessResponseKM.fromJson(jsonResponse);
+
+                                                                if (userResponse.status == "success") {
+
+                                                                   var dropdownCountry1 = int.parse(dropdownCountry!);
+
+                                                                   SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                   pre.setInt("radius", dropdownCountry1); //save String
+
                                                                   Fluttertoast.showToast(
-                                                                      msg: userResponse
-                                                                          .message!,
-                                                                      toastLength:
-                                                                          Toast
-                                                                              .LENGTH_SHORT,
-                                                                      gravity: ToastGravity
-                                                                          .BOTTOM,
-                                                                      timeInSecForIosWeb:
-                                                                          1,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .green,
-                                                                      textColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      fontSize:
-                                                                          16.0);
+                                                                      msg: userResponse.message!,
+                                                                      toastLength: Toast.LENGTH_SHORT,
+                                                                      gravity: ToastGravity.BOTTOM,
+                                                                      timeInSecForIosWeb: 1,
+                                                                      backgroundColor: Colors.green,
+                                                                      textColor: Colors.white,
+                                                                      fontSize: 16.0);
+
                                                                 } else {
                                                                   Fluttertoast.showToast(
                                                                       msg: userResponse
