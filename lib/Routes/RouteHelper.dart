@@ -171,7 +171,7 @@ class RouteHelper {
     GetPage(
         name: videoReviewDetailsScreen,
         page: () {
-          return VideoReviewDetailsScreen(filePath: '', videorating: '', videoDate: '', videoName: '',);
+          return VideoReviewDetailsScreen(filePath: '', videorating: '', videoDate: '', videoName: '', profileImage: '',);
         },
         transition: Transition.fadeIn),
   ];

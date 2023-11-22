@@ -23,5 +23,6 @@ class ApiUrl {
   static String near_by_pin_location = "${baseUrl}near-by-pin-location";
   static String show_recent_pin = "${baseUrl}show-recent-pin";
   static String view_user_video_reviews = "${baseUrl}view-user-video-reviews";
+  static String delete_business_pin = "${baseUrl}delete-business-pin";
 
 }

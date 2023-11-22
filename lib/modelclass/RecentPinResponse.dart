@@ -30,6 +30,7 @@ class RecentPinResponse {
 class RecentPin {
   int? id;
   int? userId;
+  String? namefromDelightlist;
   String? delightName;
   String? placeId;
   String? latitude;
@@ -49,33 +50,39 @@ class RecentPin {
   String? rating;
   String? commentsrating;
   String? createdAt;
+  String? openClose;
+  String? mapurl;
 
   RecentPin(
       {this.id,
-        this.userId,
-        this.delightName,
-        this.placeId,
-        this.latitude,
-        this.longitude,
-        this.name,
-        this.website,
-        this.address,
-        this.city,
-        this.state,
-        this.zip,
-        this.phonenumber,
-        this.description,
-        this.opentime,
-        this.closetime,
-        this.openfromto,
-        this.photolink,
-        this.rating,
-        this.commentsrating,
-        this.createdAt});
+      this.userId,
+      this.namefromDelightlist,
+      this.delightName,
+      this.placeId,
+      this.latitude,
+      this.longitude,
+      this.name,
+      this.website,
+      this.address,
+      this.city,
+      this.state,
+      this.zip,
+      this.phonenumber,
+      this.description,
+      this.opentime,
+      this.closetime,
+      this.openfromto,
+      this.photolink,
+      this.rating,
+      this.commentsrating,
+      this.createdAt,
+      this.openClose,
+      this.mapurl});
 
   RecentPin.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
+    namefromDelightlist = json['namefromDelightlist'];
     delightName = json['delight_name'];
     placeId = json['place_id'];
     latitude = json['latitude'];
@@ -95,12 +102,15 @@ class RecentPin {
     rating = json['rating'];
     commentsrating = json['commentsrating'];
     createdAt = json['created_at'];
+    openClose = json['openClose'];
+    mapurl = json['mapurl'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
+    data['namefromDelightlist'] = this.namefromDelightlist;
     data['delight_name'] = this.delightName;
     data['place_id'] = this.placeId;
     data['latitude'] = this.latitude;
@@ -120,6 +130,8 @@ class RecentPin {
     data['rating'] = this.rating;
     data['commentsrating'] = this.commentsrating;
     data['created_at'] = this.createdAt;
+    data['openClose'] = this.openClose;
+    data['mapurl'] = this.mapurl;
     return data;
   }
 }

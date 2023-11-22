@@ -22,6 +22,7 @@ import 'package:wherenxnew1/modelclass/RecentPinResponse.dart';
 import 'package:wherenxnew1/modelclass/ShowAllPinResponse.dart';
 import 'package:wherenxnew1/modelclass/ViewDelightList.dart';
 import '../Dimension.dart';
+import '../Helper/img.dart';
 import '../Routes/RouteHelper.dart';
 import 'package:http/http.dart' as http;
 
@@ -519,8 +520,9 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                           Dimensions.size12),
                                                     ),
                                                   ),
-                                                  child: getImage(
-                                                      "${locationList[index].photolink}"),
+                                                  child: locationList[index].photolink == null
+                                                      ? Image.asset(Img.get('resort_restarunts.jpg'),fit: BoxFit.cover)
+                                                      : getImage("${locationList[index].photolink}"),
                                                 ),
                                                 Container(
                                                   margin: const EdgeInsets.only(
@@ -599,7 +601,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                       Row(
                                                         children: [
                                                           Text(
-                                                            "",
+                                                            "${locationList[index].openClose}",
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -736,8 +738,9 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                           Dimensions.size12),
                                                     ),
                                                   ),
-                                                  child: getImage(
-                                                      "${recentPinDet[index].photolink}"),
+                                                  child: recentPinDet[index].photolink == null
+                                                      ? Image.asset(Img.get('resort_restarunts.jpg'), fit: BoxFit.cover)
+                                                      : getImage("${recentPinDet[index].photolink}"),
                                                 ),
                                                 Container(
                                                   margin: const EdgeInsets.only(
@@ -802,7 +805,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                       Row(
                                                         children: [
                                                           Text(
-                                                            "",
+                                                            "${recentPinDet[index].openClose}",
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -954,7 +957,21 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                             Dimensions.size12),
                                                       ),
                                                     ),
-                                                    child: ClipRRect(
+                                                    child: userinfoPin[index].photolink == null ?
+                                                          ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      // Image border
+                                                      child: SizedBox.fromSize(
+                                                        size:
+                                                            Size.fromRadius(48),
+                                                        // Image radius
+                                                        child: Image.asset(Img.get('resort_restarunts.jpg'),
+                                                               fit: BoxFit.cover) /*Image.network(nearbyLocations[index].icon!,)*/,
+                                                      ),
+                                                    )
+                                                        : ClipRRect(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               20),
@@ -1088,7 +1105,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                             Row(
                                                               children: [
                                                                 Text(
-                                                                  "",
+                                                                  "${userinfoPin[index].openClose}",
                                                                   overflow:
                                                                       TextOverflow
                                                                           .ellipsis,
@@ -1216,12 +1233,9 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                                       ),
                                                                         onPressed:
                                                                         () {
-                                                                      String
-                                                                          str_photourl =
-                                                                          "${userinfoPin[index].photolink}";
+                                                                      String str_photourl = "${userinfoPin[index].mapurl}";
 
-                                                                      String
-                                                                          str_Data =
+                                                                      String str_Data =
                                                                           "${userinfoPin[index].delightName}, ${userinfoPin[index].rating}, ${userinfoPin[index].latitude}, "
                                                                           " ${userinfoPin[index].longitude}}";
 
@@ -1613,7 +1627,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
   }
 
   Future<void> onButtonTap(Share share, String str_data, String str_photourl) async {
-     String url = getImage1(str_photourl);
+     String url = str_photourl;
      String msg = "$str_data,$url";
 
 

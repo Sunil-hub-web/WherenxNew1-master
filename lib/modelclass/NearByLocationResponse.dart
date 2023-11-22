@@ -46,27 +46,31 @@ class LocationList {
   String? openfromto;
   String? rating;
   String? commentsrating;
+  String? openClose;
+  String? mapurl;
   double? distance;
 
   LocationList(
       {this.id,
-        this.userId,
-        this.namefromDelightlist,
-        this.delightName,
-        this.name,
-        this.latitude,
-        this.longitude,
-        this.placeId,
-        this.photolink,
-        this.city,
-        this.state,
-        this.zip,
-        this.opentime,
-        this.closetime,
-        this.openfromto,
-        this.rating,
-        this.commentsrating,
-        this.distance});
+      this.userId,
+      this.namefromDelightlist,
+      this.delightName,
+      this.name,
+      this.latitude,
+      this.longitude,
+      this.placeId,
+      this.photolink,
+      this.city,
+      this.state,
+      this.zip,
+      this.opentime,
+      this.closetime,
+      this.openfromto,
+      this.rating,
+      this.commentsrating,
+      this.openClose,
+      this.mapurl,
+      this.distance});
 
   LocationList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -86,6 +90,8 @@ class LocationList {
     openfromto = json['openfromto'];
     rating = json['rating'];
     commentsrating = json['commentsrating'];
+    openClose = json['openClose'];
+    mapurl = json['mapurl'];
     distance = json['distance'];
   }
 
@@ -108,6 +114,8 @@ class LocationList {
     data['openfromto'] = this.openfromto;
     data['rating'] = this.rating;
     data['commentsrating'] = this.commentsrating;
+    data['openClose'] = this.openClose;
+    data['mapurl'] = this.mapurl;
     data['distance'] = this.distance;
     return data;
   }

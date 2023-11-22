@@ -15,12 +15,16 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wherenxnew1/ApiCallingPage/DeletePinRequest.dart';
 import 'package:wherenxnew1/ApiCallingPage/ViewReviewList.dart';
 import 'package:wherenxnew1/ApiCallingPage/ViewVideoReview.dart';
 import 'package:wherenxnew1/UserScerrn/VideoReviewDetailsScreen.dart';
 import 'package:wherenxnew1/model/SinglePageDetails.dart';
+import 'package:wherenxnew1/modelclass/DeletePinData.dart';
 import 'package:wherenxnew1/modelclass/ViewReviewResponse.dart';
 import '../ApiCallingPage/PinThePlaceFile.dart';
+import '../ApiCallingPage/ViewUserProfileImage.dart';
+import '../ApiImplement/ViewDialog.dart';
 import '../Dimension.dart';
 import '../Helper/img.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,6 +35,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../modelclass/PinPlace_Response.dart';
+import '../modelclass/ProfileImageResponse.dart';
 import '../modelclass/ShowVideoReviewResponse.dart';
 
 enum Share {
@@ -60,10 +65,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
   List<VideoReviewDetails> videoreviewDet = [];
 
   int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0;
-  String placeId = "", strrating = "", reviewlist = "", reviewlist1 = "", reviewlist2 = "",
-      profileImage = "", openHours = "", delightId = "", str_Url = "";
+  String placeId = "",
+      strrating = "",
+      reviewlist = "",
+      reviewlist1 = "",
+      reviewlist2 = "",
+      profileImage = "",
+      openHours = "",
+      delightId = "",
+      str_Url = "",
+      insertPinStatues = "1";
 
-  double startlatitude1 = 0.0, startlongitude1 = 0.0, locationlatitude1 = 0.0, locationlongitude2 = 0.0, valuedistansce2 = 0.0;
+  double startlatitude1 = 0.0,
+      startlongitude1 = 0.0,
+      locationlatitude1 = 0.0,
+      locationlongitude2 = 0.0,
+      valuedistansce2 = 0.0;
 
   bool isVisible = false, isVisible1 = false;
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
@@ -72,15 +89,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
   //String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
 
   VideoPlayerController? controller;
-  String videoUrl = 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
+  String videoUrl =
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
 
   List<Widget> cards = List.generate(5, (i) => CustomCard()).toList();
 
   Future<SinglePageDetails> getSinglePlace() async {
-
     SharedPreferences pre = await SharedPreferences.getInstance();
     placeId = pre.getString("placeId") ?? "";
     delightId = pre.getString("delightId") ?? "";
+    userId = pre.getInt("userId") ?? 0;
+
+    String strUserid = userId.toString();
+    showProfileImage(strUserid);
 
     var url = Uri.parse(
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googleApikey');
@@ -99,14 +120,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
     reviewlist = singlePageDetails.result?.reviews?.length.toString() ?? "";
 
     datadouble = singlePageDetails.result?.reviews?.length ?? 0;
-    openHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.time ?? "";
+    openHours = singlePageDetails
+            .result?.currentOpeningHours?.periods?[0].close?.time ??
+        "";
     str_Url = singlePageDetails.result!.url!;
 
     // SharedPreferences pre1 = await SharedPreferences.getInstance();
     pre.setString("placename", singlePageDetails.result!.name!);
     pre.setString("placeType", singlePageDetails.result!.types![0]);
-    pre.setString("profileImage", singlePageDetails.result?.photos?[0].photoReference ?? "");
-    pre.setInt("profileImagehight", singlePageDetails.result?.photos?[0].width ?? 0);
+    pre.setString("profileImage",
+        singlePageDetails.result?.photos?[0].photoReference ?? "");
+    pre.setInt(
+        "profileImagehight", singlePageDetails.result?.photos?[0].width ?? 0);
 
     if (reviewlist.length == 0) {
       reviewlist1 = "Reviews";
@@ -127,7 +152,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       isVisible1 = true;
     }
 
-     _determinePosition1(locationlatitude1,locationlongitude2);
+    _determinePosition1(locationlatitude1, locationlongitude2);
 
     bool serviceEnabler;
     LocationPermission permission;
@@ -161,37 +186,32 @@ class _DetailsScreenState extends State<DetailsScreen> {
     startlatitude1 = _locationData.latitude!;
     startlongitude1 = _locationData.longitude!;
 
-     locationlatitude1 = singlePageDetails.result!.geometry!.location!.lat!;
-     locationlongitude2 = singlePageDetails.result!.geometry!.location!.lng!;
+    locationlatitude1 = singlePageDetails.result!.geometry!.location!.lat!;
+    locationlongitude2 = singlePageDetails.result!.geometry!.location!.lng!;
 
-     valuedistansce2 = calculateDistance2(startlatitude1,startlongitude1,locationlatitude1,locationlongitude2);
-     String number = valuedistansce2.toStringAsFixed(2);
-     double distance =  double.parse(number);
+    valuedistansce2 = calculateDistance2(
+        startlatitude1, startlongitude1, locationlatitude1, locationlongitude2);
+    String number = valuedistansce2.toStringAsFixed(2);
+    double distance = double.parse(number);
 
-     item1.add(strrating);
-     item1.add("$distance km");
-     item1.add("0 pins");
+    item1.add(strrating);
+    item1.add("$distance km");
+    item1.add("0 pins");
 
-     item2.add(reviewlist1);
-     item2.add("Directions");
-     item2.add("Pins this");
-
-
+    item2.add(reviewlist1);
+    item2.add("Directions");
+    item2.add("Pins this");
 
     if (kDebugMode) {
       print("latitudedetails1 $startlatitude1");
       print("latitudedetails $startlongitude1");
-
     }
     // double value = position12 as double;
-
 
     print(photo);
     print(placeId);
 
     //   Future.delayed( Duration(seconds: 1)).then((value) => setState(() {}));
-
-
 
     return singlePageDetails;
   }
@@ -229,7 +249,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     return reviewDet;
 
-    // Future.delayed( Duration(seconds: 1)).then((value) => setState(() {}));
+    Future.delayed(Duration(seconds: 1)).then((value) => setState(() {}));
   }
 
   Future<List<VideoReviewDetails>> getVideoReview() async {
@@ -238,6 +258,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     SharedPreferences pre = await SharedPreferences.getInstance();
     placeId = pre.getString("placeId") ?? "";
     userId = pre.getInt("userId") ?? 0;
+
+    print("userdetails $placeId  $userId");
 
     String strUserid = userId.toString();
 
@@ -252,6 +274,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       }
 
       videoreviewlength = videoreviewDet.length;
+
       isVisible = true;
     } else {
       Fluttertoast.showToast(
@@ -266,7 +289,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
       isVisible = false;
     }
 
+    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+
     return videoreviewDet;
+  }
+
+  Future<String> showProfileImage(String strUserid) async {
+    print("useruserid  $strUserid");
+
+    http.Response? response =
+        await ViewUserProfileImage().getProfileImage(strUserid);
+    var jsonResponse = jsonDecode(response.body);
+    var userResponse1 = ProfileImageResponse.fromJson(jsonResponse);
+
+    if (userResponse1.status == "success") {
+      profileImage = userResponse1.image!;
+      print("userProfileimage   $profileImage");
+    } else {
+      profileImage = "";
+    }
+    return profileImage;
   }
 
   File? file;
@@ -329,21 +371,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
 //    double? _rating;
 //    IconData? _selectedIcon;
-
-    ProgressDialog pr15 = ProgressDialog(context);
-    pr15 = ProgressDialog(context, type: ProgressDialogType.normal);
-    pr15.style(
-        message: 'Insert Pin Details Wait...',
-        borderRadius: 10.0,
-        backgroundColor: Colors.white,
-        progressWidget: const CircularProgressIndicator(),
-        elevation: 10.0,
-        insetAnimCurve: Curves.easeInOut,
-        progress: 0.0,
-        progressTextStyle: const TextStyle(
-            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
-        messageTextStyle: const TextStyle(
-            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w600));
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -510,19 +537,51 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                       alignment:
                                                           Alignment.center,
                                                       child: ListView(
-                                                        scrollDirection: Axis.horizontal,
-                                                        children: dataList.map((data) {
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        children: dataList
+                                                            .map((data) {
                                                           return InkWell(
                                                             onTap: () {
-                                                              if (data.name == "Facebook") {onButtonTap(Share.facebook, strData, strPhotourl);
-                                                              } else if (data.name == "Whatsapp") {
-                                                                onButtonTap(Share.whatsapp, strData, strPhotourl);
-                                                              } else if (data.name == "Whatsapp Business") {
-                                                                onButtonTap(Share.whatsapp_business, strData, strPhotourl);
-                                                              } else if (data.name == "Twitter") {
-                                                                onButtonTap(Share.twitter, strData, strPhotourl);
-                                                              } else if (data.name == "More") {
-                                                                onButtonTap(Share.share_system, strData, strPhotourl);
+                                                              if (data.name ==
+                                                                  "Facebook") {
+                                                                onButtonTap(
+                                                                    Share
+                                                                        .facebook,
+                                                                    strData,
+                                                                    strPhotourl);
+                                                              } else if (data
+                                                                      .name ==
+                                                                  "Whatsapp") {
+                                                                onButtonTap(
+                                                                    Share
+                                                                        .whatsapp,
+                                                                    strData,
+                                                                    strPhotourl);
+                                                              } else if (data
+                                                                      .name ==
+                                                                  "Whatsapp Business") {
+                                                                onButtonTap(
+                                                                    Share
+                                                                        .whatsapp_business,
+                                                                    strData,
+                                                                    strPhotourl);
+                                                              } else if (data
+                                                                      .name ==
+                                                                  "Twitter") {
+                                                                onButtonTap(
+                                                                    Share
+                                                                        .twitter,
+                                                                    strData,
+                                                                    strPhotourl);
+                                                              } else if (data
+                                                                      .name ==
+                                                                  "More") {
+                                                                onButtonTap(
+                                                                    Share
+                                                                        .share_system,
+                                                                    strData,
+                                                                    strPhotourl);
                                                               }
                                                             },
                                                             child: Container(
@@ -631,89 +690,172 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       child: GestureDetector(
                                         onTap: () async {
                                           if (index == 2) {
-                                            pr15.show();
+                                            if (insertPinStatues == "1") {
+                                            ViewDialog(context: context).showLoadingIndicator(" Pin this Location Wait...", "",context);
 
-                                            SharedPreferences pre =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            final islogin =
-                                                pre.getBool("islogin") ?? false;
-                                            final userId =
-                                                pre.getInt("userId") ?? 0;
-                                            final struserId = userId.toString();
-                                            final strlat = singlePageDetails
-                                                .result!.geometry?.location?.lat
-                                                .toString();
-                                            final strlng = singlePageDetails
-                                                .result!.geometry?.location?.lng
-                                                .toString();
-                                            final placeid = singlePageDetails
-                                                .result!.placeId!;
+                                              var openclose = singlePageDetails
+                                                          .result
+                                                          ?.businessStatus ==
+                                                      "OPERATIONAL"
+                                                  ? " open:  "
+                                                  : " close";
 
-                                            http.Response response =
-                                                await PinPlaces()
-                                                    .insertPinPlaces(
-                                                        struserId,
-                                                        delightId,
-                                                        singlePageDetails
-                                                            .result!.types![0],
-                                                        placeid,
-                                                        strlat!,
-                                                        strlng!,
-                                                        singlePageDetails
-                                                            .result!.name!,
-                                                        "",
-                                                        singlePageDetails
-                                                            .result!.vicinity!,
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        "",
-                                                        singlePageDetails
-                                                            .result!
-                                                            .photos![0]
-                                                            .photoReference!,
-                                                        singlePageDetails
-                                                            .result!.rating
-                                                            .toString(),
-                                                        "");
+                                              SharedPreferences pre =
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              final islogin =
+                                                  pre.getBool("islogin") ??
+                                                      false;
+                                              final userId =
+                                                  pre.getInt("userId") ?? 0;
+                                              final struserId =
+                                                  userId.toString();
+                                              final strlat = singlePageDetails
+                                                  .result!
+                                                  .geometry
+                                                  ?.location
+                                                  ?.lat
+                                                  .toString();
+                                              final strlng = singlePageDetails
+                                                  .result!
+                                                  .geometry
+                                                  ?.location
+                                                  ?.lng
+                                                  .toString();
+                                              final placeid = singlePageDetails
+                                                  .result!.placeId!;
+                                              final photo = singlePageDetails
+                                                      .result!
+                                                      .photos![0]
+                                                      .photoReference ??
+                                                  "";
 
-                                            print(response);
+                                              http.Response response =
+                                                  await PinPlaces()
+                                                      .insertPinPlaces(
+                                                          struserId,
+                                                          delightId,
+                                                          singlePageDetails
+                                                              .result!
+                                                              .types![0],
+                                                          placeid,
+                                                          strlat!,
+                                                          strlng!,
+                                                          singlePageDetails
+                                                              .result!.name!,
+                                                          "",
+                                                          singlePageDetails
+                                                              .result!
+                                                              .vicinity!,
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          photo,
+                                                          singlePageDetails
+                                                              .result!.rating
+                                                              .toString(),
+                                                          "",
+                                                          str_Url,
+                                                          openclose);
 
-                                            var pinResponse =
-                                                jsonDecode(response.body);
-                                            var userResponse =
-                                                PinThePlace.fromJson(
-                                                    pinResponse);
+                                              print(response);
 
-                                            if (userResponse.status == "200") {
-                                              pr15.hide();
+                                              var pinResponse =
+                                                  jsonDecode(response.body);
+                                              var userResponse =
+                                                  PinThePlace.fromJson(
+                                                      pinResponse);
 
-                                              Fluttertoast.showToast(
-                                                  msg: userResponse.message!,
-                                                  toastLength:
-                                                      Toast.LENGTH_SHORT,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                  timeInSecForIosWeb: 1,
-                                                  backgroundColor: Colors.green,
-                                                  textColor: Colors.white,
-                                                  fontSize: 16.0);
+                                              if (userResponse.status ==
+                                                  "200") {
+                                                  ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+                                                insertPinStatues = "2";
+
+                                                Fluttertoast.showToast(
+                                                    msg: userResponse.message!,
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0);
+                                              } else {
+                                                ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+                                                insertPinStatues = "1";
+                                                Fluttertoast.showToast(
+                                                    msg: userResponse.message!,
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0);
+                                              }
                                             } else {
-                                              pr15.hide();
 
-                                              Fluttertoast.showToast(
-                                                  msg: userResponse.message!,
-                                                  toastLength:
-                                                      Toast.LENGTH_SHORT,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                  timeInSecForIosWeb: 1,
-                                                  backgroundColor: Colors.green,
-                                                  textColor: Colors.white,
-                                                  fontSize: 16.0);
+                                           ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "",context);
+
+                                              SharedPreferences pre =
+                                                  await SharedPreferences.getInstance();
+                                              final userId = pre.getInt("userId") ?? 0;
+                                              String struserId = userId.toString();
+                                              final placeid = singlePageDetails.result!.placeId!;
+
+                                              http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                              print(response1);
+
+                                              var pinResponse =
+                                                  jsonDecode(response1.body);
+                                              var userResponse =
+                                                  DeletePinData.fromJson(
+                                                      pinResponse);
+
+                                              if (userResponse.status ==
+                                                  "200") {
+                                                  ViewDialog(context: context).hideOpenDialog();
+                                                 insertPinStatues = "1";
+                                                Fluttertoast.showToast(
+                                                    msg: userResponse.message!,
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0);
+                                              }else{
+
+                                                  ViewDialog(context: context).hideOpenDialog();
+                                                 insertPinStatues = "2";
+                                                Fluttertoast.showToast(
+                                                    msg: userResponse.message!,
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0);
+                                              }
                                             }
                                           }
                                         },
@@ -1287,7 +1429,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                                 videoName:
                                                                     videoreviewDet[
                                                                             index]
-                                                                        .reviewerName!)));
+                                                                        .reviewerName!,
+                                                                profileImage:
+                                                                    profileImage)));
                                                   },
                                                   child: Container(
                                                     width: 140,
@@ -1317,9 +1461,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                                           .size20),
                                                                 ),
                                                                 image:
-                                                                    const DecorationImage(
-                                                                  image: AssetImage(
-                                                                      "assets/images/videoReview.jpg"),
+                                                                    DecorationImage(
+                                                                  image: NetworkImage(
+                                                                      videoreviewDet[
+                                                                              index]
+                                                                          .photo!),
                                                                   fit: BoxFit
                                                                       .cover,
                                                                 )),
@@ -1978,7 +2124,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   _determinePosition1(double latitude, double longitude) async {
-
     bool serviceEnabler;
     LocationPermission permission;
 
@@ -2011,28 +2156,24 @@ class _DetailsScreenState extends State<DetailsScreen> {
     startlatitude1 = _locationData.latitude!;
     startlongitude1 = _locationData.longitude!;
 
-     valuedistansce2 = calculateDistance2(startlatitude1,startlongitude1,latitude,longitude);
-
-
+    valuedistansce2 = calculateDistance2(
+        startlatitude1, startlongitude1, latitude, longitude);
 
     if (kDebugMode) {
       print("latitudedetails1 $startlatitude1");
       print("latitudedetails $startlongitude1");
-
     }
 
-   // Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+    // Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
   }
 
-   double calculateDistance2(lat1, lon1, lat2, lon2) {
-
+  double calculateDistance2(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
     var c = cos;
     var a = 0.5 -
         c((lat2 - lat1) * p) / 2 +
         c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
-
   }
 }
 

@@ -100,6 +100,7 @@ class Assets {
   static const String imagesPinG = 'assets/images/Pin-g.png';
   static const String imagesPinS = 'assets/images/Pin-s.png';
   static const String imagesPinW = 'assets/images/Pin-w.png';
+  static const String imagesPlayButton = 'assets/images/play_button.png';
   static const String imagesPlusIcon = 'assets/images/plus-icon.svg';
   static const String imagesProfileimage = 'assets/images/profileimage.jpg';
   static const String imagesRadius = 'assets/images/radius.png';

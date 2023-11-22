@@ -5,9 +5,9 @@ import 'package:wherenxnew1/ApiImplement/ApiUrl.dart';
 
 class PinPlaces{
 
-  Future<http.Response> insertPinPlaces(String userId, String delightId, delightName, String placeId, String latitude, String longitude,
-      String name, String website, String address, String city,String state,String zip,String phonenumber, String description, 
-      String opentime, String closetime, String openfromto, String photolink, String rating, String commentsrating) async{
+  Future<http.Response> insertPinPlaces( userId,  delightId, delightName,  placeId,  latitude,  longitude, name,  website,
+      address,  city, state, zip, phonenumber,  description, opentime, closetime, openfromto, photolink, rating, commentsrating,
+      mapurl, openClose) async{
     
     http.Response response;
     
@@ -19,7 +19,7 @@ class PinPlaces{
       body: jsonEncode(<String,String>{ "user_id":userId, "delight_id":delightId, "delight_name": delightName, "place_id": placeId, "latitude": latitude,
         "longitude": longitude, "name": name, "website": website, "address": address, "city": city, "state":state, "zip": zip,
         "phonenumber":phonenumber, "description":description, "opentime":opentime, "closetime":closetime, "openfromto":openfromto,
-        "photolink":photolink, "rating":rating, "commentsrating":commentsrating}));
+        "photolink":photolink, "rating":rating, "commentsrating":commentsrating, "mapurl":mapurl, "openClose":openClose}));
 
     return response;
 

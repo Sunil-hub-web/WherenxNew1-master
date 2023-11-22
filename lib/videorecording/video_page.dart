@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:another_flushbar/flushbar.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +28,14 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   late VideoPlayerController _videoPlayerController;
-  String text = "", placeId = "", placename = "", F_name = "", formattedDate= "", placeType = "",profileImage = "",filePath1 = "";
+  String text = "",
+      placeId = "",
+      placename = "",
+      F_name = "",
+      formattedDate = "",
+      placeType = "",
+      profileImage = "",
+      filePath1 = "";
   int userId = 0;
   double? _rating = 0.0;
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
@@ -36,7 +43,6 @@ class _VideoPageState extends State<VideoPage> {
   MediaInfo? compressedVideoInfo;
 
   Future<void> getUserData() async {
-
     SharedPreferences pre = await SharedPreferences.getInstance();
     placeId = pre.getString("placeId") ?? "";
     placename = pre.getString("placename") ?? "";
@@ -51,36 +57,31 @@ class _VideoPageState extends State<VideoPage> {
     formattedDate = formatter.format(now);
     print(formattedDate); // 2016-01-25
 
-  //  Future.delayed( Duration(seconds: 1)).then((value) => setState(() {}));
-
+    //  Future.delayed( Duration(seconds: 1)).then((value) => setState(() {}));
   }
 
-
-
   Future _initVideoPlayer() async {
-
     // await _displayFileSize(widget.filePath);
     // Left_indicator_bar_Flushbar(context,"File Size ${_result}");
     // print("Your File Size ${_result}");
     // print("Your File url is ${widget.filePath}");
 
-   // File file = new File(widget.filePath);
+    // File file = new File(widget.filePath);
     //final info = await FileCompressionApi.compressVideo(file);
 
     _videoPlayerController = VideoPlayerController.file(File(widget.filePath));
     await _videoPlayerController.initialize();
     await _videoPlayerController.setLooping(true);
     await _videoPlayerController.play();
-
   }
 
-  Future genThumbnailFile() async{
+  Future genThumbnailFile() async {
     final thumbnail = await VideoThumbnail.thumbnailFile(
         video: widget.filePath,
         // thumbnailPath: _tempDir,
         imageFormat: ImageFormat.JPEG,
         //maxHeightOrWidth: 0,
-        maxHeight:3,
+        maxHeight: 3,
         maxWidth: 2,
         quality: 10);
 
@@ -127,10 +128,8 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   void initState() {
-
-   genThumbnailFile();
+    //genThumbnailFile();
     super.initState();
-
   }
 
   @override
@@ -141,7 +140,6 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Preview'),
@@ -153,12 +151,24 @@ class _VideoPageState extends State<VideoPage> {
             onPressed: () async {
               print("do something with the file ${widget.filePath}");
 
+                ViewDialog(context: context).showLoadingIndicator(
+                    "Upload Video Wait...", "Video Preview", context);
+
+              var imagefilepath = await VideoThumbnail.thumbnailFile(
+                video: widget.filePath,
+                thumbnailPath: (await getTemporaryDirectory()).path,
+                imageFormat: ImageFormat.WEBP,
+                maxHeight: 200,
+                // specify the height of the thumbnail, let the width auto-scaled to keep the source aspect ratio
+                quality: 75,
+              );
+
               File file = new File(widget.filePath);
               final info = await FileCompressionApi.compressVideo(file);
               compressedVideoInfo = info;
-              var filePath = compressedVideoInfo!.file!.path;
+              var filePath = compressedVideoInfo?.file?.path;
               //var fileName = (filePath.split('/').last);
-             // final destination = "files/videos/$fileName";
+              // final destination = "files/videos/$fileName";
 
               //_lightCompressor.cancelCompression();
 
@@ -176,33 +186,31 @@ class _VideoPageState extends State<VideoPage> {
               formattedDate = formatter.format(now);
               print(formattedDate); // 2016-01-25
 
-              if(_rating == 0.0){
-
-                Left_indicator_bar_Flushbar(context,"Select You Rating");
-
-              } else{
-
+              if (_rating == 0.0) {
+                Left_indicator_bar_Flushbar(context, "Select You Rating");
+              } else {
                 String struserId = userId.toString();
                 String strrating = _rating.toString();
 
-                String allvaluedet = "Your path details $struserId, $formattedDate, $F_name,$placename, $placeId, $strrating, "
+                String allvaluedet =
+                    "Your path details $struserId, $formattedDate, $F_name,$placename, $placeId, "
+                    "$strrating, "
                     "$filePath";
                 print(allvaluedet);
                 print("your video file path $filePath");
 
-                ViewDialog(context: context).showLoadingIndicator("Upload Video Wait...", "Video Preview", context);
-
                 // http.Response response = await AddVideoView().addVideoReviewDetails(
                 //     struserId, formattedDate, F_name, placename, placeId, strrating, videopath);
 
-                http.StreamedResponse? response = await AddVideoView().addVideoReviewDetails(struserId, formattedDate,
-                    F_name, placename, placeId, strrating, filePath);
+                http.StreamedResponse? response = await AddVideoView()
+                    .addVideoReviewDetails(struserId, formattedDate, F_name,
+                        placename, placeId, strrating, filePath, imagefilepath);
 
-                if(response?.statusCode == 201){
-
+                if (response?.statusCode == 201) {
                   ViewDialog(context: context).hideOpenDialog();
 
-                  print("show your message ${await response?.stream.bytesToString()}");
+                  print(
+                      "show your message ${await response?.stream.bytesToString()}");
 
                   Fluttertoast.showToast(
                       msg: "Video Upload Success",
@@ -215,7 +223,7 @@ class _VideoPageState extends State<VideoPage> {
 
                   Get.toNamed(RouteHelper.getdetailsScreen());
 
-                }else{
+                } else {
 
                   ViewDialog(context: context).hideOpenDialog();
 
@@ -229,11 +237,8 @@ class _VideoPageState extends State<VideoPage> {
                       backgroundColor: Colors.green,
                       textColor: Colors.white,
                       fontSize: 16.0);
-
                 }
-
               }
-
             },
           )
         ],
@@ -252,8 +257,7 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
-  void Left_indicator_bar_Flushbar(BuildContext context,String Message){
-
+  void Left_indicator_bar_Flushbar(BuildContext context, String Message) {
     Flushbar(
       message: Message,
       icon: Icon(
@@ -265,5 +269,4 @@ class _VideoPageState extends State<VideoPage> {
       leftBarIndicatorColor: Colors.red[300],
     )..show(context);
   }
-
 }

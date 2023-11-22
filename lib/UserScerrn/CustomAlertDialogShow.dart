@@ -17,6 +17,7 @@ import '../Routes/RouteHelper.dart';
 import '../model/NearByplaces.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/SinglePageDetails.dart';
 import '../modelclass/PinPlace_Response.dart';
 
 class CustomAlertDialogShow extends StatefulWidget {
@@ -354,7 +355,7 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                             const SizedBox(width: 6),
                                                                             Container(
                                                                               height: 35,
-                                                                              decoration:curIndex == index
+                                                                              decoration: curIndex == index
                                                                                   ? isSelected == true
                                                                                       ? BoxDecoration(
                                                                                           borderRadius: BorderRadius.circular(25),
@@ -406,6 +407,13 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                   namelist.add(index.toString());
                                                                                   print("index $namelist");
 
+                                                                                  SinglePageDetails singlePageDetails = SinglePageDetails();
+                                                                                  var url = Uri.parse('https://maps.googleapis.com/maps/api/place/details/json?place_id=${widget.nearbyLocations[index].placeId!}&key=$googleApikey');
+                                                                                  var response1 = await http.get(url);
+                                                                                  singlePageDetails = SinglePageDetails.fromJson(jsonDecode(response1.body));
+                                                                                  var str_Url = singlePageDetails.result!.url!;
+                                                                                  var openclose = widget.nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close";
+
                                                                                   SharedPreferences pre = await SharedPreferences.getInstance();
                                                                                   final islogin = pre.getBool("islogin") ?? false;
                                                                                   final userId = pre.getInt("userId") ?? 0;
@@ -414,7 +422,13 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                   final strlng = widget.nearbyLocations[index].geometry?.location?.lng.toString();
                                                                                   final placeid = widget.nearbyLocations[index].placeId!;
 
-                                                                                  http.Response response = await PinPlaces().insertPinPlaces(struserId, widget.delightId, widget.nearbyLocations[index].types![0], placeid, strlat!, strlng!, widget.nearbyLocations[index].name!, "", widget.nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", widget.nearbyLocations[index].photos![0].photoReference!, widget.nearbyLocations[index].rating.toString(), "");
+                                                                                  http.Response response = await PinPlaces().insertPinPlaces(
+                                                                                    struserId, widget.delightId, widget.nearbyLocations[index].types![0],
+                                                                                      placeid, strlat!, strlng!, widget.nearbyLocations[index].name!, "",
+                                                                                      widget.nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "",
+                                                                                      widget.nearbyLocations[index].photos![0].photoReference!,
+                                                                                      widget.nearbyLocations[index].rating.toString(), "",str_Url,openclose
+                                                                                  );
 
                                                                                   print(response);
 
@@ -424,7 +438,13 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                   if (userResponse.status == "200") {
                                                                                     //   pr4.hide();
 
-                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    Fluttertoast.showToast(msg: userResponse.message!,
+                                                                                        toastLength: Toast.LENGTH_SHORT,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 1,
+                                                                                        backgroundColor: Colors.green,
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 16.0);
 
                                                                                     setState(() {
                                                                                       isSelected = true;
@@ -433,17 +453,23 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                                   } else {
                                                                                     //   pr4.hide();
 
-                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    Fluttertoast.showToast(msg: userResponse.message!,
+                                                                                        toastLength: Toast.LENGTH_SHORT,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 1,
+                                                                                        backgroundColor: Colors.green,
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 16.0);
                                                                                   }
 
-                                                                                   setState(() {});
+                                                                                  setState(() {});
                                                                                 },
                                                                                 child: Row(
                                                                                   children: <Widget>[
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/Pin-s.svg',
                                                                                       width: 11,
-                                                                                      color:curIndex == index
+                                                                                      color: curIndex == index
                                                                                           ? isSelected == true
                                                                                               ? Color(0xFF00B8CA)
                                                                                               : Color(0xFFFFFFFFF)

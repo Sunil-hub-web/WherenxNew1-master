@@ -19,6 +19,7 @@ import 'package:wherenxnew1/Dimension.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wherenxnew1/modelclass/PinPlace_Response.dart';
 import 'package:wherenxnew1/modelclass/SuccessResponseKM.dart';
+import '../ApiCallingPage/DeletePinRequest.dart';
 import '../ApiCallingPage/ViewDelight_List.dart';
 import '../Routes/RouteHelper.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +27,8 @@ import '../model/NearByplaces.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import '../model/SinglePageDetails.dart';
+import '../modelclass/DeletePinData.dart';
 import '../modelclass/ViewDelightList.dart';
 
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -105,7 +108,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
   //String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
   String locationString = "Search delights";
   late LatLng _latLng;
-  late String _name = "", city = "", state = "", countary = "", mobileNo = "";
+  late String _name = "",
+      city = "",
+      state = "",
+      countary = "",
+      mobileNo = "",
+      insertPinStatues = "1",
+      insertPinStatues1 = "3";
   late bool islogin = false;
   int userId = 0;
   NearByplaces nearByplaces = NearByplaces();
@@ -354,36 +363,39 @@ class _ExploreScreenState extends State<ExploreScreen> {
     }
 
     for (int i = 0; i < elightlistName1.length; i++) {
-      if (elightlistName1[i].delightName == "Restaurant") {
+      if (elightlistName1[i].delightName == "Restaurants") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "restaurant|food");
-      } else if (elightlistName1[i].delightName == "Bar") {
+      } else if (elightlistName1[i].delightName == "Bars") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "bar|night_club");
-      } else if (elightlistName1[i].delightName == "Shopping") {
+      } else if (elightlistName1[i].delightName == "Shopping Centers") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "shopping_mall");
-      } else if (elightlistName1[i].delightName == "Museum") {
+      } else if (elightlistName1[i].delightName == "Museums") {
         getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "museum");
-      } else if (elightlistName1[i].delightName == "Health & Fitness") {
+      } else if (elightlistName1[i].delightName == "Health") {
         getNearbyPlaces2(
-            startlatitude1, startlongitude1, "1000", "gym|health|hospital");
-      } else if (elightlistName1[i].delightName == "Park") {
+            startlatitude1, startlongitude1, "1000", "health|hospital");
+      } else if (elightlistName1[i].delightName == "Fitness") {
+        getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "gym");
+      } else if (elightlistName1[i].delightName == "Parks") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "park|amusement_park");
-      } else if (elightlistName1[i].delightName == "Sports") {
+      } else if (elightlistName1[i].delightName == "Sports Facilities") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "shoe_store|store");
-      } else if (elightlistName1[i].delightName == "Films") {
+      } else if (elightlistName1[i].delightName == "Theaters") {
         getNearbyPlaces2(
             startlatitude1, startlongitude1, "1000", "movie_theater");
-      } else if (elightlistName1[i].delightName == "Event") {
+      } else if (elightlistName1[i].delightName == "Events") {
         getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "event");
-      } else if (elightlistName1[i].delightName == "Music") {
+      } else if (elightlistName1[i].delightName == "Live Music") {
         getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "night_club");
-      } else if (elightlistName1[i].delightName == "Adventure") {
-        getNearbyPlaces2(startlatitude1, startlongitude1, "1000",
-            "aquarium|art_gallery|tourist_attraction");
+      } else if (elightlistName1[i].delightName == "Hiking") {
+        getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "Hikingarea");
+      } else if (elightlistName1[i].delightName == "Family Activities") {
+        getNearbyPlaces2(startlatitude1, startlongitude1, "1000", "");
       }
     }
 
@@ -834,17 +846,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Container(
                   height: Dimensions.size160,
                   width: Dimensions.size600,
-                 // color: Colors.green,
+                  // color: Colors.green,
                   margin: EdgeInsets.only(
-                      left: Dimensions.size7,
-                      right: Dimensions.size10,
+                    left: Dimensions.size7,
+                    right: Dimensions.size10,
                   ),
                   child: Column(
                     children: <Widget>[
                       Container(
                           height: Dimensions.size150,
                           width: Dimensions.size600,
-                        //  margin: const EdgeInsets.all(5),
+                          //  margin: const EdgeInsets.all(5),
                           child: ListView.builder(
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
@@ -1144,121 +1156,128 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                           width:
                                                                               10),
                                                                       Container(
-                                                                        height: 36,
-                                                                        decoration:
-                                                                            curIndex1 == index
-                                                                                  ? isSelected == true
-                                                                                      ? BoxDecoration(
-                                                                                          borderRadius: BorderRadius.circular(25),
-                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                            Color.fromRGBO(255, 255, 255, 255),
-                                                                                            Color.fromRGBO(255, 255, 255, 255),
-                                                                                          ]))
-                                                                                      : BoxDecoration(
-                                                                                          borderRadius: BorderRadius.circular(25),
-                                                                                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                            Color.fromRGBO(31, 203, 220, 1),
-                                                                                            Color.fromRGBO(0, 184, 202, 1)
-                                                                                          ]),
-                                                                                        )
-                                                                                  : BoxDecoration(
-                                                                                      borderRadius: BorderRadius.circular(25),
-                                                                                      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                                                                                        Color.fromRGBO(31, 203, 220, 1),
-                                                                                        Color.fromRGBO(0, 184, 202, 1)
-                                                                                      ]),
-                                                                                    ),
+                                                                        height:
+                                                                            36,
+                                                                        decoration: curIndex1 ==
+                                                                                index
+                                                                            ? isSelected == true
+                                                                                ? BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(25),
+                                                                                    gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                      Color.fromRGBO(255, 255, 255, 255),
+                                                                                      Color.fromRGBO(255, 255, 255, 255),
+                                                                                    ]))
+                                                                                : BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(25),
+                                                                                    gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                      Color.fromRGBO(31, 203, 220, 1),
+                                                                                      Color.fromRGBO(0, 184, 202, 1)
+                                                                                    ]),
+                                                                                  )
+                                                                            : BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(25),
+                                                                                gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                                  Color.fromRGBO(31, 203, 220, 1),
+                                                                                  Color.fromRGBO(0, 184, 202, 1)
+                                                                                ]),
+                                                                              ),
                                                                         child:
                                                                             TextButton(
-                                                                          style:
-                                                                               curIndex1 == index
-                                                                                    ? isSelected == true
-                                                                                        ? TextButton.styleFrom(
-                                                                                            foregroundColor: Colors.white,
-                                                                                            shape: RoundedRectangleBorder(
-                                                                                              borderRadius: BorderRadius.circular(25.0),
-                                                                                            ),
-                                                                                            side: const BorderSide(
-                                                                                              color: Color(0xFFDDE4E4),
-                                                                                            ),
-                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                            textStyle: TextStyle(fontSize: 13.sp),
-                                                                                          )
-                                                                                        : TextButton.styleFrom(
-                                                                                            foregroundColor: Colors.white,
-                                                                                            padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                            textStyle: TextStyle(fontSize: 13.sp),
-                                                                                          )
-                                                                                    : TextButton.styleFrom(
-                                                                                        foregroundColor: Colors.white,
-                                                                                        padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
-                                                                                        textStyle: TextStyle(fontSize: 13.sp),
+                                                                          style: curIndex1 == index
+                                                                              ? isSelected == true
+                                                                                  ? TextButton.styleFrom(
+                                                                                      foregroundColor: Colors.white,
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius.circular(25.0),
                                                                                       ),
+                                                                                      side: const BorderSide(
+                                                                                        color: Color(0xFFDDE4E4),
+                                                                                      ),
+                                                                                      padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                      textStyle: TextStyle(fontSize: 13.sp),
+                                                                                    )
+                                                                                  : TextButton.styleFrom(
+                                                                                      foregroundColor: Colors.white,
+                                                                                      padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                      textStyle: TextStyle(fontSize: 13.sp),
+                                                                                    )
+                                                                              : TextButton.styleFrom(
+                                                                                  foregroundColor: Colors.white,
+                                                                                  padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                  textStyle: TextStyle(fontSize: 13.sp),
+                                                                                ),
                                                                           onPressed:
                                                                               () async {
-                                                                            pr4.show();
+                                                                            if (insertPinStatues1 == "3") {
 
-                                                                                  curIndex1 = index;
-                                                                                  namelist.add(index.toString());
-                                                                                  print("index $namelist");
+                                                                              pr4.show();
 
-                                                                            SharedPreferences
-                                                                                pre =
-                                                                                await SharedPreferences.getInstance();
-                                                                            final islogin =
-                                                                                pre.getBool("islogin") ?? false;
-                                                                            final userId =
-                                                                                pre.getInt("userId") ?? 0;
-                                                                            final struserId =
-                                                                                userId.toString();
-                                                                            final strlat =
-                                                                                nearbyLocations1[index].geometry?.location?.lat.toString();
-                                                                            final strlng =
-                                                                                nearbyLocations1[index].geometry?.location?.lng.toString();
-                                                                            final placeid =
-                                                                                nearbyLocations1[index].placeId!;
+                                                                              SinglePageDetails singlePageDetails = SinglePageDetails();
+                                                                              var url = Uri.parse('https://maps.googleapis.com/maps/api/place/details/json?place_id=${nearbyLocations1[index].placeId!}&key=$googleApikey');
+                                                                              var response1 = await http.get(url);
+                                                                              singlePageDetails = SinglePageDetails.fromJson(jsonDecode(response1.body));
+                                                                              var str_Url = singlePageDetails.result!.url!;
+                                                                              var openclose = nearbyLocations1[index].businessStatus == "OPERATIONAL" ? "open" : "close";
 
-                                                                            http.Response response = await PinPlaces().insertPinPlaces(
-                                                                                struserId,
-                                                                                delightId,
-                                                                                nearbyLocations[index].types![0],
-                                                                                placeid,
-                                                                                strlat!,
-                                                                                strlng!,
-                                                                                nearbyLocations[index].name!,
-                                                                                "",
-                                                                                nearbyLocations[index].vicinity!,
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                "",
-                                                                                nearbyLocations[index].photos![0].photoReference!,
-                                                                                nearbyLocations[index].rating.toString(),
-                                                                                "");
+                                                                              curIndex1 = index;
+                                                                              namelist.add(index.toString());
+                                                                              print("index $namelist");
 
-                                                                            print(response);
+                                                                              SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                              final islogin = pre.getBool("islogin") ?? false;
+                                                                              final userId = pre.getInt("userId") ?? 0;
+                                                                              final struserId = userId.toString();
+                                                                              final strlat = nearbyLocations1[index].geometry?.location?.lat.toString();
+                                                                              final strlng = nearbyLocations1[index].geometry?.location?.lng.toString();
+                                                                              final placeid = nearbyLocations1[index].placeId!;
+                                                                              final photo = nearbyLocations[index].photos![0].photoReference ?? "";
 
-                                                                            var pinResponse =
-                                                                                jsonDecode(response.body);
-                                                                            var userResponse =
-                                                                                PinThePlace.fromJson(pinResponse);
+                                                                              http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", photo, nearbyLocations[index].rating.toString(), "", str_Url, openclose);
 
-                                                                            if (userResponse.status ==
-                                                                                "200") {
-                                                                              pr4.hide();
+                                                                              print(response);
 
-                                                                              Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                               setState(() {
-                                                                                      isSelected = true;
-                                                                                    });
+                                                                              var pinResponse = jsonDecode(response.body);
+                                                                              var userResponse = PinThePlace.fromJson(pinResponse);
+
+                                                                              if (userResponse.status == "200") {
+                                                                                pr4.hide();
+                                                                                insertPinStatues1 = "4";
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                setState(() {
+                                                                                  isSelected = true;
+                                                                                });
+                                                                              } else {
+                                                                                pr4.hide();
+                                                                                insertPinStatues1 = "3";
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                              }
                                                                             } else {
-                                                                              pr4.hide();
+                                                                              ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
 
-                                                                              Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                              SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                              final userId = pre.getInt("userId") ?? 0;
+                                                                              String struserId = userId.toString();
+                                                                              final placeid = nearbyLocations1[index].placeId!;
+
+                                                                              http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                                                              print(response1);
+
+                                                                              var pinResponse = jsonDecode(response1.body);
+                                                                              var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                              if (userResponse.status == "200") {
+                                                                                ViewDialog(context: context).hideOpenDialog();
+                                                                                insertPinStatues1 = "3";
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                setState(() {
+                                                                                  isSelected = false;
+                                                                                });
+                                                                              } else {
+                                                                                ViewDialog(context: context).hideOpenDialog();
+                                                                                insertPinStatues1 = "4";
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                              }
                                                                             }
                                                                           },
                                                                           child:
@@ -1268,22 +1287,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                 'assets/images/Pin-s.svg',
                                                                                 width: 11,
                                                                                 color: curIndex1 == index
-                                                                                          ? isSelected == true
-                                                                                              ? Color(0xFF00B8CA)
-                                                                                              : Color(0xFFFFFFFFF)
-                                                                                          : Color(0xFFFFFFFFF),
+                                                                                    ? isSelected == true
+                                                                                        ? Color(0xFF00B8CA)
+                                                                                        : Color(0xFFFFFFFFF)
+                                                                                    : Color(0xFFFFFFFFF),
                                                                               ),
                                                                               const SizedBox(
                                                                                 width: 5,
                                                                               ),
                                                                               Text(
                                                                                 "Pinned",
-                                                                                style: TextStyle(fontSize: 13,
+                                                                                style: TextStyle(
+                                                                                    fontSize: 13,
                                                                                     color: curIndex1 == index
-                                                                                          ? isSelected == true
-                                                                                              ? Color(0xFF00B8CA)
-                                                                                              : Color(0xFFFFFFFFF)
-                                                                                          : Color(0xFFFFFFFFF),
+                                                                                        ? isSelected == true
+                                                                                            ? Color(0xFF00B8CA)
+                                                                                            : Color(0xFFFFFFFFF)
+                                                                                        : Color(0xFFFFFFFFF),
                                                                                     fontWeight: FontWeight.normal),
                                                                               ),
                                                                               // text
@@ -1333,15 +1353,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       width: Dimensions.size600,
                       //    color: Colors.green,
                       margin: EdgeInsets.only(
-                          left: Dimensions.size7,
-                          right: Dimensions.size10,),
+                        left: Dimensions.size7,
+                        right: Dimensions.size10,
+                      ),
                       child: nearbyLocations.isNotEmpty
                           ? Column(
                               children: <Widget>[
                                 Container(
                                     height: Dimensions.size151,
                                     width: Dimensions.size600,
-                                //    margin: const EdgeInsets.all(5),
+                                    //    margin: const EdgeInsets.all(5),
                                     child: ListView.builder(
                                         shrinkWrap: true,
                                         scrollDirection: Axis.horizontal,
@@ -1659,38 +1680,76 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                         textStyle: TextStyle(fontSize: 13.sp),
                                                                                       ),
                                                                                 onPressed: () async {
-                                                                                  pr4.show();
+                                                                                  if (insertPinStatues == "1") {
+                                                                                    pr4.show();
 
-                                                                                  curIndex1 = index;
-                                                                                  namelist.add(index.toString());
-                                                                                  print("index $namelist");
+                                                                                    SinglePageDetails singlePageDetails = SinglePageDetails();
+                                                                                    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/details/json?place_id=${nearbyLocations[index].placeId!}&key=$googleApikey');
+                                                                                    var response1 = await http.get(url);
+                                                                                    singlePageDetails = SinglePageDetails.fromJson(jsonDecode(response1.body));
+                                                                                    var str_Url = singlePageDetails.result!.url!;
+                                                                                    var openclose = nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close";
 
-                                                                                  SharedPreferences pre = await SharedPreferences.getInstance();
-                                                                                  final islogin = pre.getBool("islogin") ?? false;
-                                                                                  final userId = pre.getInt("userId") ?? 0;
-                                                                                  final struserId = userId.toString();
-                                                                                  final strlat = nearbyLocations[index].geometry?.location?.lat.toString();
-                                                                                  final strlng = nearbyLocations[index].geometry?.location?.lng.toString();
-                                                                                  final placeid = nearbyLocations[index].placeId!;
+                                                                                    curIndex1 = index;
+                                                                                    namelist.add(index.toString());
+                                                                                    print("index $namelist");
 
-                                                                                  http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", nearbyLocations[index].photos![0].photoReference!, nearbyLocations[index].rating.toString(), "");
+                                                                                    SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                    final islogin = pre.getBool("islogin") ?? false;
+                                                                                    final userId = pre.getInt("userId") ?? 0;
+                                                                                    final struserId = userId.toString();
+                                                                                    final strlat = nearbyLocations[index].geometry?.location?.lat.toString();
+                                                                                    final strlng = nearbyLocations[index].geometry?.location?.lng.toString();
+                                                                                    final placeid = nearbyLocations[index].placeId!;
+                                                                                    final photo = nearbyLocations[index].photos?[0].photoReference ?? "";
 
-                                                                                  print(response);
+                                                                                    http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId, nearbyLocations[index].types![0], placeid, strlat!, strlng!, nearbyLocations[index].name!, "", nearbyLocations[index].vicinity!, "", "", "", "", "", "", "", "", photo, nearbyLocations[index].rating.toString(), "", str_Url, openclose);
 
-                                                                                  var pinResponse = jsonDecode(response.body);
-                                                                                  var userResponse = PinThePlace.fromJson(pinResponse);
+                                                                                    var pinResponse = jsonDecode(response.body);
+                                                                                    var userResponse = PinThePlace.fromJson(pinResponse);
 
-                                                                                  if (userResponse.status == "200") {
-                                                                                    pr4.hide();
+                                                                                    print("Your Responce${response.body}");
 
-                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                                     setState(() {
-                                                                                      isSelected = true;
-                                                                                    });
+                                                                                    if (userResponse.status == "200") {
+                                                                                      pr4.hide();
+                                                                                      insertPinStatues = "2";
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                      setState(() {
+                                                                                        isSelected = true;
+                                                                                      });
+                                                                                    } else {
+                                                                                      pr4.hide();
+                                                                                      insertPinStatues = "1";
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    }
                                                                                   } else {
-                                                                                    pr4.hide();
+                                                                                    ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
 
-                                                                                    Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                    final userId = pre.getInt("userId") ?? 0;
+                                                                                    String struserId = userId.toString();
+                                                                                    final placeid = nearbyLocations[index].placeId!;
+
+                                                                                    http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                                                                    print(response1);
+
+                                                                                    var pinResponse = jsonDecode(response1.body);
+                                                                                    var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                                    if (userResponse.status == "200") {
+                                                                                      ViewDialog(context: context).hideOpenDialog();
+                                                                                      insertPinStatues = "1";
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                      setState(() {
+                                                                                        isSelected = false;
+                                                                                      });
+                                                                                    } else {
+                                                                                      ViewDialog(context: context).hideOpenDialog();
+                                                                                      insertPinStatues = "2";
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    }
                                                                                   }
                                                                                 },
                                                                                 child: Row(
@@ -1709,7 +1768,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                     ),
                                                                                     Text(
                                                                                       "Pinned",
-                                                                                      style: TextStyle(fontSize: 13,
+                                                                                      style: TextStyle(
+                                                                                          fontSize: 13,
                                                                                           color: curIndex1 == index
                                                                                               ? isSelected == true
                                                                                                   ? Color(0xFF00B8CA)
@@ -1851,6 +1911,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           nearbyLocations1.clear();
           editingController.text = "";
           isListProduct = true;
+          isSelected = false;
 
           // _determinePosition("food",_radius2);
 
@@ -1858,40 +1919,45 @@ class _ExploreScreenState extends State<ExploreScreen> {
           //   "Music",
           // "Adventure",
 
-          if (kename == "Restaurant") {
+          if (kename == "Restaurants") {
             _determinePosition("restaurant|food", _radius2);
             kenameType = "restaurant|food";
-          } else if (kename == "Bar") {
+          } else if (kename == "Bars") {
             _determinePosition("bar|night_club", _radius2);
             kenameType = "bar";
-          } else if (kename == "Shopping") {
+          } else if (kename == "Shopping Centers") {
             _determinePosition("shopping_mall", _radius2);
             kenameType = "shopping_mall";
-          } else if (kename == "Museum") {
+          } else if (kename == "Museums") {
             _determinePosition("museum", _radius2);
             kenameType = "museum";
-          } else if (kename == "Health & Fitness") {
-            _determinePosition("health|gym|hospital|doctor", _radius2);
-            kenameType = "health|gym|hospital|doctor";
-          } else if (kename == "Park") {
+          } else if (kename == "Health") {
+            _determinePosition("health|hospital|doctor", _radius2);
+            kenameType = "health|hospital|doctor";
+          } else if (kename == "Fitness") {
+            _determinePosition("gym", _radius2);
+            kenameType = "gym";
+          } else if (kename == "Parks") {
             _determinePosition("park|amusement_park", _radius2);
             kenameType = "park|amusement_park";
-          } else if (kename == "Sports") {
+          } else if (kename == "Sports Facilities") {
             _determinePosition("shoe_store|store", _radius2);
             kenameType = "shoe_store|store";
-          } else if (kename == "Films") {
+          } else if (kename == "Theaters") {
             _determinePosition("movie_theater", _radius2);
             kenameType = "movie_theater";
-          } else if (kename == "Event") {
+          } else if (kename == "Events") {
             _determinePosition("event", _radius2);
             kenameType = "event";
-          } else if (kename == "Music") {
+          } else if (kename == "Live Music") {
             _determinePosition("night_club", _radius2);
             kenameType = "night_club";
-          } else if (kename == "Adventure") {
-            _determinePosition(
-                "aquarium|art_gallery|tourist_attraction", _radius2);
-            kenameType = "aquarium|art_gallery|tourist_attraction";
+          } else if (kename == "Hiking") {
+            _determinePosition("Hikingarea", _radius2);
+            kenameType = "Hikingarea";
+          } else if (kename == "Family Activities") {
+            _determinePosition("", _radius2);
+            kenameType = "";
           }
 
           //  _determinePosition(kename);
@@ -2336,6 +2402,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     isVisible = true;
     isTextVisible = true;
     isListProduct = false;
+    isSelected = false;
     setState(() {});
   }
 
@@ -3051,6 +3118,27 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                             "",
                                                                             context);
 
+                                                                    SinglePageDetails
+                                                                        singlePageDetails =
+                                                                        SinglePageDetails();
+                                                                    var url = Uri
+                                                                        .parse(
+                                                                            'https://maps.googleapis.com/maps/api/place/details/json?place_id=${nearbyLocations[index].placeId!}&key=$googleApikey');
+                                                                    var response1 =
+                                                                        await http
+                                                                            .get(url);
+                                                                    singlePageDetails =
+                                                                        SinglePageDetails.fromJson(
+                                                                            jsonDecode(response1.body));
+                                                                    var str_Url =
+                                                                        singlePageDetails
+                                                                            .result!
+                                                                            .url!;
+                                                                    var openclose = nearbyLocations[index].businessStatus ==
+                                                                            "OPERATIONAL"
+                                                                        ? "open"
+                                                                        : "close";
+
                                                                     SharedPreferences
                                                                         pre =
                                                                         await SharedPreferences
@@ -3079,6 +3167,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                     final placeid =
                                                                         nearbyLocations[index]
                                                                             .placeId!;
+                                                                    final photo =
+                                                                        nearbyLocations[index].photos![0].photoReference ??
+                                                                            "";
 
                                                                     http.Response response = await PinPlaces().insertPinPlaces(
                                                                         struserId,
@@ -3101,14 +3192,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                         "",
                                                                         "",
                                                                         "",
-                                                                        nearbyLocations[index]
-                                                                            .photos![
-                                                                                0]
-                                                                            .photoReference!,
+                                                                        photo,
                                                                         nearbyLocations[index]
                                                                             .rating
                                                                             .toString(),
-                                                                        "");
+                                                                        "",
+                                                                        str_Url,
+                                                                        openclose);
 
                                                                     print(
                                                                         response);

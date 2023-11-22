@@ -4,8 +4,8 @@ import 'package:wherenxnew1/ApiImplement/ApiUrl.dart';
 
 class AddVideoView{
 
-  Future<http.StreamedResponse?> addVideoReviewDetails(String userId,String reviewDate, String reviewerName,
-      String restaurantName, String placeId, String rating, video) async {
+  Future<http.StreamedResponse?> addVideoReviewDetails( userId, reviewDate, reviewerName, restaurantName,  placeId,
+       rating, video, photo) async {
 
     http.StreamedResponse? response;
 
@@ -32,7 +32,7 @@ class AddVideoView{
             'place_id' : placeId,
             'rating' : rating,});
       request.files.add(await http.MultipartFile.fromPath('video', video));
-     // request.files.add(await http.MultipartFile.fromPath('video', video));
+      request.files.add(await http.MultipartFile.fromPath('photo', photo));
       response = await request.send();
       //response = await request.send();
 

@@ -40,6 +40,7 @@ class ShowAllPinResponse {
 class AllPinList {
   int? id;
   int? userId;
+  String? namefromDelightlist;
   String? delightName;
   String? placeId;
   String? latitude;
@@ -58,32 +59,38 @@ class AllPinList {
   String? photolink;
   String? rating;
   String? commentsrating;
+  String? openClose;
+  String? mapurl;
 
   AllPinList(
       {this.id,
-        this.userId,
-        this.delightName,
-        this.placeId,
-        this.latitude,
-        this.longitude,
-        this.name,
-        this.website,
-        this.address,
-        this.city,
-        this.state,
-        this.zip,
-        this.phonenumber,
-        this.description,
-        this.opentime,
-        this.closetime,
-        this.openfromto,
-        this.photolink,
-        this.rating,
-        this.commentsrating});
+      this.userId,
+      this.namefromDelightlist,
+      this.delightName,
+      this.placeId,
+      this.latitude,
+      this.longitude,
+      this.name,
+      this.website,
+      this.address,
+      this.city,
+      this.state,
+      this.zip,
+      this.phonenumber,
+      this.description,
+      this.opentime,
+      this.closetime,
+      this.openfromto,
+      this.photolink,
+      this.rating,
+      this.commentsrating,
+      this.openClose,
+      this.mapurl});
 
   AllPinList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
+    namefromDelightlist = json['namefromDelightlist'];
     delightName = json['delight_name'];
     placeId = json['place_id'];
     latitude = json['latitude'];
@@ -102,12 +109,15 @@ class AllPinList {
     photolink = json['photolink'];
     rating = json['rating'];
     commentsrating = json['commentsrating'];
+    openClose = json['openClose'];
+    mapurl = json['mapurl'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
+    data['namefromDelightlist'] = this.namefromDelightlist;
     data['delight_name'] = this.delightName;
     data['place_id'] = this.placeId;
     data['latitude'] = this.latitude;
@@ -126,6 +136,8 @@ class AllPinList {
     data['photolink'] = this.photolink;
     data['rating'] = this.rating;
     data['commentsrating'] = this.commentsrating;
+    data['openClose'] = this.openClose;
+    data['mapurl'] = this.mapurl;
     return data;
   }
 }

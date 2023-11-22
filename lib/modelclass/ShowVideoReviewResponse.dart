@@ -38,17 +38,19 @@ class VideoReviewDetails {
   String? rating;
   String? video;
   String? message;
+  String? photo;
 
   VideoReviewDetails(
       {this.id,
-        this.userId,
-        this.reviewDate,
-        this.reviewerName,
-        this.restaurantName,
-        this.placeId,
-        this.rating,
-        this.video,
-        this.message});
+      this.userId,
+      this.reviewDate,
+      this.reviewerName,
+      this.restaurantName,
+      this.placeId,
+      this.rating,
+      this.video,
+      this.message,
+      this.photo});
 
   VideoReviewDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -60,6 +62,7 @@ class VideoReviewDetails {
     rating = json['rating'];
     video = json['video'];
     message = json['message'];
+    photo = json['photo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -73,6 +76,7 @@ class VideoReviewDetails {
     data['rating'] = this.rating;
     data['video'] = this.video;
     data['message'] = this.message;
+    data['photo'] = this.photo;
     return data;
   }
 }
