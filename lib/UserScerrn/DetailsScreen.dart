@@ -16,11 +16,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wherenxnew1/ApiCallingPage/DeletePinRequest.dart';
+import 'package:wherenxnew1/ApiCallingPage/PinCoutDetails.dart';
 import 'package:wherenxnew1/ApiCallingPage/ViewReviewList.dart';
 import 'package:wherenxnew1/ApiCallingPage/ViewVideoReview.dart';
 import 'package:wherenxnew1/UserScerrn/VideoReviewDetailsScreen.dart';
 import 'package:wherenxnew1/model/SinglePageDetails.dart';
 import 'package:wherenxnew1/modelclass/DeletePinData.dart';
+import 'package:wherenxnew1/modelclass/PinCountResponse.dart';
 import 'package:wherenxnew1/modelclass/ViewReviewResponse.dart';
 import '../ApiCallingPage/PinThePlaceFile.dart';
 import '../ApiCallingPage/ViewUserProfileImage.dart';
@@ -63,6 +65,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   List item2 = [];
   List<ReviewDetails> reviewDet = [];
   List<VideoReviewDetails> videoreviewDet = [];
+  List<String> str_userinfoPin = [];
 
   int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0;
   String placeId = "",
@@ -74,7 +77,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
       openHours = "",
       delightId = "",
       str_Url = "",
-      insertPinStatues = "1";
+      insertPinStatues = "1",
+      str_count = "0";
 
   double startlatitude1 = 0.0,
       startlongitude1 = 0.0,
@@ -99,6 +103,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     placeId = pre.getString("placeId") ?? "";
     delightId = pre.getString("delightId") ?? "";
     userId = pre.getInt("userId") ?? 0;
+    str_userinfoPin = pre.getStringList("userinfoPin") ?? [];
 
     String strUserid = userId.toString();
     showProfileImage(strUserid);
@@ -194,9 +199,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
     String number = valuedistansce2.toStringAsFixed(2);
     double distance = double.parse(number);
 
+    http.Response response_Count =
+        await PinCoutDetails().pincoutDetails(placeId);
+    var countresponse = jsonDecode(response_Count.body);
+    var countResponseData = PinCountResponse.fromJson(countresponse);
+
+    if (countResponseData.status == "200") {
+      str_count = countResponseData.count.toString();
+    } else {
+      str_count = "0";
+    }
+
     item1.add(strrating);
     item1.add("$distance km");
-    item1.add("0 pins");
+    item1.add("$str_count pins");
 
     item2.add(reviewlist1);
     item2.add("Directions");
@@ -681,8 +697,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 Matrix4.translationValues(0.0, -32.0, 0.0),
                             child: Center(
                               child: Wrap(
-                                children: List<Widget>.generate(
-                                  3,
+                                children: List<Widget>.generate(3,
                                   (index) {
                                     return Padding(
                                       padding: const EdgeInsets.fromLTRB(
@@ -691,7 +706,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         onTap: () async {
                                           if (index == 2) {
                                             if (insertPinStatues == "1") {
-                                            ViewDialog(context: context).showLoadingIndicator(" Pin this Location Wait...", "",context);
+                                              ViewDialog(context: context)
+                                                  .showLoadingIndicator(
+                                                      " Pin this Location Wait...",
+                                                      "",
+                                                      context);
 
                                               var openclose = singlePageDetails
                                                           .result
@@ -700,82 +719,32 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                   ? " open:  "
                                                   : " close";
 
-                                              SharedPreferences pre =
-                                                  await SharedPreferences
-                                                      .getInstance();
-                                              final islogin =
-                                                  pre.getBool("islogin") ??
-                                                      false;
-                                              final userId =
-                                                  pre.getInt("userId") ?? 0;
-                                              final struserId =
-                                                  userId.toString();
-                                              final strlat = singlePageDetails
-                                                  .result!
-                                                  .geometry
-                                                  ?.location
-                                                  ?.lat
-                                                  .toString();
-                                              final strlng = singlePageDetails
-                                                  .result!
-                                                  .geometry
-                                                  ?.location
-                                                  ?.lng
-                                                  .toString();
-                                              final placeid = singlePageDetails
-                                                  .result!.placeId!;
-                                              final photo = singlePageDetails
-                                                      .result!
-                                                      .photos![0]
-                                                      .photoReference ??
-                                                  "";
+                                              SharedPreferences pre = await SharedPreferences.getInstance();
+                                              final islogin = pre.getBool("islogin") ?? false;
+                                              final userId = pre.getInt("userId") ?? 0;
+                                              final struserId = userId.toString();
+                                              final strlat = singlePageDetails.result!.geometry?.location?.lat.toString();
+                                              final strlng = singlePageDetails.result!.geometry?.location?.lng.toString();
+                                              final placeid = singlePageDetails.result!.placeId!;
+                                              final photo = singlePageDetails.result?.photos?[0].photoReference ?? "";
 
-                                              http.Response response =
-                                                  await PinPlaces()
-                                                      .insertPinPlaces(
-                                                          struserId,
-                                                          delightId,
-                                                          singlePageDetails
-                                                              .result!
-                                                              .types![0],
-                                                          placeid,
-                                                          strlat!,
-                                                          strlng!,
-                                                          singlePageDetails
-                                                              .result!.name!,
-                                                          "",
-                                                          singlePageDetails
-                                                              .result!
-                                                              .vicinity!,
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          "",
-                                                          photo,
-                                                          singlePageDetails
-                                                              .result!.rating
-                                                              .toString(),
-                                                          "",
-                                                          str_Url,
-                                                          openclose);
+                                              http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId,
+                                                          singlePageDetails.result!.types![0], placeid, strlat!,
+                                                          strlng!, singlePageDetails.result!.name!, "",
+                                                          singlePageDetails.result!.vicinity!,
+                                                          "", "", "", "", "", "", "", "",
+                                                          photo, singlePageDetails.result!.rating.toString(),
+                                                          "", str_Url, openclose);
 
                                               print(response);
 
-                                              var pinResponse =
-                                                  jsonDecode(response.body);
-                                              var userResponse =
-                                                  PinThePlace.fromJson(
-                                                      pinResponse);
+                                              var pinResponse = jsonDecode(response.body);
+                                              var userResponse = PinThePlace.fromJson(pinResponse);
 
-                                              if (userResponse.status ==
-                                                  "200") {
-                                                  ViewDialog(
-                                                                              context: context)
-                                                                          .hideOpenDialog();
+                                              if (userResponse.status == "200") {
+
+                                                ViewDialog(context: context)
+                                                    .hideOpenDialog();
                                                 insertPinStatues = "2";
 
                                                 Fluttertoast.showToast(
@@ -789,10 +758,29 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                         Colors.green,
                                                     textColor: Colors.white,
                                                     fontSize: 16.0);
+
+                                                setState(() async {
+
+                                                 //  str_userinfoPin.add(placeid);
+                                                 //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                 //  pre.setStringList("userinfoPin", str_userinfoPin); //save List
+
+                                                    http.Response response_Count = await PinCoutDetails().pincoutDetails(placeId);
+                                                     var countresponse = jsonDecode(response_Count.body);
+                                                      var countResponseData = PinCountResponse.fromJson(countresponse);
+
+                                                if (countResponseData.status == "200") {
+                                                  str_count = countResponseData.count.toString();
+
+                                                 item1.add("$str_count pins");
+                                                } else {
+                                                  str_count = "0";
+                                                }
+                                                });
+
                                               } else {
-                                                ViewDialog(
-                                                                              context: context)
-                                                                          .hideOpenDialog();
+                                                ViewDialog(context: context)
+                                                    .hideOpenDialog();
                                                 insertPinStatues = "1";
                                                 Fluttertoast.showToast(
                                                     msg: userResponse.message!,
@@ -807,16 +795,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                     fontSize: 16.0);
                                               }
                                             } else {
-
-                                           ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "",context);
+                                              ViewDialog(context: context)
+                                                  .showLoadingIndicator(
+                                                      " Delete Pin Request Wait...",
+                                                      "",
+                                                      context);
 
                                               SharedPreferences pre =
-                                                  await SharedPreferences.getInstance();
-                                              final userId = pre.getInt("userId") ?? 0;
-                                              String struserId = userId.toString();
-                                              final placeid = singlePageDetails.result!.placeId!;
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              final userId =
+                                                  pre.getInt("userId") ?? 0;
+                                              String struserId =
+                                                  userId.toString();
+                                              final placeid = singlePageDetails
+                                                  .result!.placeId!;
 
-                                              http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                              http.Response response1 =
+                                                  await DeletePinRequest()
+                                                      .deletePinPlaces(
+                                                          struserId, placeid);
                                               print(response1);
 
                                               var pinResponse =
@@ -827,8 +825,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                                               if (userResponse.status ==
                                                   "200") {
-                                                  ViewDialog(context: context).hideOpenDialog();
-                                                 insertPinStatues = "1";
+                                                ViewDialog(context: context)
+                                                    .hideOpenDialog();
+                                                insertPinStatues = "1";
                                                 Fluttertoast.showToast(
                                                     msg: userResponse.message!,
                                                     toastLength:
@@ -840,10 +839,37 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                         Colors.green,
                                                     textColor: Colors.white,
                                                     fontSize: 16.0);
-                                              }else{
 
-                                                  ViewDialog(context: context).hideOpenDialog();
-                                                 insertPinStatues = "2";
+                                                setState(() async {
+
+                                                  // str_userinfoPin.remove(placeid);
+                                                 //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                //   pre.setStringList("userinfoPin", str_userinfoPin); //save List
+
+                                                    http.Response response_Count =
+                                                    await PinCoutDetails()
+                                                        .pincoutDetails(
+                                                            placeId);
+                                                var countresponse = jsonDecode(
+                                                    response_Count.body);
+                                                var countResponseData =
+                                                    PinCountResponse.fromJson(
+                                                        countresponse);
+
+                                                if (countResponseData.status ==
+                                                    "200") {
+                                                  str_count = countResponseData
+                                                      .count
+                                                      .toString();
+                                                } else {
+                                                  str_count = "0";
+                                                }
+                                                });
+
+                                              } else {
+                                                ViewDialog(context: context)
+                                                    .hideOpenDialog();
+                                                insertPinStatues = "2";
                                                 Fluttertoast.showToast(
                                                     msg: userResponse.message!,
                                                     toastLength:
@@ -858,6 +884,28 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                               }
                                             }
                                           }
+
+                                          setState(() async {
+
+                                              http.Response response_Count =
+                                                    await PinCoutDetails()
+                                                        .pincoutDetails(
+                                                            placeId);
+                                                var countresponse = jsonDecode(
+                                                    response_Count.body);
+                                                var countResponseData =
+                                                    PinCountResponse.fromJson(
+                                                        countresponse);
+
+                                                if (countResponseData.status ==
+                                                    "200") {
+                                                  str_count = countResponseData
+                                                      .count
+                                                      .toString();
+                                                } else {
+                                                  str_count = "0";
+                                                }
+                                          });
                                         },
                                         child: Column(
                                           children: [

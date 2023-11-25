@@ -120,6 +120,7 @@ class Assets {
   static const String imagesStarGrey = 'assets/images/star-grey.png';
   static const String imagesStarIcon = 'assets/images/star-icon.png';
   static const String imagesStarYellow = 'assets/images/star-yellow.png';
+  static const String imagesTrashBin = 'assets/images/trash_bin.png';
   static const String imagesTwitter = 'assets/images/twitter.png';
   static const String imagesTwitterShare = 'assets/images/twitter_share.png';
   static const String imagesUploading = 'assets/images/uploading.png';

@@ -24,5 +24,7 @@ class ApiUrl {
   static String show_recent_pin = "${baseUrl}show-recent-pin";
   static String view_user_video_reviews = "${baseUrl}view-user-video-reviews";
   static String delete_business_pin = "${baseUrl}delete-business-pin";
+  static String show_business_pin = "${baseUrl}show-business-pin";
+  static String count_business_pin = "${baseUrl}count-business-pin";
 
 }

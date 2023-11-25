@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,13 +22,17 @@ import 'package:wherenxnew1/modelclass/NearByLocationResponse.dart';
 import 'package:wherenxnew1/modelclass/RecentPinResponse.dart';
 import 'package:wherenxnew1/modelclass/ShowAllPinResponse.dart';
 import 'package:wherenxnew1/modelclass/ViewDelightList.dart';
+import '../ApiCallingPage/DeletePinRequest.dart';
+import '../ApiImplement/ViewDialog.dart';
 import '../Dimension.dart';
 import '../Helper/img.dart';
 import '../Routes/RouteHelper.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import '../modelclass/DeletePinData.dart';
 
 enum Share {
   facebook,
@@ -83,6 +88,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
 
   List<RecentPinResponse> recentPinResponse = [];
   List<RecentPin> recentPinDet = [];
+  List<String> str_userinfoPin = [];
 
   late bool islogin = false;
   int userId = 0, radius = 0;
@@ -110,6 +116,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
 
     islogin = pre.getBool("islogin") ?? false;
     userId = pre.getInt("userId") ?? 0;
+    str_userinfoPin = pre.getStringList("userinfoPin") ?? [];
 
     String str_userId = userId.toString();
 
@@ -341,35 +348,41 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 0),
+                      margin:
+                          const EdgeInsets.only(left: 10, right: 10, bottom: 0),
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => SearchItemList(),),);
+                                  builder: (context) => SearchItemList(),
+                                ),
+                              );
                             },
                             child: Card(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(Dimensions.size20),
+                                    BorderRadius.circular(Dimensions.size20),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     GestureDetector(
                                       onTap: () {
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
-                                            builder: (context) => SearchItemList(),),);
+                                            builder: (context) =>
+                                                SearchItemList(),
+                                          ),
+                                        );
                                       },
                                       child: Row(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                            CrossAxisAlignment.center,
                                         children: [
                                           Icon(
                                             Icons.search,
@@ -520,9 +533,15 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                           Dimensions.size12),
                                                     ),
                                                   ),
-                                                  child: locationList[index].photolink == null
-                                                      ? Image.asset(Img.get('resort_restarunts.jpg'),fit: BoxFit.cover)
-                                                      : getImage("${locationList[index].photolink}"),
+                                                  child: locationList[index]
+                                                              .photolink ==
+                                                          null
+                                                      ? Image.asset(
+                                                          Img.get(
+                                                              'resort_restarunts.jpg'),
+                                                          fit: BoxFit.cover)
+                                                      : getImage(
+                                                          "${locationList[index].photolink}"),
                                                 ),
                                                 Container(
                                                   margin: const EdgeInsets.only(
@@ -738,9 +757,15 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                           Dimensions.size12),
                                                     ),
                                                   ),
-                                                  child: recentPinDet[index].photolink == null
-                                                      ? Image.asset(Img.get('resort_restarunts.jpg'), fit: BoxFit.cover)
-                                                      : getImage("${recentPinDet[index].photolink}"),
+                                                  child: recentPinDet[index]
+                                                              .photolink ==
+                                                          null
+                                                      ? Image.asset(
+                                                          Img.get(
+                                                              'resort_restarunts.jpg'),
+                                                          fit: BoxFit.cover)
+                                                      : getImage(
+                                                          "${recentPinDet[index].photolink}"),
                                                 ),
                                                 Container(
                                                   margin: const EdgeInsets.only(
@@ -841,7 +866,8 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                     Container(
                         child: FutureBuilder(
                       future: showAppPin(),
-                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
                         if (snapshot.hasData) {
                           return Column(
                             children: [
@@ -908,13 +934,6 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                     itemCount: userinfoPin.length,
                                     itemBuilder: (context, int index) {
                                       return GestureDetector(
-                                        onTap: () async {
-
-                                          SharedPreferences pre = await SharedPreferences.getInstance();
-                                          pre.setString("placeId", userinfoPin[index].placeId!);
-                                          Get.toNamed(RouteHelper.getdetailsScreen());
-
-                                        },
                                         child: Container(
                                           padding: const EdgeInsets.only(
                                               left: 10, right: 10),
@@ -925,7 +944,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                             bottom: 10,
                                           ),
                                           width: 100.w,
-                                          height: 16.h,
+                                          height: 20.h,
                                           child: Card(
                                             elevation: 5,
                                             shadowColor: Colors.black26,
@@ -936,19 +955,30 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                       Dimensions.size18),
                                             ),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               children: [
-                                                Expanded(
-                                                  flex: 1, // 20%
+                                                GestureDetector(
+                                                  onTap: () async {
+                                                    SharedPreferences pre =
+                                                        await SharedPreferences
+                                                            .getInstance();
+                                                    pre.setString(
+                                                        "placeId",
+                                                        userinfoPin[index]
+                                                            .placeId!);
+                                                    Get.toNamed(RouteHelper
+                                                        .getdetailsScreen());
+                                                  },
                                                   child: Container(
                                                     height: 100.h,
-                                                    width: (15.w),
+                                                    width: (30.w),
                                                     margin:
                                                         const EdgeInsets.only(
                                                             top: 5,
-                                                            left: 10,
-                                                            right: 10,
-                                                            bottom: 10),
+                                                            left: 5,
+                                                            right: 5,
+                                                            bottom: 5),
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
@@ -957,34 +987,46 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                             Dimensions.size12),
                                                       ),
                                                     ),
-                                                    child: userinfoPin[index].photolink == null ?
-                                                          ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      // Image border
-                                                      child: SizedBox.fromSize(
-                                                        size:
-                                                            Size.fromRadius(48),
-                                                        // Image radius
-                                                        child: Image.asset(Img.get('resort_restarunts.jpg'),
-                                                               fit: BoxFit.cover) /*Image.network(nearbyLocations[index].icon!,)*/,
-                                                      ),
-                                                    )
+                                                    child: userinfoPin[index]
+                                                                .photolink ==
+                                                            null
+                                                        ? ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            // Image border
+                                                            child: SizedBox
+                                                                .fromSize(
+                                                              size: Size
+                                                                  .fromRadius(
+                                                                      48),
+                                                              // Image radius
+                                                              child: Image.asset(
+                                                                  Img.get(
+                                                                      'resort_restarunts.jpg'),
+                                                                  fit: BoxFit
+                                                                      .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
+                                                            ),
+                                                          )
                                                         : ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      // Image border
-                                                      child: SizedBox.fromSize(
-                                                        size:
-                                                            Size.fromRadius(48),
-                                                        // Image radius
-                                                        child: getImage(
-                                                            "${userinfoPin[index].photolink}") /*Image.network(nearbyLocations[index].icon!,)*/,
-                                                      ),
-                                                    ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            // Image border
+                                                            child: SizedBox
+                                                                .fromSize(
+                                                              size: Size
+                                                                  .fromRadius(
+                                                                      48),
+                                                              // Image radius
+                                                              child: getImage(
+                                                                  "${userinfoPin[index].photolink}") /*Image.network(nearbyLocations[index].icon!,)*/,
+                                                            ),
+                                                          ),
                                                   ),
+                                                  //Expanded(// flex: 2, // 20child:),
                                                 ),
                                                 Expanded(
                                                   flex: 2, // 60%
@@ -996,429 +1038,567 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                                                       //         top: 5),
                                                       child:
                                                           SingleChildScrollView(
-                                                        child: Column(
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
-                                                                  .start,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  .spaceBetween,
                                                           children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Container(
-                                                                  width: 40.w,
-                                                                  child: Text(
-                                                                    "${userinfoPin[index].name}",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 5,
-                                                                    style: TextStyle(
-                                                                        fontSize: 15.sp,
-                                                                        color: Colors.black,
-                                                                        fontWeight: FontWeight.normal),
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  height: 30,
-                                                                  child:
-                                                                      TextButton(
-                                                                    style:
-                                                                        ButtonStyle(
-                                                                      backgroundColor: MaterialStateProperty.all<
-                                                                              Color>(
+                                                            Container(
+                                                              width: 40.w,
+                                                              child: Text(
+                                                                "${userinfoPin[index].name}",
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines: 5,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                            ),
+                                                            GestureDetector(
+                                                              onTap: () async {
+
+                                                                int currentIndex = index;
+
+                                                                ViewDialog(context: context).
+                                                                showLoadingIndicator(" Delete Pin Request Wait...", "", context);
+
+                                                                SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                final userId = pre.getInt("userId") ?? 0;
+                                                                String struserId = userId.toString();
+                                                                final placeid = userinfoPin[index].placeId;
+
+                                                                http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                                                print(response1);
+
+                                                                var pinResponse = jsonDecode(response1.body);
+                                                                var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                if (userResponse.status == "200") {
+
+                                                                  ViewDialog(context: context).hideOpenDialog();
+
+                                                              //      userinfoPin,locationList,recentPinDet
+
+                                                                  setState((){
+
+                                                                      userinfoPin.removeAt(currentIndex);
+                                                                      recentPinDet.removeWhere((item) => item.placeId == placeid);
+                                                                      locationList.removeWhere((item) => item.placeId == placeid);
+                                                                      locationList.remove(placeid);
+                                                                      recentPinDet.remove(placeid);
+                                                                      str_userinfoPin.remove(placeid);
+
+                                                                     //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                      // pre.setStringList("userinfoPin", str_userinfoPin);//save List
+
+                                                                  });
+
+                                                                  Fluttertoast.showToast(
+                                                                      msg: userResponse
+                                                                          .message!,
+                                                                      toastLength:
+                                                                          Toast
+                                                                              .LENGTH_SHORT,
+                                                                      gravity: ToastGravity
+                                                                          .BOTTOM,
+                                                                      timeInSecForIosWeb:
+                                                                          1,
+                                                                      backgroundColor:
                                                                           Colors
-                                                                              .white),
-                                                                    ),
-                                                                    onPressed:
-                                                                        () {},
-                                                                    child: Row(
-                                                                      children: <Widget>[
-                                                                        SvgPicture
-                                                                            .asset(
-                                                                          'assets/images/star.svg',
-                                                                          width:
-                                                                              3.w,
-                                                                          color:
-                                                                              const Color(0xFFF9BF3A),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              2,
-                                                                        ),
-                                                                        Text(
-                                                                          "${userinfoPin[index].rating}",
-                                                                          style: TextStyle(
-                                                                              fontSize: 14.5.sp,
-                                                                              color: Color(0xFF616768),
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                        // text
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 2,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  "${userinfoPin[index].delightName}",
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          15.sp,
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          500],
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                                ),
-                                                                Text(
-                                                                  "",
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          11,
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          500],
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 2,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  "${userinfoPin[index].openClose}",
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          500],
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Container(
-                                                                  height: 36,
-                                                                  child:
-                                                                      TextButton(
-                                                                    style:
-                                                                        ButtonStyle(
-                                                                      backgroundColor: MaterialStateProperty.all<
-                                                                              Color>(
-                                                                          Colors
-                                                                              .white),
-                                                                      shape: MaterialStateProperty.all<
-                                                                              RoundedRectangleBorder>(
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(50.0),
-                                                                        side:
-                                                                            const BorderSide(
-                                                                          color:
-                                                                              Color(0xFFDDE4E4),
-                                                                        ),
-                                                                      )),
-                                                                      padding: MaterialStateProperty.all<
-                                                                              EdgeInsets>(
-                                                                          const EdgeInsets
-                                                                              .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                      )),
-                                                                    ),
-                                                                    onPressed:
-                                                                        () {},
-                                                                    child: Row(
-                                                                      children: <Widget>[
-                                                                        SvgPicture
-                                                                            .asset(
-                                                                          'assets/images/direction-icon.svg',
-                                                                          width:
-                                                                              18,
-                                                                          color:
-                                                                              const Color(0xFF00B8CA),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        const Text(
-                                                                          "Directions",
-                                                                          style: TextStyle(
-                                                                              fontSize: 11,
-                                                                              color: Color(0xFF00B8CA),
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                        // text
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 10),
-                                                                Container(
-                                                                  height: 36,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            25),
-                                                                    gradient: const LinearGradient(
-                                                                        begin: Alignment
-                                                                            .topCenter,
-                                                                        end: Alignment.bottomCenter,
-                                                                        colors: [
-                                                                          Color.fromRGBO(
-                                                                              31,
-                                                                              203,
-                                                                              220,
-                                                                              1),
-                                                                          Color.fromRGBO(
-                                                                              0,
-                                                                              184,
-                                                                              202,
-                                                                              1)
-                                                                        ]),
-                                                                  ),
-                                                                  child:
-                                                                      TextButton(
-                                                                       style: TextButton
-                                                                        .styleFrom(
-                                                                      foregroundColor:
+                                                                              .green,
+                                                                      textColor:
                                                                           Colors
                                                                               .white,
-                                                                       padding: const EdgeInsets.only(
-                                                                          left:
-                                                                              12,
-                                                                          right:
-                                                                              12,
-                                                                          top:
-                                                                              5.0,
-                                                                          bottom:
-                                                                              5.0),
-                                                                       textStyle:
-                                                                          const TextStyle(
-                                                                              fontSize: 13),
-                                                                      ),
-                                                                        onPressed:
-                                                                        () {
-                                                                      String str_photourl = "${userinfoPin[index].mapurl}";
+                                                                      fontSize:
+                                                                          16.0);
+                                                                } else {
+                                                                  ViewDialog(context: context).hideOpenDialog();
 
-                                                                      String str_Data =
-                                                                          "${userinfoPin[index].delightName}, ${userinfoPin[index].rating}, ${userinfoPin[index].latitude}, "
-                                                                          " ${userinfoPin[index].longitude}}";
-
-                                                                      showModalBottomSheet<
-                                                                          void>(
-                                                                        context:
-                                                                            context,
-                                                                        backgroundColor:
-                                                                            Colors.transparent,
-                                                                        builder:
-                                                                            (BuildContext
-                                                                                context) {
-                                                                          return GestureDetector(
-                                                                            onTap: () =>
-                                                                                Navigator.of(context).pop(),
-                                                                            child:
-                                                                                Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                  height: MediaQuery.of(context).size.height / 10,
-                                                                                  width: MediaQuery.of(context).size.width,
-                                                                                  margin: EdgeInsets.only(left: 10, right: 10,bottom: 10),
-                                                                                  decoration: BoxDecoration(
-                                                                                    color: Color(0xFFffffff),
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: Colors.black12,
-                                                                                        blurRadius: 5.0,
-                                                                                        // soften the shadow
-                                                                                        spreadRadius: 5.0,
-                                                                                        //extend the shadow
-                                                                                        offset: Offset(
-                                                                                          1.0,
-                                                                                          // Move to right 5  horizontally
-                                                                                          1.0, // Move to bottom 5 Vertically
-                                                                                        ),
-                                                                                      )
-                                                                                    ],
-                                                                                    borderRadius: BorderRadius.circular(10),
-                                                                                  ),
-                                                                                  alignment: Alignment.center,
-                                                                                  child: ListView(
-                                                                                    scrollDirection: Axis.horizontal,
-                                                                                    children: dataList.map((data) {
-                                                                                      return InkWell(
-                                                                                        onTap: () {
-                                                                                          if (data.name == "Facebook") {
-                                                                                            onButtonTap(Share.facebook, str_Data, str_photourl);
-                                                                                          } else if (data.name == "Whatsapp") {
-                                                                                            onButtonTap(Share.whatsapp, str_Data, str_photourl);
-                                                                                          } else if (data.name == "Whatsapp Business") {
-                                                                                            onButtonTap(Share.whatsapp_business, str_Data, str_photourl);
-                                                                                          } else if (data.name == "Twitter") {
-                                                                                            onButtonTap(Share.twitter, str_Data, str_photourl);
-                                                                                          } else if (data.name == "More") {
-                                                                                            onButtonTap(Share.share_system, str_Data, str_photourl);
-                                                                                          }
-                                                                                        },
-                                                                                        child: Container(
-                                                                                          margin: EdgeInsets.all(10),
-                                                                                          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.5, color: Colors.white))),
-                                                                                          child: Column(
-                                                                                            children: [
-                                                                                              Image.asset(
-                                                                                                data.imageURL,
-                                                                                                height: 40,
-                                                                                                width: 40,
-                                                                                              ),
-                                                                                              Text(data.name),
-                                                                                            ],
-                                                                                          ),
-                                                                                        ),
-                                                                                      );
-                                                                                    }).toList(),
-                                                                                  )),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      );
-
-                                                                      // showDialog(
-                                                                      //   context: context,
-                                                                      //   builder: (BuildContext context) {
-                                                                      //     return Dialog(
-                                                                      //         elevation: 0,
-                                                                      //         backgroundColor: Colors.transparent,
-                                                                      //         child:  Container(
-                                                                      //             height: MediaQuery.of(context).size.height / 9,
-                                                                      //             width: MediaQuery.of(context).size.width,
-                                                                      //             decoration: BoxDecoration(
-                                                                      //               color: Color(0xFFffffff),
-                                                                      //               boxShadow: [
-                                                                      //                 BoxShadow(
-                                                                      //                   color: Colors.black12,
-                                                                      //                   blurRadius: 5.0, // soften the shadow
-                                                                      //                   spreadRadius: 5.0, //extend the shadow
-                                                                      //                   offset: Offset(
-                                                                      //                     1.0, // Move to right 5  horizontally
-                                                                      //                     1.0, // Move to bottom 5 Vertically
-                                                                      //                   ),
-                                                                      //                 )
-                                                                      //               ],
-                                                                      //               borderRadius: BorderRadius.circular(10),
-                                                                      //             ),
-                                                                      //             child: ListView(
-                                                                      //               scrollDirection: Axis.horizontal,
-                                                                      //               children: dataList.map((data){
-                                                                      //                 return InkWell(
-                                                                      //                   onTap: (){
-                                                                      //
-                                                                      //                     if(data.name == "Facebook"){
-                                                                      //
-                                                                      //                       onButtonTap(Share.facebook);
-                                                                      //
-                                                                      //                     }else if(data.name == "Whatsapp"){
-                                                                      //
-                                                                      //                       onButtonTap(Share.whatsapp);
-                                                                      //
-                                                                      //                     }else if(data.name == "Whatsapp Business"){
-                                                                      //
-                                                                      //                       onButtonTap(Share.whatsapp_business);
-                                                                      //
-                                                                      //                     }else if(data.name == "Twitter"){
-                                                                      //
-                                                                      //                       onButtonTap(Share.twitter);
-                                                                      //
-                                                                      //                     }else if(data.name == "More"){
-                                                                      //
-                                                                      //                       onButtonTap(Share.share_system);
-                                                                      //
-                                                                      //                     }
-                                                                      //
-                                                                      //                   },
-                                                                      //                   child: Container(
-                                                                      //                     margin: EdgeInsets.all(10),
-                                                                      //                     decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.5,color: Colors.white))),
-                                                                      //                     child: Column(
-                                                                      //                       children: [
-                                                                      //                         Image.asset(data.imageURL,height: 40,width: 40,),
-                                                                      //                         Text(data.name),
-                                                                      //                       ],
-                                                                      //                     ),
-                                                                      //                   ),
-                                                                      //                 );
-                                                                      //               }).toList(),
-                                                                      //
-                                                                      //             )
-                                                                      //         )
-                                                                      //     );
-                                                                      //   },
-                                                                      // );
-                                                                    },
-                                                                    child: Row(
-                                                                      children: <Widget>[
-                                                                        Image
-                                                                            .asset(
-                                                                          "assets/images/share-g.png",
-                                                                          width:
-                                                                              11,
-                                                                          color:
-                                                                              Colors.white,
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        const Text(
-                                                                          "Share",
-                                                                          style: TextStyle(
-                                                                              fontSize: 13,
-                                                                              color: Colors.white,
-                                                                              fontWeight: FontWeight.normal),
-                                                                        ),
-                                                                        // text
-                                                                      ],
+                                                                  Fluttertoast.showToast(
+                                                                      msg: userResponse
+                                                                          .message!,
+                                                                      toastLength:
+                                                                          Toast
+                                                                              .LENGTH_SHORT,
+                                                                      gravity: ToastGravity
+                                                                          .BOTTOM,
+                                                                      timeInSecForIosWeb:
+                                                                          1,
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .green,
+                                                                      textColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      fontSize:
+                                                                          16.0);
+                                                                }
+                                                              },
+                                                              child: Container(
+                                                                height: 30,
+                                                                margin:
+                                                                    EdgeInsets
+                                                                        .all(5),
+                                                                child: Row(
+                                                                  children: <Widget>[
+                                                                    Image.asset(
+                                                                      'assets/images/trash_bin.png',
+                                                                      width:
+                                                                          10.w,
+                                                                      //  color: const Color(0xFFF9BF3A),
                                                                     ),
-                                                                  ),
+                                                                    const SizedBox(
+                                                                      width: 2,
+                                                                    ),
+                                                                    /*    Text(
+                                                                    "${userinfoPin[index].rating}",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            14.5
+                                                                                .sp,
+                                                                        color: Color(
+                                                                            0xFF616768),
+                                                                        fontWeight:
+                                                                            FontWeight.normal),
+                                                                  ),*/
+                                                                    // text
+                                                                  ],
                                                                 ),
-                                                              ],
+                                                                //     TextButton(
+                                                                //   style:
+                                                                //       ButtonStyle(
+                                                                //     backgroundColor:
+                                                                //     MaterialStateProperty.all<Color>(Colors.white),
+                                                                //   ),
+                                                                //   onPressed:
+                                                                //       () {},
+                                                                //   child:
+                                                                // ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 2,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              "${userinfoPin[index].delightName}",
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      15.sp,
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      500],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal),
+                                                            ),
+                                                            Text(
+                                                              "",
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  fontSize: 11,
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      500],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal),
                                                             ),
                                                           ],
                                                         ),
-                                                      )),
+                                                        const SizedBox(
+                                                          height: 2,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              "${userinfoPin[index].openClose}",
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      500],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          1),
+                                                              child:
+                                                                  RatingBarIndicator(
+                                                                rating: double.parse(
+                                                                    userinfoPin[
+                                                                            index]
+                                                                        .rating!),
+                                                                itemBuilder:
+                                                                    (context,
+                                                                            index) =>
+                                                                        Icon(
+                                                                  Icons.star,
+                                                                  color: Colors
+                                                                      .amber,
+                                                                ),
+                                                                itemCount: 5,
+                                                                itemSize: 15.0,
+                                                                direction: Axis
+                                                                    .horizontal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              "(${userinfoPin[index].rating})",
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      15.sp,
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      500],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              height: 36,
+                                                              child: TextButton(
+                                                                style:
+                                                                    ButtonStyle(
+                                                                  backgroundColor:
+                                                                      MaterialStateProperty.all<
+                                                                              Color>(
+                                                                          Colors
+                                                                              .white),
+                                                                  shape: MaterialStateProperty.all<
+                                                                          RoundedRectangleBorder>(
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50.0),
+                                                                    side:
+                                                                        const BorderSide(
+                                                                      color: Color(
+                                                                          0xFFDDE4E4),
+                                                                    ),
+                                                                  )),
+                                                                  padding: MaterialStateProperty.all<
+                                                                          EdgeInsets>(
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                    left: 12,
+                                                                    right: 12,
+                                                                  )),
+                                                                ),
+                                                                onPressed:
+                                                                    () {},
+                                                                child: Row(
+                                                                  children: <Widget>[
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      'assets/images/direction-icon.svg',
+                                                                      width: 18,
+                                                                      color: const Color(
+                                                                          0xFF00B8CA),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width: 5,
+                                                                    ),
+                                                                    const Text(
+                                                                      "Directions",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              11,
+                                                                          color: Color(
+                                                                              0xFF00B8CA),
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                    // text
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Container(
+                                                              height: 36,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            25),
+                                                                gradient: const LinearGradient(
+                                                                    begin: Alignment
+                                                                        .topCenter,
+                                                                    end: Alignment.bottomCenter,
+                                                                    colors: [
+                                                                      Color.fromRGBO(
+                                                                          31,
+                                                                          203,
+                                                                          220,
+                                                                          1),
+                                                                      Color.fromRGBO(
+                                                                          0,
+                                                                          184,
+                                                                          202,
+                                                                          1)
+                                                                    ]),
+                                                              ),
+                                                              child: TextButton(
+                                                                style: TextButton
+                                                                    .styleFrom(
+                                                                  foregroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  padding: const EdgeInsets
+                                                                      .only(
+                                                                      left: 12,
+                                                                      right: 12,
+                                                                      top: 5.0,
+                                                                      bottom:
+                                                                          5.0),
+                                                                  textStyle:
+                                                                      const TextStyle(
+                                                                          fontSize:
+                                                                              13),
+                                                                ),
+                                                                onPressed: () {
+                                                                  String
+                                                                      str_photourl =
+                                                                      "${userinfoPin[index].mapurl}";
+
+                                                                  String
+                                                                      str_Data =
+                                                                      "${userinfoPin[index].delightName}, ${userinfoPin[index].rating}, ${userinfoPin[index].latitude}, "
+                                                                      " ${userinfoPin[index].longitude}}";
+
+                                                                  showModalBottomSheet<
+                                                                      void>(
+                                                                    context:
+                                                                        context,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .transparent,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return GestureDetector(
+                                                                        onTap: () =>
+                                                                            Navigator.of(context).pop(),
+                                                                        child:
+                                                                            Align(
+                                                                          alignment:
+                                                                              Alignment.bottomCenter,
+                                                                          child: Container(
+                                                                              height: MediaQuery.of(context).size.height / 10,
+                                                                              width: MediaQuery.of(context).size.width,
+                                                                              margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                                                              decoration: BoxDecoration(
+                                                                                color: Color(0xFFffffff),
+                                                                                boxShadow: [
+                                                                                  BoxShadow(
+                                                                                    color: Colors.black12,
+                                                                                    blurRadius: 5.0,
+                                                                                    // soften the shadow
+                                                                                    spreadRadius: 5.0,
+                                                                                    //extend the shadow
+                                                                                    offset: Offset(
+                                                                                      1.0,
+                                                                                      // Move to right 5  horizontally
+                                                                                      1.0, // Move to bottom 5 Vertically
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                              ),
+                                                                              alignment: Alignment.center,
+                                                                              child: ListView(
+                                                                                scrollDirection: Axis.horizontal,
+                                                                                children: dataList.map((data) {
+                                                                                  return InkWell(
+                                                                                    onTap: () {
+                                                                                      if (data.name == "Facebook") {
+                                                                                        onButtonTap(Share.facebook, str_Data, str_photourl);
+                                                                                      } else if (data.name == "Whatsapp") {
+                                                                                        onButtonTap(Share.whatsapp, str_Data, str_photourl);
+                                                                                      } else if (data.name == "Whatsapp Business") {
+                                                                                        onButtonTap(Share.whatsapp_business, str_Data, str_photourl);
+                                                                                      } else if (data.name == "Twitter") {
+                                                                                        onButtonTap(Share.twitter, str_Data, str_photourl);
+                                                                                      } else if (data.name == "More") {
+                                                                                        onButtonTap(Share.share_system, str_Data, str_photourl);
+                                                                                      }
+                                                                                    },
+                                                                                    child: Container(
+                                                                                      margin: EdgeInsets.all(10),
+                                                                                      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.5, color: Colors.white))),
+                                                                                      child: Column(
+                                                                                        children: [
+                                                                                          Image.asset(
+                                                                                            data.imageURL,
+                                                                                            height: 40,
+                                                                                            width: 40,
+                                                                                          ),
+                                                                                          Text(data.name),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  );
+                                                                                }).toList(),
+                                                                              )),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  );
+
+                                                                  // showDialog(
+                                                                  //   context: context,
+                                                                  //   builder: (BuildContext context) {
+                                                                  //     return Dialog(
+                                                                  //         elevation: 0,
+                                                                  //         backgroundColor: Colors.transparent,
+                                                                  //         child:  Container(
+                                                                  //             height: MediaQuery.of(context).size.height / 9,
+                                                                  //             width: MediaQuery.of(context).size.width,
+                                                                  //             decoration: BoxDecoration(
+                                                                  //               color: Color(0xFFffffff),
+                                                                  //               boxShadow: [
+                                                                  //                 BoxShadow(
+                                                                  //                   color: Colors.black12,
+                                                                  //                   blurRadius: 5.0, // soften the shadow
+                                                                  //                   spreadRadius: 5.0, //extend the shadow
+                                                                  //                   offset: Offset(
+                                                                  //                     1.0, // Move to right 5  horizontally
+                                                                  //                     1.0, // Move to bottom 5 Vertically
+                                                                  //                   ),
+                                                                  //                 )
+                                                                  //               ],
+                                                                  //               borderRadius: BorderRadius.circular(10),
+                                                                  //             ),
+                                                                  //             child: ListView(
+                                                                  //               scrollDirection: Axis.horizontal,
+                                                                  //               children: dataList.map((data){
+                                                                  //                 return InkWell(
+                                                                  //                   onTap: (){
+                                                                  //
+                                                                  //                     if(data.name == "Facebook"){
+                                                                  //
+                                                                  //                       onButtonTap(Share.facebook);
+                                                                  //
+                                                                  //                     }else if(data.name == "Whatsapp"){
+                                                                  //
+                                                                  //                       onButtonTap(Share.whatsapp);
+                                                                  //
+                                                                  //                     }else if(data.name == "Whatsapp Business"){
+                                                                  //
+                                                                  //                       onButtonTap(Share.whatsapp_business);
+                                                                  //
+                                                                  //                     }else if(data.name == "Twitter"){
+                                                                  //
+                                                                  //                       onButtonTap(Share.twitter);
+                                                                  //
+                                                                  //                     }else if(data.name == "More"){
+                                                                  //
+                                                                  //                       onButtonTap(Share.share_system);
+                                                                  //
+                                                                  //                     }
+                                                                  //
+                                                                  //                   },
+                                                                  //                   child: Container(
+                                                                  //                     margin: EdgeInsets.all(10),
+                                                                  //                     decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.5,color: Colors.white))),
+                                                                  //                     child: Column(
+                                                                  //                       children: [
+                                                                  //                         Image.asset(data.imageURL,height: 40,width: 40,),
+                                                                  //                         Text(data.name),
+                                                                  //                       ],
+                                                                  //                     ),
+                                                                  //                   ),
+                                                                  //                 );
+                                                                  //               }).toList(),
+                                                                  //
+                                                                  //             )
+                                                                  //         )
+                                                                  //     );
+                                                                  //   },
+                                                                  // );
+                                                                },
+                                                                child: Row(
+                                                                  children: <Widget>[
+                                                                    Image.asset(
+                                                                      "assets/images/share-g.png",
+                                                                      width: 11,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width: 5,
+                                                                    ),
+                                                                    const Text(
+                                                                      "Share",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                    // text
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )),
                                                 ),
                                               ],
                                             ),
@@ -1538,7 +1718,7 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
   Image getImage(String photo_reference) {
     var baseurl = "https://maps.googleapis.com/maps/api/place/photo";
     var maxWidth = "1000";
-   // var maxHeight = "110";
+    // var maxHeight = "110";
     final url =
         "$baseurl?maxwidth=$maxWidth&photo_reference=$photo_reference&key=$googleApikey";
     return Image.network(
@@ -1626,10 +1806,10 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
     );
   }
 
-  Future<void> onButtonTap(Share share, String str_data, String str_photourl) async {
-     String url = str_photourl;
-     String msg = "$str_data,$url";
-
+  Future<void> onButtonTap(
+      Share share, String str_data, String str_photourl) async {
+    String url = str_photourl;
+    String msg = "$str_data,$url";
 
     String? response;
     final FlutterShareMe flutterShareMe = FlutterShareMe();

@@ -14,6 +14,7 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wherenxnew1/ApiCallingPage/AddKMRadius.dart';
 import 'package:wherenxnew1/ApiCallingPage/PinThePlaceFile.dart';
+import 'package:wherenxnew1/ApiCallingPage/ShowPinExitOrNOt.dart';
 import 'package:wherenxnew1/ApiImplement/ViewDialog.dart';
 import 'package:wherenxnew1/Dimension.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -112,10 +113,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
       city = "",
       state = "",
       countary = "",
-      mobileNo = "",
-      insertPinStatues = "1",
-      insertPinStatues1 = "3";
-  late bool islogin = false;
+      mobileNo = "";
+  bool islogin = false;
   int userId = 0;
   NearByplaces nearByplaces = NearByplaces();
   List<Results> nearbyLocations = [];
@@ -208,6 +207,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   List<UserInfo> elightlistName1 = [];
   String kename = "", delightId = "", kenameType = "";
   int delight_Id = 0, radius = 0;
+  List<String> str_userinfoPin = [];
 
   bool isVisible = false, isTextVisible = false, isListProduct = true;
 
@@ -220,7 +220,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     islogin = pre.getBool("islogin") ?? false;
     userId = pre.getInt("userId") ?? 0;
     radius = pre.getInt("radius") ?? 0;
-    dob_radiusData = pre.getDouble("radiusData") ?? 0.0;
+    str_userinfoPin = pre.getStringList("userinfoPin") ?? [];
+
+    print("userdetails123 $str_userinfoPin");
 
     String radiusData = radius.toString();
     _radius3 = radiusData;
@@ -275,7 +277,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
               fontSize: 16.0);
         }
       }
-    } else {
+    }
+    else {
       Fluttertoast.showToast(
           msg: delightlistResponse.message!,
           toastLength: Toast.LENGTH_SHORT,
@@ -837,12 +840,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
             //
             // )
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.end,
             mainAxisSize: MainAxisSize.max,
             children: [
+
               Container(
                   height: Dimensions.size160,
                   width: Dimensions.size600,
@@ -1208,8 +1211,54 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                 ),
                                                                           onPressed:
                                                                               () async {
-                                                                            if (insertPinStatues1 == "3") {
+                                                                            SharedPreferences
+                                                                                pre =
+                                                                                await SharedPreferences.getInstance();
+                                                                            final userId =
+                                                                                pre.getInt("userId") ?? 0;
+                                                                            String
+                                                                                struserId =
+                                                                                userId.toString();
+                                                                            final placeid =
+                                                                                nearbyLocations1[index].placeId!;
 
+                                                                            http.Response
+                                                                                response1 =
+                                                                                await ShowPinExitOrNOt().showPinExits(struserId, placeid);
+                                                                            print(response1);
+
+                                                                            var pinResponse =
+                                                                                jsonDecode(response1.body);
+                                                                            var userResponse =
+                                                                                DeletePinData.fromJson(pinResponse);
+
+                                                                            if (userResponse.status ==
+                                                                                "200") {
+                                                                              ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
+
+                                                                              SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                              final userId = pre.getInt("userId") ?? 0;
+                                                                              String struserId = userId.toString();
+                                                                              final placeid = nearbyLocations1[index].placeId!;
+
+                                                                              http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                                                              print(response1);
+
+                                                                              var pinResponse = jsonDecode(response1.body);
+                                                                              var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                              if (userResponse.status == "200") {
+                                                                                ViewDialog(context: context).hideOpenDialog();
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                setState(() {
+                                                                                  isSelected = false;
+                                                                                });
+                                                                              } else {
+                                                                                ViewDialog(context: context).hideOpenDialog();
+                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                              }
+                                                                            } else {
                                                                               pr4.show();
 
                                                                               SinglePageDetails singlePageDetails = SinglePageDetails();
@@ -1241,41 +1290,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
                                                                               if (userResponse.status == "200") {
                                                                                 pr4.hide();
-                                                                                insertPinStatues1 = "4";
                                                                                 Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
                                                                                 setState(() {
                                                                                   isSelected = true;
                                                                                 });
                                                                               } else {
                                                                                 pr4.hide();
-                                                                                insertPinStatues1 = "3";
-                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                              }
-                                                                            } else {
-                                                                              ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
-
-                                                                              SharedPreferences pre = await SharedPreferences.getInstance();
-                                                                              final userId = pre.getInt("userId") ?? 0;
-                                                                              String struserId = userId.toString();
-                                                                              final placeid = nearbyLocations1[index].placeId!;
-
-                                                                              http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
-                                                                              print(response1);
-
-                                                                              var pinResponse = jsonDecode(response1.body);
-                                                                              var userResponse = DeletePinData.fromJson(pinResponse);
-
-                                                                              if (userResponse.status == "200") {
-                                                                                ViewDialog(context: context).hideOpenDialog();
-                                                                                insertPinStatues1 = "3";
-                                                                                Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-
-                                                                                setState(() {
-                                                                                  isSelected = false;
-                                                                                });
-                                                                              } else {
-                                                                                ViewDialog(context: context).hideOpenDialog();
-                                                                                insertPinStatues1 = "4";
                                                                                 Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
                                                                               }
                                                                             }
@@ -1312,6 +1332,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                         ),
                                                                       ),
                                                                     ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 5,
                                                                   ),
                                                                 ],
                                                               ),
@@ -1633,7 +1656,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                             const SizedBox(width: 10),
                                                                             Container(
                                                                               height: 36,
-                                                                              decoration: curIndex1 == index
+                                                                              decoration:
+                                                                              // str_userinfoPin.contains(nearbyLocations[index].placeId!) ?  BoxDecoration(
+                                                                              //             borderRadius: BorderRadius.circular(25),
+                                                                              //             gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                                                                              //               Color.fromRGBO(255, 255, 255, 255),
+                                                                              //               Color.fromRGBO(255, 255, 255, 255),
+                                                                              //             ]),
+                                                                              //           ):
+                                                                              curIndex1 == index
                                                                                   ? isSelected == true
                                                                                       ? BoxDecoration(
                                                                                           borderRadius: BorderRadius.circular(25),
@@ -1656,7 +1687,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                       ]),
                                                                                     ),
                                                                               child: TextButton(
-                                                                                style: curIndex1 == index
+                                                                                style:
+                                                                                // str_userinfoPin.contains(nearbyLocations[index].placeId!) ?  TextButton.styleFrom(
+                                                                                //             foregroundColor: Colors.white,
+                                                                                //             shape: RoundedRectangleBorder(
+                                                                                //               borderRadius: BorderRadius.circular(25.0),
+                                                                                //             ),
+                                                                                //             side: const BorderSide(
+                                                                                //               color: Color(0xFFDDE4E4),
+                                                                                //             ),
+                                                                                //             padding: const EdgeInsets.only(left: 12, right: 12, top: 5.0, bottom: 5.0),
+                                                                                //             textStyle: TextStyle(fontSize: 13.sp),
+                                                                                //           ):
+                                                                                curIndex1 == index
                                                                                     ? isSelected == true
                                                                                         ? TextButton.styleFrom(
                                                                                             foregroundColor: Colors.white,
@@ -1680,7 +1723,54 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                         textStyle: TextStyle(fontSize: 13.sp),
                                                                                       ),
                                                                                 onPressed: () async {
-                                                                                  if (insertPinStatues == "1") {
+
+                                                                                  ViewDialog(context: context).showLoadingIndicator("Place Is Avilable Or Not", "Home Page", context);
+
+                                                                                  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                  final userId = pre.getInt("userId") ?? 0;
+                                                                                  String struserId = userId.toString();
+                                                                                  final placeid = nearbyLocations[index].placeId!;
+
+                                                                                  http.Response response1 = await ShowPinExitOrNOt().showPinExits(struserId, placeid);
+                                                                                  print(response1);
+
+                                                                                  var pinResponse = jsonDecode(response1.body);
+                                                                                  var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                                  if (userResponse.status == "200") {
+
+                                                                                     ViewDialog(context: context).hideOpenDialog();
+
+                                                                                    ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
+
+                                                                                    SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                    final userId = pre.getInt("userId") ?? 0;
+                                                                                    String struserId = userId.toString();
+                                                                                    final placeid = nearbyLocations[index].placeId!;
+
+                                                                                    http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
+                                                                                    print(response1);
+
+                                                                                    var pinResponse = jsonDecode(response1.body);
+                                                                                    var userResponse = DeletePinData.fromJson(pinResponse);
+
+                                                                                    if (userResponse.status == "200") {
+                                                                                      ViewDialog(context: context).hideOpenDialog();
+
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+                                                                                      setState(() {
+                                                                                        isSelected = false;
+                                                                                       // str_userinfoPin.remove(placeid);
+                                                                                      });
+                                                                                    } else {
+                                                                                      ViewDialog(context: context).hideOpenDialog();
+                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+                                                                                    }
+                                                                                  } else {
+
+                                                                                     ViewDialog(context: context).hideOpenDialog();
+
                                                                                     pr4.show();
 
                                                                                     SinglePageDetails singlePageDetails = SinglePageDetails();
@@ -1712,42 +1802,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
                                                                                     if (userResponse.status == "200") {
                                                                                       pr4.hide();
-                                                                                      insertPinStatues = "2";
                                                                                       Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
 
-                                                                                      setState(() {
+                                                                                      setState(()  {
                                                                                         isSelected = true;
+                                                                                       // str_userinfoPin.add(placeid);
+
+                                                                                                // SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                                                // pre.setStringList("userinfoPin", str_userinfoPin); //save List
                                                                                       });
                                                                                     } else {
                                                                                       pr4.hide();
-                                                                                      insertPinStatues = "1";
-                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-                                                                                    }
-                                                                                  } else {
-                                                                                    ViewDialog(context: context).showLoadingIndicator(" Delete Pin Request Wait...", "", context);
-
-                                                                                    SharedPreferences pre = await SharedPreferences.getInstance();
-                                                                                    final userId = pre.getInt("userId") ?? 0;
-                                                                                    String struserId = userId.toString();
-                                                                                    final placeid = nearbyLocations[index].placeId!;
-
-                                                                                    http.Response response1 = await DeletePinRequest().deletePinPlaces(struserId, placeid);
-                                                                                    print(response1);
-
-                                                                                    var pinResponse = jsonDecode(response1.body);
-                                                                                    var userResponse = DeletePinData.fromJson(pinResponse);
-
-                                                                                    if (userResponse.status == "200") {
-                                                                                      ViewDialog(context: context).hideOpenDialog();
-                                                                                      insertPinStatues = "1";
-                                                                                      Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
-
-                                                                                      setState(() {
-                                                                                        isSelected = false;
-                                                                                      });
-                                                                                    } else {
-                                                                                      ViewDialog(context: context).hideOpenDialog();
-                                                                                      insertPinStatues = "2";
                                                                                       Fluttertoast.showToast(msg: userResponse.message!, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
                                                                                     }
                                                                                   }
@@ -1757,7 +1822,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                     SvgPicture.asset(
                                                                                       'assets/images/Pin-s.svg',
                                                                                       width: 11,
-                                                                                      color: curIndex1 == index
+                                                                                      color:
+                                                                                      //str_userinfoPin.contains(nearbyLocations[index].placeId!) ? Color(0xFF00B8CA) :
+                                                                                      curIndex1 == index
                                                                                           ? isSelected == true
                                                                                               ? Color(0xFF00B8CA)
                                                                                               : Color(0xFFFFFFFFF)
@@ -1770,7 +1837,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                                       "Pinned",
                                                                                       style: TextStyle(
                                                                                           fontSize: 13,
-                                                                                          color: curIndex1 == index
+                                                                                          color:
+                                                                                          //str_userinfoPin.contains(nearbyLocations[index].placeId!) ? Color(0xFF00B8CA) :
+                                                                                          curIndex1 == index
                                                                                               ? isSelected == true
                                                                                                   ? Color(0xFF00B8CA)
                                                                                                   : Color(0xFFFFFFFFF)
@@ -1847,6 +1916,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                 ),
               )
+
             ],
           )
         ],
