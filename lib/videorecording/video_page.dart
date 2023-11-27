@@ -223,7 +223,8 @@ class _VideoPageState extends State<VideoPage> {
 
                   Get.toNamed(RouteHelper.getdetailsScreen());
 
-                } else {
+                }
+                else {
 
                   ViewDialog(context: context).hideOpenDialog();
 

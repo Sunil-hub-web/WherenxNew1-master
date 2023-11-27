@@ -1,15 +1,29 @@
+import 'dart:io';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_compress/video_compress.dart';
+import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:wherenxnew1/ApiCallingPage/Addevent.dart';
 
+import '../ApiImplement/ViewDialog.dart';
+import '../Helper/img.dart';
 import '../Routes/RouteHelper.dart';
+import '../videorecording/FileCompressionApi.dart';
+import 'package:http/http.dart' as http;
 
 class AddEventsDetails extends StatefulWidget {
   const AddEventsDetails({super.key});
@@ -28,8 +42,18 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
 
   final ImagePicker imgpicker = ImagePicker();
   List<XFile>? imagefiles;
+  List<String> filepathdet = [];
   File? galleryFile;
-  String filePath1 = "";
+  String filePath1 = "", videofilepath = "";
+  bool isImageVisiable = false, isVideoVisiable = false;
+  MediaInfo? compressedVideoInfo;
+  VideoPlayerController? _videoPlayerController;
+
+  @override
+  void dispose() {
+    _videoPlayerController?.dispose();
+    super.dispose();
+  }
 
   openImages() async {
     try {
@@ -38,6 +62,13 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
       // ignore: unnecessary_null_comparison
       if (pickedfiles != null) {
         imagefiles = pickedfiles;
+        print("imagelist $imagefiles");
+
+        for (int i = 0; i < imagefiles!.length; i++) {
+          filepathdet.add(imagefiles![i].path);
+        }
+        isImageVisiable = true;
+        print("Yourdatafile  $filepathdet");
         setState(() {});
       } else {
         print("No image is selected.");
@@ -47,7 +78,9 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
     }
   }
 
-  Future getVideo(ImageSource img,) async {
+  Future getVideo(
+    ImageSource img,
+  ) async {
     // Pick an image
     // final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
@@ -60,11 +93,26 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
     );
     XFile? xfilePick = pickedFile;
     setState(
-      () {
+      () async {
         if (xfilePick != null) {
           galleryFile = File(pickedFile!.path);
           genThumbnailFile(galleryFile?.path);
           print("imagevideo${galleryFile?.path}");
+          File file = new File(galleryFile!.path);
+          final info = await FileCompressionApi.compressVideo(file);
+          compressedVideoInfo = info;
+          var filePath = compressedVideoInfo?.file?.path;
+          videofilepath = filePath!;
+          print("videofilepath  $videofilepath");
+
+          // MediaInfo? compressedVideoInfo = info;
+          _videoPlayerController =
+              VideoPlayerController.networkUrl(Uri.parse(videofilepath));
+          await _videoPlayerController?.initialize();
+          await _videoPlayerController?.setLooping(true);
+          await _videoPlayerController?.play();
+
+          isVideoVisiable = true;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
               const SnackBar(content: Text('Nothing is selected')));
@@ -84,23 +132,59 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
     if (pickedDate != null && pickedDate != currentDate)
       setState(() {
         currentDate = pickedDate;
-        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+        String formattedDate =
+            DateFormat('yyyy-MM-dd - HH:mm').format(pickedDate);
         currentDateTime.text = formattedDate.toString();
       });
   }
 
-  Future genThumbnailFile(String? path) async {
-    final thumbnail = await VideoThumbnail.thumbnailFile(
-        video: path!,
-        // thumbnailPath: _tempDir,
-        imageFormat: ImageFormat.JPEG,
-        //maxHeightOrWidth: 0,
-        maxHeight: 3,
-        maxWidth: 2,
-        quality: 10);
+  dateTimePickerWidget(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ).then((selectedDate) {
+      // After selecting the date, display the time picker.
+      if (selectedDate != null) {
+        showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        ).then((selectedTime) {
+          // Handle the selected date and time here.
+          if (selectedTime != null) {
+            DateTime selectedDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+            print(selectedDateTime);
+            setState(() {
+              currentDate = selectedDateTime;
+              String formattedDate =
+                  DateFormat('d MMM, yyyy  hh:mm').format(selectedDateTime);
+              currentDateTime.text = formattedDate.toString();
+            }); // You can use the selectedDateTime as needed.
+          }
+        });
+      }
+    });
+  }
+
+  Future genThumbnailFile(String? filePath) async {
+    var imagefilepath = await VideoThumbnail.thumbnailFile(
+      video: filePath!,
+      thumbnailPath: (await getTemporaryDirectory()).path,
+      imageFormat: ImageFormat.WEBP,
+      maxHeight: 200,
+      // specify the height of the thumbnail, let the width auto-scaled to keep the source aspect ratio
+      quality: 75,
+    );
 
     setState(() {
-      final file = File(thumbnail!);
+      final file = File(imagefilepath!);
       filePath1 = file.path;
     });
 
@@ -246,6 +330,52 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                     )
                   ],
                 ),
+                Visibility(
+                  visible: isImageVisiable,
+                  child: Container(
+                    height: 20.h,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: filepathdet.length,
+                        itemBuilder: (context, int index) {
+                          return GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              height: 20.h,
+                              width: (30.w),
+                              margin: const EdgeInsets.only(
+                                  top: 5, left: 5, right: 5, bottom: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                // Image border
+                                child: SizedBox.fromSize(
+                                  size: Size.fromRadius(48),
+                                  // Image radius
+                                  child: Image.file(File(filepathdet[index]),
+                                      fit: BoxFit
+                                          .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                ),
+                // Visibility(
+                //   visible: isVideoVisiable,
+                //   child: Container(
+                //     height: 20.h,
+                //     width: MediaQuery.of(context).size.width,
+                //     child: VideoPlayer(_videoPlayerController!)
+                //   ),
+                // ),
                 Container(
                   margin: const EdgeInsets.only(top: 10),
                   child: Card(
@@ -326,7 +456,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                     ),
                     child: TextFormField(
                       onTap: () {
-                        _selectDate(context);
+                        // _selectDate(context);
+                        dateTimePickerWidget(context);
                         FocusScope.of(context).requestFocus(new FocusNode());
                       },
                       controller: currentDateTime,
@@ -404,6 +535,88 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                     onPressed: () async {
                       //Get.toNamed(RouteHelper.getotpScreenpage());
                       // Get.back();
+
+                      if (textYouName.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(context, "Enter User Name");
+                      } else if (textYourEventName.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Enter User Event Name");
+                      } else if (textEventType.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Enter User Event Type");
+                      } else if (textEventAddress.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Enter User Event Address");
+                      } else if (textEventDescription.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Enter User Event Description");
+                      } else if (currentDateTime.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Select Event Date Time");
+                      } else if (filepathdet.isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Select Your Event Image");
+                      } else {
+                        ViewDialog(context: context).showLoadingIndicator(
+                            "Create Event Wait...", "Event Details", context);
+
+                        SharedPreferences pre =
+                            await SharedPreferences.getInstance();
+                        int userId = pre.getInt("userId") ?? 0;
+                        String str_userId = userId.toString();
+
+                        http.StreamedResponse? response = await Addevent()
+                            .addEventDetails(
+                                str_userId,
+                                textYouName.text.toString(),
+                                textYouName.text.toString(),
+                                textEventType.text.toString(),
+                                currentDateTime.text.toString(),
+                                textEventAddress.text.toString(),
+                                textEventDescription.text.toString(),
+                                videofilepath,
+                                filepathdet);
+
+                        print(
+                            "usereventdetails ${str_userId}  ${textYouName.text.toString()}  ${textYouName.text.toString()}  ${textEventType.text.toString()}  "
+                            "${currentDateTime.text.toString()}  ${textEventAddress.text.toString()}  ${textEventDescription.text.toString()}  "
+                            "${videofilepath}  ${filepathdet}");
+
+                        var respStr = await response?.stream.bytesToString();
+                        print("userdataresponse  $respStr");
+                        print("userdataresponse1  $response");
+                        print("userdataresponse2  ${response?.statusCode}");
+
+                        if (response?.statusCode == 200) {
+                          ViewDialog(context: context).hideOpenDialog();
+
+                          //  print("show your message ${await response?.stream.bytesToString()}");
+
+                          Fluttertoast.showToast(
+                              msg: "Event successfully create.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+
+                          textYouName.text = "";
+                        } else {
+                          ViewDialog(context: context).hideOpenDialog();
+
+                          print("show your message1${response?.reasonPhrase}");
+
+                          Fluttertoast.showToast(
+                              msg: "Event not create.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       shadowColor: Colors.transparent,
@@ -421,5 +634,18 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
             ),
           ),
         ));
+  }
+
+  void Left_indicator_bar_Flushbar(BuildContext context, String Message) {
+    Flushbar(
+      message: Message,
+      icon: Icon(
+        Icons.info_outline,
+        size: 28.0,
+        color: Colors.blue[300],
+      ),
+      duration: Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red[300],
+    )..show(context);
   }
 }

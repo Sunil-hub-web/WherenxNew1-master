@@ -133,27 +133,6 @@ class _EventDetailsState extends State<EventDetails> {
             ),
           ),
         ),
-
-        // Container(
-        //      alignment: Alignment.center,
-        //      padding: EdgeInsets.all(20),
-        //      child: Column(
-        //        children: [
-        //           imagefiles != null?Wrap(
-        //              children: imagefiles!.map((imageone){
-        //                 return Container(
-        //                    child:Card(
-        //                       child: Container(
-        //                          height: 100, width:100,
-        //                          child: Image.file(File(imageone.path)),
-        //                       ),
-        //                    )
-        //                 );
-        //              }).toList(),
-        //           ):Container()
-        //        ],
-        //      ),
-        //   ),
       );
     });
   }

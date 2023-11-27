@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,7 +68,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   List<VideoReviewDetails> videoreviewDet = [];
   List<String> str_userinfoPin = [];
 
-  int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0;
+  int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0,closeopenHoursDay = 0;
   String placeId = "",
       strrating = "",
       reviewlist = "",
@@ -75,10 +76,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
       reviewlist2 = "",
       profileImage = "",
       openHours = "",
+      closeHours = "",
+      closeopenHoursDate = "",
+      dateName = "",
       delightId = "",
       str_Url = "",
       insertPinStatues = "1",
       str_count = "0";
+
 
   double startlatitude1 = 0.0,
       startlongitude1 = 0.0,
@@ -87,6 +92,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       valuedistansce2 = 0.0;
 
   bool isVisible = false, isVisible1 = false;
+
   String googleApikey = "AIzaSyAuFYxq-RX0I1boI5HU5-olArirEi2Ez8k";
   SinglePageDetails singlePageDetails = SinglePageDetails();
 
@@ -104,6 +110,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     delightId = pre.getString("delightId") ?? "";
     userId = pre.getInt("userId") ?? 0;
     str_userinfoPin = pre.getStringList("userinfoPin") ?? [];
+
+    String place1 = "ChIJbVztMfYhDogRqLNzF3Xxvas";
 
     String strUserid = userId.toString();
     showProfileImage(strUserid);
@@ -125,9 +133,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
     reviewlist = singlePageDetails.result?.reviews?.length.toString() ?? "";
 
     datadouble = singlePageDetails.result?.reviews?.length ?? 0;
-    openHours = singlePageDetails
-            .result?.currentOpeningHours?.periods?[0].close?.time ??
-        "";
+    closeHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.time ?? "";
+    openHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].open?.time ?? "";
+    closeopenHoursDate = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.date ?? "";
+    if(closeopenHoursDate == ""){
+      dateName = "";
+    }else{
+      dateName = DateFormat('EEEE').format(DateFormat("yyyy-MM-dd").parse(closeopenHoursDate));
+    }
+
+   // String data = getWeekdayName(int.parse(closeopenHoursDate));
+    print("userdatadate $dateName   $closeopenHoursDate");
     str_Url = singlePageDetails.result!.url!;
 
     // SharedPreferences pre1 = await SharedPreferences.getInstance();
@@ -666,20 +682,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     Row(
                                       children: [
                                         Text(
-                                          singlePageDetails
-                                                      .result?.businessStatus ==
-                                                  "OPERATIONAL"
+                                          singlePageDetails.result?.openingHours?.openNow == true
                                               ? " open:  "
-                                              : " close",
+                                              : " close: ",
                                           style: TextStyle(
                                               color: Colors.green,
                                               fontSize: 14),
                                         ),
                                         Text(
-                                          openHours == ""
-                                              ? ""
-                                              : " Close  "
-                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}",
+                                         singlePageDetails.result?.openingHours?.openNow == true  ? openHours == "" ? "" : " Close  "
+                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}"
+                                            : openHours == "" ? "" : " Open  "
+                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].open!.time)} $dateName",
                                           style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 14),

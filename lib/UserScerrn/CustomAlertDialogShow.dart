@@ -300,7 +300,7 @@ class _CustomAlertDialogShowState extends State<CustomAlertDialogShow> {
                                                                         Row(
                                                                           children: [
                                                                             Text(
-                                                                              widget.nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close",
+                                                                              widget.nearbyLocations[index].openingHours?.openNow == true ? "open" : "close",
                                                                               overflow: TextOverflow.ellipsis,
                                                                               style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
                                                                             ),

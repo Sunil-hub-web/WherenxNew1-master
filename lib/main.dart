@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:wherenxnew1/UserScerrn/ViewEventDetails.dart';
 
 import 'Routes/RouteHelper.dart';
 import 'UserScerrn/MapDirectionGoogle.dart';
@@ -7,7 +8,7 @@ import 'UserScerrn/MapDirectionGoogle.dart';
 void main() {
   runApp(const MyApp());
 }
-
+//
 // class MyApp extends StatelessWidget {
 //   const MyApp({super.key});
 //
@@ -25,7 +26,7 @@ void main() {
 //       title: 'WhereNx',
 //       // initialRoute: RouteHelper.getSplashScreenPage(),
 //       // getPages: RouteHelper.routes,
-//       home: MapDirectionGoogle(),
+//       home: ViewEventDetails(),
 //     );
 //       //dart fix --apply
 //   }

@@ -79,6 +79,7 @@ class Assets {
   static const String imagesListG = 'assets/images/list-g.png';
   static const String imagesListS = 'assets/images/list-s.png';
   static const String imagesListW = 'assets/images/list-w.png';
+  static const String imagesLocation = 'assets/images/location.png';
   static const String imagesLocationCrosshairs = 'assets/images/location-crosshairs.png';
   static const String imagesLoce = 'assets/images/loce.svg';
   static const String imagesLogo = 'assets/images/logo.png';

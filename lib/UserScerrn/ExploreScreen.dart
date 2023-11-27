@@ -1091,8 +1091,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                   Row(
                                                                     children: [
                                                                       Text(
-                                                                        nearbyLocations1[index].businessStatus ==
-                                                                                "OPERATIONAL"
+                                                                        nearbyLocations1[index].openingHours?.openNow == true
                                                                             ? "open"
                                                                             : "close",
                                                                         overflow:
@@ -1605,7 +1604,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                         Row(
                                                                           children: [
                                                                             Text(
-                                                                              nearbyLocations[index].businessStatus == "OPERATIONAL" ? "open" : "close",
+                                                                              nearbyLocations[index].openingHours?.openNow == true ? "open" : "close",
                                                                               overflow: TextOverflow.ellipsis,
                                                                               style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.normal),
                                                                             ),
@@ -3045,11 +3044,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                nearbyLocations[index]
-                                                                            .businessStatus ==
-                                                                        "OPERATIONAL"
-                                                                    ? "open"
-                                                                    : "close",
+                                                                nearbyLocations[index].openingHours?.openNow == true ? "open" : "close",
                                                                 overflow:
                                                                     TextOverflow
                                                                         .ellipsis,

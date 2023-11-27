@@ -866,9 +866,8 @@ class _MyPinsScreenState extends State<MyPinsScreen> {
                     Container(
                         child: FutureBuilder(
                       future: showAppPin(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
-                        if (snapshot.hasData) {
+                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                        if (snapshot.hasData)   {
                           return Column(
                             children: [
                               Container(

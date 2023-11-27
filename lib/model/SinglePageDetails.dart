@@ -1,9 +1,9 @@
-
 class SinglePageDetails {
+  List<Null>? htmlAttributions;
   Result? result;
   String? status;
 
-  SinglePageDetails({this.result, this.status});
+  SinglePageDetails({/*this.htmlAttributions*/ this.result, this.status});
 
   SinglePageDetails.fromJson(Map<String, dynamic> json) {
     // if (json['html_attributions'] != null) {
@@ -13,7 +13,7 @@ class SinglePageDetails {
     //   });
     // }
     result =
-    json['result'] != null ? new Result.fromJson(json['result']) : null;
+        json['result'] != null ? new Result.fromJson(json['result']) : null;
     status = json['status'];
   }
 
@@ -48,22 +48,14 @@ class Result {
   String? iconMaskBaseUri;
   String? internationalPhoneNumber;
   String? name;
-  CurrentOpeningHours? openingHours;
+  OpeningHours? openingHours;
   List<Photos>? photos;
   String? placeId;
   PlusCode? plusCode;
   int? priceLevel;
   dynamic rating;
   String? reference;
-  bool? reservable;
   List<Reviews>? reviews;
-  bool? servesBeer;
-  bool? servesBreakfast;
-  bool? servesBrunch;
-  bool? servesDinner;
-  bool? servesLunch;
-  bool? servesVegetarianFood;
-  bool? servesWine;
   bool? takeout;
   List<String>? types;
   String? url;
@@ -75,45 +67,37 @@ class Result {
 
   Result(
       {this.addressComponents,
-        this.adrAddress,
-        this.businessStatus,
-        this.curbsidePickup,
-        this.currentOpeningHours,
-        this.delivery,
-        this.dineIn,
-        this.editorialSummary,
-        this.formattedAddress,
-        this.formattedPhoneNumber,
-        this.geometry,
-        this.icon,
-        this.iconBackgroundColor,
-        this.iconMaskBaseUri,
-        this.internationalPhoneNumber,
-        this.name,
-        this.openingHours,
-        this.photos,
-        this.placeId,
-        this.plusCode,
-        this.priceLevel,
-        this.rating,
-        this.reference,
-        this.reservable,
-        this.reviews,
-        this.servesBeer,
-        this.servesBreakfast,
-        this.servesBrunch,
-        this.servesDinner,
-        this.servesLunch,
-        this.servesVegetarianFood,
-        this.servesWine,
-        this.takeout,
-        this.types,
-        this.url,
-        this.userRatingsTotal,
-        this.utcOffset,
-        this.vicinity,
-        this.website,
-        this.wheelchairAccessibleEntrance});
+      this.adrAddress,
+      this.businessStatus,
+      this.curbsidePickup,
+      this.currentOpeningHours,
+      this.delivery,
+      this.dineIn,
+      this.editorialSummary,
+      this.formattedAddress,
+      this.formattedPhoneNumber,
+      this.geometry,
+      this.icon,
+      this.iconBackgroundColor,
+      this.iconMaskBaseUri,
+      this.internationalPhoneNumber,
+      this.name,
+      this.openingHours,
+      this.photos,
+      this.placeId,
+      this.plusCode,
+      this.priceLevel,
+      this.rating,
+      this.reference,
+      this.reviews,
+      this.takeout,
+      this.types,
+      this.url,
+      this.userRatingsTotal,
+      this.utcOffset,
+      this.vicinity,
+      this.website,
+      this.wheelchairAccessibleEntrance});
 
   Result.fromJson(Map<String, dynamic> json) {
     if (json['address_components'] != null) {
@@ -130,7 +114,7 @@ class Result {
         : null;
     delivery = json['delivery'];
     dineIn = json['dine_in'];
-    editorialSummary = json['editorial_summary'] != null
+     editorialSummary = json['editorial_summary'] != null
         ? new EditorialSummary.fromJson(json['editorial_summary'])
         : null;
     formattedAddress = json['formatted_address'];
@@ -144,7 +128,7 @@ class Result {
     internationalPhoneNumber = json['international_phone_number'];
     name = json['name'];
     openingHours = json['opening_hours'] != null
-        ? new CurrentOpeningHours.fromJson(json['opening_hours'])
+        ? new OpeningHours.fromJson(json['opening_hours'])
         : null;
     if (json['photos'] != null) {
       photos = <Photos>[];
@@ -159,20 +143,12 @@ class Result {
     priceLevel = json['price_level'];
     rating = json['rating'];
     reference = json['reference'];
-    reservable = json['reservable'];
     if (json['reviews'] != null) {
       reviews = <Reviews>[];
       json['reviews'].forEach((v) {
         reviews!.add(new Reviews.fromJson(v));
       });
     }
-    servesBeer = json['serves_beer'];
-    servesBreakfast = json['serves_breakfast'];
-    servesBrunch = json['serves_brunch'];
-    servesDinner = json['serves_dinner'];
-    servesLunch = json['serves_lunch'];
-    servesVegetarianFood = json['serves_vegetarian_food'];
-    servesWine = json['serves_wine'];
     takeout = json['takeout'];
     types = json['types'].cast<String>();
     url = json['url'];
@@ -223,17 +199,9 @@ class Result {
     data['price_level'] = this.priceLevel;
     data['rating'] = this.rating;
     data['reference'] = this.reference;
-    data['reservable'] = this.reservable;
     if (this.reviews != null) {
       data['reviews'] = this.reviews!.map((v) => v.toJson()).toList();
     }
-    data['serves_beer'] = this.servesBeer;
-    data['serves_breakfast'] = this.servesBreakfast;
-    data['serves_brunch'] = this.servesBrunch;
-    data['serves_dinner'] = this.servesDinner;
-    data['serves_lunch'] = this.servesLunch;
-    data['serves_vegetarian_food'] = this.servesVegetarianFood;
-    data['serves_wine'] = this.servesWine;
     data['takeout'] = this.takeout;
     data['types'] = this.types;
     data['url'] = this.url;
@@ -271,9 +239,11 @@ class AddressComponents {
 class CurrentOpeningHours {
   bool? openNow;
   List<Periods>? periods;
+  List<SpecialDays>? specialDays;
   List<String>? weekdayText;
 
-  CurrentOpeningHours({this.openNow, this.periods, this.weekdayText});
+  CurrentOpeningHours(
+      {this.openNow, this.periods, this.specialDays, this.weekdayText});
 
   CurrentOpeningHours.fromJson(Map<String, dynamic> json) {
     openNow = json['open_now'];
@@ -281,6 +251,12 @@ class CurrentOpeningHours {
       periods = <Periods>[];
       json['periods'].forEach((v) {
         periods!.add(new Periods.fromJson(v));
+      });
+    }
+    if (json['special_days'] != null) {
+      specialDays = <SpecialDays>[];
+      json['special_days'].forEach((v) {
+        specialDays!.add(new SpecialDays.fromJson(v));
       });
     }
     weekdayText = json['weekday_text'].cast<String>();
@@ -291,6 +267,9 @@ class CurrentOpeningHours {
     data['open_now'] = this.openNow;
     if (this.periods != null) {
       data['periods'] = this.periods!.map((v) => v.toJson()).toList();
+    }
+    if (this.specialDays != null) {
+      data['special_days'] = this.specialDays!.map((v) => v.toJson()).toList();
     }
     data['weekday_text'] = this.weekdayText;
     return data;
@@ -338,6 +317,25 @@ class Close {
     data['date'] = this.date;
     data['day'] = this.day;
     data['time'] = this.time;
+    return data;
+  }
+}
+
+class SpecialDays {
+  String? date;
+  bool? exceptionalHours;
+
+  SpecialDays({this.date, this.exceptionalHours});
+
+  SpecialDays.fromJson(Map<String, dynamic> json) {
+    date = json['date'];
+    exceptionalHours = json['exceptional_hours'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['date'] = this.date;
+    data['exceptional_hours'] = this.exceptionalHours;
     return data;
   }
 }
@@ -434,6 +432,35 @@ class Viewport {
   }
 }
 
+class OpeningHours {
+  bool? openNow;
+  List<Periods>? periods;
+  List<String>? weekdayText;
+
+  OpeningHours({this.openNow, this.periods, this.weekdayText});
+
+  OpeningHours.fromJson(Map<String, dynamic> json) {
+    openNow = json['open_now'];
+    if (json['periods'] != null) {
+      periods = <Periods>[];
+      json['periods'].forEach((v) {
+        periods!.add(new Periods.fromJson(v));
+      });
+    }
+    weekdayText = json['weekday_text'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['open_now'] = this.openNow;
+    if (this.periods != null) {
+      data['periods'] = this.periods!.map((v) => v.toJson()).toList();
+    }
+    data['weekday_text'] = this.weekdayText;
+    return data;
+  }
+}
+
 class Close1 {
   int? day;
   String? time;
@@ -503,7 +530,7 @@ class Reviews {
   String? language;
   String? originalLanguage;
   String? profilePhotoUrl;
-  dynamic rating;
+  int? rating;
   String? relativeTimeDescription;
   String? text;
   int? time;
@@ -511,15 +538,15 @@ class Reviews {
 
   Reviews(
       {this.authorName,
-        this.authorUrl,
-        this.language,
-        this.originalLanguage,
-        this.profilePhotoUrl,
-        this.rating,
-        this.relativeTimeDescription,
-        this.text,
-        this.time,
-        this.translated});
+      this.authorUrl,
+      this.language,
+      this.originalLanguage,
+      this.profilePhotoUrl,
+      this.rating,
+      this.relativeTimeDescription,
+      this.text,
+      this.time,
+      this.translated});
 
   Reviews.fromJson(Map<String, dynamic> json) {
     authorName = json['author_name'];
