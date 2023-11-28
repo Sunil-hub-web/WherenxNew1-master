@@ -28,5 +28,6 @@ class ApiUrl {
   static String count_business_pin = "${baseUrl}count-business-pin";
   static String business_event_create = "${baseUrl}business-event-create";
   static String business_event_show = "${baseUrl}business-event-show";
+  static String business_event_by_id = "${baseUrl}business-event-by-id";
 
 }

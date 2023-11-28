@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:wherenxnew1/UserScerrn/AddEventsDetails.dart';
+import 'package:wherenxnew1/UserScerrn/HomeScreen.dart';
+import 'package:wherenxnew1/UserScerrn/ViewSingleEvent.dart';
+
+import '../ApiCallingPage/ViewEventData.dart';
+import '../Helper/img.dart';
+import '../modelclass/ViewEventResponse.dart';
+import 'package:http/http.dart' as http;
 
 class EventDetails extends StatefulWidget {
   const EventDetails({super.key});
@@ -103,36 +111,242 @@ class _EventDetailsState extends State<EventDetails> {
     print("filepathimage${filePath1}");
   }
 
+  String profileImage = "";
+  List<ViewEventResponse> visereventresponse = [];
+  List<Data> vieweventdata = [];
+  List<PeventImage> profileimage = [];
+
+  Future<List<Data>> showEventData() async {
+    vieweventdata.clear();
+
+    http.Response? response = await ViewEventData().getEventData();
+    var jsonResponse = json.decode(response!.body);
+    var eventdataresponse = ViewEventResponse.fromJson(jsonResponse);
+
+    if (eventdataresponse.status == "200") {
+      if (eventdataresponse.data!.isNotEmpty) {
+        for (int i = 0; i < eventdataresponse.data!.length; i++) {
+          vieweventdata.add(eventdataresponse.data![i]);
+        }
+      }
+    }
+
+    print("userdatalist ${vieweventdata.toString()}");
+
+    return vieweventdata;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(builder: (context, Orientation, ScreenType) {
       return Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          height: 100.h,
-          width: 100.w,
-          margin: EdgeInsets.all(10),
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton.extended(
-              onPressed: () {
-                // showDialog(
-                //   barrierColor: Colors.black26,
-                //   context: context,
-                //   builder: (context) {
-                //     return setupAlertDialoadContainer();
-                //   },
-                // );
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddEventsDetails()),
-                );
-              },
-              label: const Text('Upload Event'),
-              icon: const Icon(Icons.add),
+        appBar: AppBar(
+          backgroundColor: Color(0xFF00B8CA),
+          leading: IconButton(
+              icon: Image.asset(
+                "assets/images/arrow.png",
+                height: 20,
+                width: 20,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              ),
             ),
-          ),
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            // showDialog(
+            //   barrierColor: Colors.black26,
+            //   context: context,
+            //   builder: (context) {
+            //     return setupAlertDialoadContainer();
+            //   },
+            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddEventsDetails()),
+            );
+          },
+          label: const Text('Upload Event'),
+          icon: const Icon(Icons.add),
+        ),
+        // backgroundColor: Colors.white10,
+        body: Container(
+            height: 100.h,
+            width: 100.w,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment(6.123234262925839e-17, 1),
+                  end: Alignment(-1, 6.123234262925839e-17),
+                  colors: [
+                    Color.fromRGBO(31, 203, 220, 1),
+                    Color.fromRGBO(0, 184, 202, 1)
+                  ]),
+            ),
+            child: FutureBuilder(
+                future: showEventData(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasData) {
+                    return Container(
+                      width: 100.w,
+                      height: 65.h,
+                      child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          itemCount: vieweventdata.length,
+                          itemBuilder: (context, int index) {
+                            return InkWell(
+                              onTap: () {
+                                final route = MaterialPageRoute(
+                                  fullscreenDialog: true,
+                                  builder: (_) =>
+                                      ViewSingleEvent(eventId: vieweventdata[index].id!),
+                                );
+                                Navigator.push(context, route);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.only(left: 5, right: 5),
+                                width: MediaQuery.of(context).size.width,
+                                height: 40.h,
+                                child: Card(
+                                  elevation: 5,
+                                  shadowColor: Colors.black12,
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 20.h,
+                                        width: 100.w,
+                                        margin: const EdgeInsets.only(
+                                          top: 5,
+                                          left: 5,
+                                          right: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(12),
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              // Image border
+                                              child: SizedBox.fromSize(
+                                                size: Size.fromRadius(48),
+                                                // Image radius
+                                                child: Image.network(
+                                                    vieweventdata[index]
+                                                        .peventImage![index]
+                                                        .image!,
+                                                    fit: BoxFit
+                                                        .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
+                                              ),
+                                            )
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 7.w,
+                                                  height: 5.h,
+                                                  alignment: Alignment.topRight,
+                                                  margin:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    image: profileImage == ""
+                                                        ? const DecorationImage(
+                                                            image: AssetImage(
+                                                                'assets/images/profileimage.jpg'), //Your Background image
+                                                          )
+                                                        : DecorationImage(
+                                                            image: NetworkImage(
+                                                                profileImage),
+                                                            fit: BoxFit.cover,
+
+                                                            //Your Background image
+                                                          ),
+                                                    border: Border.all(
+                                                        width: 2.0,
+                                                        color: Colors.white),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                Text(
+                                                    "${vieweventdata[index].userName}")
+                                              ],
+                                            ),
+                                            Container(
+                                              margin:
+                                                  EdgeInsets.only(left: 4.h),
+                                              child: Text(
+                                                  "${vieweventdata[index].eventName}",
+                                                  style: TextStyle()),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  EdgeInsets.only(left: 4.h),
+                                              child: Text(
+                                                  "${vieweventdata[index].eventDatetime}",
+                                                  style: TextStyle()),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 7.w,
+                                                  height: 5.h,
+                                                  alignment: Alignment.topRight,
+                                                  margin:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    image:
+                                                        const DecorationImage(
+                                                      image: AssetImage(
+                                                          'assets/images/location.png'),
+                                                      //Your Background image
+                                                    ),
+                                                    border: Border.all(
+                                                        width: 2.0,
+                                                        color: Colors.white),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                Text(
+                                                    "${vieweventdata[index].eventAddress}")
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                })),
       );
     });
   }

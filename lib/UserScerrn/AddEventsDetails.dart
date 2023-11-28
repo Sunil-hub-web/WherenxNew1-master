@@ -69,6 +69,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
         }
         isImageVisiable = true;
         print("Yourdatafile  $filepathdet");
+        Left_indicator_bar_Flushbar1("Image Selected SuccessFully");
         setState(() {});
       } else {
         print("No image is selected.");
@@ -105,12 +106,13 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
           videofilepath = filePath!;
           print("videofilepath  $videofilepath");
 
+          Left_indicator_bar_Flushbar1("Video Selected SuccessFully");
+
           // MediaInfo? compressedVideoInfo = info;
-          _videoPlayerController =
-              VideoPlayerController.networkUrl(Uri.parse(videofilepath));
-          await _videoPlayerController?.initialize();
-          await _videoPlayerController?.setLooping(true);
-          await _videoPlayerController?.play();
+          //_videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videofilepath));
+        //  await _videoPlayerController?.initialize();
+        //  await _videoPlayerController?.setLooping(true);
+       //   await _videoPlayerController?.play();
 
           isVideoVisiable = true;
         } else {
@@ -556,7 +558,10 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       } else if (filepathdet.isEmpty) {
                         Left_indicator_bar_Flushbar(
                             context, "Select Your Event Image");
-                      } else {
+                      } else if (videofilepath == "") {
+                        Left_indicator_bar_Flushbar(
+                            context, "Select Your Event Video");
+                      }else {
                         ViewDialog(context: context).showLoadingIndicator(
                             "Create Event Wait...", "Event Details", context);
 
@@ -637,6 +642,19 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
   }
 
   void Left_indicator_bar_Flushbar(BuildContext context, String Message) {
+    Flushbar(
+      message: Message,
+      icon: Icon(
+        Icons.info_outline,
+        size: 28.0,
+        color: Colors.blue[300],
+      ),
+      duration: Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red[300],
+    )..show(context);
+  }
+
+    void Left_indicator_bar_Flushbar1(String Message) {
     Flushbar(
       message: Message,
       icon: Icon(
