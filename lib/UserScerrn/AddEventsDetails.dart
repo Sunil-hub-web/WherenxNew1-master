@@ -110,9 +110,9 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
 
           // MediaInfo? compressedVideoInfo = info;
           //_videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videofilepath));
-        //  await _videoPlayerController?.initialize();
-        //  await _videoPlayerController?.setLooping(true);
-       //   await _videoPlayerController?.play();
+          //  await _videoPlayerController?.initialize();
+          //  await _videoPlayerController?.setLooping(true);
+          //   await _videoPlayerController?.play();
 
           isVideoVisiable = true;
         } else {
@@ -561,7 +561,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       } else if (videofilepath == "") {
                         Left_indicator_bar_Flushbar(
                             context, "Select Your Event Video");
-                      }else {
+                      } else {
                         ViewDialog(context: context).showLoadingIndicator(
                             "Create Event Wait...", "Event Details", context);
 
@@ -574,7 +574,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                             .addEventDetails(
                                 str_userId,
                                 textYouName.text.toString(),
-                                textYouName.text.toString(),
+                                textYourEventName.text.toString(),
                                 textEventType.text.toString(),
                                 currentDateTime.text.toString(),
                                 textEventAddress.text.toString(),
@@ -583,8 +583,10 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                                 filepathdet);
 
                         print(
-                            "usereventdetails ${str_userId}  ${textYouName.text.toString()}  ${textYouName.text.toString()}  ${textEventType.text.toString()}  "
-                            "${currentDateTime.text.toString()}  ${textEventAddress.text.toString()}  ${textEventDescription.text.toString()}  "
+                            "usereventdetails ${str_userId}  ${textYouName.text.toString()}  ${textYourEventName.text.toString()}  "
+                            "${textEventType.text.toString()} "
+                            "${currentDateTime.text.toString()}  ${textEventAddress.text.toString()}  "
+                            "${textEventDescription.text.toString()}"
                             "${videofilepath}  ${filepathdet}");
 
                         var respStr = await response?.stream.bytesToString();
@@ -607,7 +609,16 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                               fontSize: 16.0);
 
                           textYouName.text = "";
+                          textYourEventName.text = "";
+                          textEventType.text = "";
+                          currentDateTime.text = "";
+                          textEventAddress.text = "";
+                          textEventDescription.text = "";
+                          videofilepath = "";
+                          filepathdet.clear();
+
                         } else {
+
                           ViewDialog(context: context).hideOpenDialog();
 
                           print("show your message1${response?.reasonPhrase}");
@@ -654,7 +665,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
     )..show(context);
   }
 
-    void Left_indicator_bar_Flushbar1(String Message) {
+  void Left_indicator_bar_Flushbar1(String Message) {
     Flushbar(
       message: Message,
       icon: Icon(
