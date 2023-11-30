@@ -29,9 +29,10 @@ class Addevent {
             'event_type' : eventtype,
             'event_datetime' : eventdatetime,
             'event_address' : eventaddress,
-            'event_description' : eventdescription,});
+            'event_description' : eventdescription,
+             'event_video' : eventvideo,});
 
-      request.files.add(await http.MultipartFile.fromPath('event_video', eventvideo));
+     // request.files.add(await http.MultipartFile.fromPath('event_video', eventvideo));
       for(int i=0; i<eventimage.length;i++){
          request.files.add(await http.MultipartFile.fromPath('event_image[]', eventimage[i]));
       }

@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
@@ -180,62 +178,62 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 25.h,
-                        width: 100.w,
-                        margin: const EdgeInsets.only(
-                          top: 5,
-                          left: 5,
-                          right: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          // Image border
-                          child: SizedBox.fromSize(
-                            size: Size.fromRadius(48),
-                            // Image radius
-                            child: FutureBuilder(
-                              future: _initVideoPlayer(eventvideo),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  // If the VideoPlayerController has finished initialization, use
-                                  // the data it provides to limit the aspect ratio of the video.
-                                  return AspectRatio(
-                                    aspectRatio: _videoPlayerController
-                                        .value.aspectRatio,
-                                    // Use the VideoPlayer widget to display the video.
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            // If the video is playing, pause it.
-                                            if (_videoPlayerController.value.isPlaying) {
-                                              _videoPlayerController.pause();
-                                            } else {
-                                              // If the video is paused, play it.
-                                              _videoPlayerController.play();
-                                            }
-                                          });
-                                        },
-                                        child: VideoPlayer(_videoPlayerController)),
-                                  );
-                                } else {
-                                  // If the VideoPlayerController is still initializing, show a
-                                  // loading spinner.
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                }
-                              },
-                            ), /*Image.network(nearbyLocations[index].icon!,)*/
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   height: 25.h,
+                      //   width: 100.w,
+                      //   margin: const EdgeInsets.only(
+                      //     top: 5,
+                      //     left: 5,
+                      //     right: 5,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.all(
+                      //       Radius.circular(12),
+                      //     ),
+                      //   ),
+                      //   child: ClipRRect(
+                      //     borderRadius: BorderRadius.circular(20),
+                      //     // Image border
+                      //     child: SizedBox.fromSize(
+                      //       size: Size.fromRadius(48),
+                      //       // Image radius
+                      //       child: FutureBuilder(
+                      //         future: _initVideoPlayer(eventvideo),
+                      //         builder: (context, snapshot) {
+                      //           if (snapshot.connectionState ==
+                      //               ConnectionState.done) {
+                      //             // If the VideoPlayerController has finished initialization, use
+                      //             // the data it provides to limit the aspect ratio of the video.
+                      //             return AspectRatio(
+                      //               aspectRatio: _videoPlayerController
+                      //                   .value.aspectRatio,
+                      //               // Use the VideoPlayer widget to display the video.
+                      //               child: GestureDetector(
+                      //                   onTap: () {
+                      //                     setState(() {
+                      //                       // If the video is playing, pause it.
+                      //                       if (_videoPlayerController.value.isPlaying) {
+                      //                         _videoPlayerController.pause();
+                      //                       } else {
+                      //                         // If the video is paused, play it.
+                      //                         _videoPlayerController.play();
+                      //                       }
+                      //                     });
+                      //                   },
+                      //                   child: VideoPlayer(_videoPlayerController)),
+                      //             );
+                      //           } else {
+                      //             // If the VideoPlayerController is still initializing, show a
+                      //             // loading spinner.
+                      //             return Center(
+                      //                 child: CircularProgressIndicator());
+                      //           }
+                      //         },
+                      //       ), /*Image.network(nearbyLocations[index].icon!,)*/
+                      //     ),
+                      //   ),
+                      // ),
                       Container(
                         height: 25.h,
                         width: 100.w,
@@ -343,7 +341,7 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
                             ),
                             Container(
                               margin: EdgeInsets.only(left: 4.h),
-                              child: Text("${eventdescription1}",
+                              child: Text("${eventdescription}",
                                   style: TextStyle()),
                             ),
                           ],

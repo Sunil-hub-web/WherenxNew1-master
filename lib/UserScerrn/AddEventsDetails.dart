@@ -166,7 +166,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
             setState(() {
               currentDate = selectedDateTime;
               String formattedDate =
-                  DateFormat('d MMM, yyyy  hh:mm').format(selectedDateTime);
+                  DateFormat('d MMM, yyyy  hh:mm aaa').format(selectedDateTime);
               currentDateTime.text = formattedDate.toString();
             }); // You can use the selectedDateTime as needed.
           }
@@ -279,7 +279,10 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                           // Navigator.of(context).pop();
                         }
                       },
-                      child: Card(
+                      child: Container(
+                        width: 60.w,
+                        height: 13.h,
+                        child: Card(
                         elevation: 5,
                         shadowColor: Colors.black,
                         color: Colors.white,
@@ -301,35 +304,36 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                           ),
                         ),
                       ),
+                      )
                     ),
-                    InkWell(
-                      onTap: () async {
-                        getVideo(ImageSource.gallery);
-                        //   Navigator.of(context).pop();
-                        // print("imagedetails123${galleryFile?.path}");
-                      },
-                      child: Card(
-                          elevation: 5,
-                          shadowColor: Colors.black,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Image.asset(
-                                  'assets/images/uploading.png',
-                                  height: 50,
-                                  width: 50,
-                                ),
-                                Text("Uplod Video")
-                              ],
-                            ),
-                          )),
-                    )
+                    // InkWell(
+                    //   onTap: () async {
+                    //     getVideo(ImageSource.gallery);
+                    //     //   Navigator.of(context).pop();
+                    //     // print("imagedetails123${galleryFile?.path}");
+                    //   },
+                    //   child: Card(
+                    //       elevation: 5,
+                    //       shadowColor: Colors.black,
+                    //       color: Colors.white,
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(18),
+                    //       ),
+                    //       child: Container(
+                    //         padding: EdgeInsets.all(10),
+                    //         child: Column(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             Image.asset(
+                    //               'assets/images/uploading.png',
+                    //               height: 50,
+                    //               width: 50,
+                    //             ),
+                    //             Text("Uplod Video")
+                    //           ],
+                    //         ),
+                    //       )),
+                    // )
                   ],
                 ),
                 Visibility(
@@ -558,9 +562,6 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       } else if (filepathdet.isEmpty) {
                         Left_indicator_bar_Flushbar(
                             context, "Select Your Event Image");
-                      } else if (videofilepath == "") {
-                        Left_indicator_bar_Flushbar(
-                            context, "Select Your Event Video");
                       } else {
                         ViewDialog(context: context).showLoadingIndicator(
                             "Create Event Wait...", "Event Details", context);
@@ -569,6 +570,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                             await SharedPreferences.getInstance();
                         int userId = pre.getInt("userId") ?? 0;
                         String str_userId = userId.toString();
+
+                        String videofilepath1 = "";
 
                         http.StreamedResponse? response = await Addevent()
                             .addEventDetails(
@@ -579,7 +582,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                                 currentDateTime.text.toString(),
                                 textEventAddress.text.toString(),
                                 textEventDescription.text.toString(),
-                                videofilepath,
+                                videofilepath1,
                                 filepathdet);
 
                         print(

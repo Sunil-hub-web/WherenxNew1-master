@@ -141,7 +141,8 @@ class _EventDetailsState extends State<EventDetails> {
     return ResponsiveSizer(builder: (context, Orientation, ScreenType) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFF00B8CA),
+          title: const Text("Event"),
+          backgroundColor: const Color(0xFF00B8CA),
           leading: IconButton(
               icon: Image.asset(
                 "assets/images/arrow.png",
@@ -190,9 +191,9 @@ class _EventDetailsState extends State<EventDetails> {
                 builder:
                     (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.hasData) {
-                    return Container(
+                    return SizedBox(
                       width: 100.w,
-                      height: 65.h,
+                      height: 70.h,
                       child: ListView.builder(
                           scrollDirection: Axis.vertical,
                           itemCount: vieweventdata.length,
@@ -210,7 +211,7 @@ class _EventDetailsState extends State<EventDetails> {
                                 padding:
                                     const EdgeInsets.only(left: 5, right: 5),
                                 width: MediaQuery.of(context).size.width,
-                                height: 40.h,
+                                height: 43.h,
                                 child: Card(
                                   elevation: 5,
                                   shadowColor: Colors.black12,
@@ -246,7 +247,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                 // Image radius
                                                 child: Image.network(
                                                     vieweventdata[index]
-                                                        .peventImage![index]
+                                                        .peventImage![0]
                                                         .image!,
                                                     fit: BoxFit
                                                         .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
@@ -290,22 +291,22 @@ class _EventDetailsState extends State<EventDetails> {
                                                   ),
                                                 ),
                                                 Text(
-                                                    "${vieweventdata[index].userName}")
+                                                    "${vieweventdata[index].userName}",
+                                                style: TextStyle(fontSize: 15.sp),)
                                               ],
                                             ),
                                             Container(
-                                              margin:
-                                                  EdgeInsets.only(left: 4.h),
+                                              margin: EdgeInsets.only(left: 4.h),
                                               child: Text(
                                                   "${vieweventdata[index].eventName}",
-                                                  style: TextStyle()),
+                                                  style: TextStyle(fontSize: 15.sp)),
                                             ),
                                             Container(
                                               margin:
                                                   EdgeInsets.only(left: 4.h),
                                               child: Text(
                                                   "${vieweventdata[index].eventDatetime}",
-                                                  style: TextStyle()),
+                                                  style: TextStyle(fontSize: 15.sp)),
                                             ),
                                             Row(
                                               children: [
@@ -330,7 +331,8 @@ class _EventDetailsState extends State<EventDetails> {
                                                   ),
                                                 ),
                                                 Text(
-                                                    "${vieweventdata[index].eventAddress}")
+                                                    "${vieweventdata[index].eventAddress}",
+                                                style: TextStyle(fontSize: 15.sp),)
                                               ],
                                             ),
                                           ],
@@ -344,7 +346,7 @@ class _EventDetailsState extends State<EventDetails> {
                           }),
                     );
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                 })),
       );
