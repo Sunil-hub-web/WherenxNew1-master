@@ -68,7 +68,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
   List<VideoReviewDetails> videoreviewDet = [];
   List<String> str_userinfoPin = [];
 
-  int datadouble = 0, userId = 0, reviewlength = 0, videoreviewlength = 0,closeopenHoursDay = 0;
+  int datadouble = 0,
+      userId = 0,
+      reviewlength = 0,
+      videoreviewlength = 0,
+      closeopenHoursDay = 0;
   String placeId = "",
       strrating = "",
       reviewlist = "",
@@ -83,7 +87,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
       str_Url = "",
       insertPinStatues = "1",
       str_count = "0";
-
 
   double startlatitude1 = 0.0,
       startlongitude1 = 0.0,
@@ -133,16 +136,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
     reviewlist = singlePageDetails.result?.reviews?.length.toString() ?? "";
 
     datadouble = singlePageDetails.result?.reviews?.length ?? 0;
-    closeHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.time ?? "";
-    openHours = singlePageDetails.result?.currentOpeningHours?.periods?[0].open?.time ?? "";
-    closeopenHoursDate = singlePageDetails.result?.currentOpeningHours?.periods?[0].close?.date ?? "";
-    if(closeopenHoursDate == ""){
+    closeHours = singlePageDetails
+            .result?.currentOpeningHours?.periods?[0].close?.time ??
+        "";
+    openHours =
+        singlePageDetails.result?.currentOpeningHours?.periods?[0].open?.time ??
+            "";
+    closeopenHoursDate = singlePageDetails
+            .result?.currentOpeningHours?.periods?[0].close?.date ??
+        "";
+    if (closeopenHoursDate == "") {
       dateName = "";
-    }else{
-      dateName = DateFormat('EEEE').format(DateFormat("yyyy-MM-dd").parse(closeopenHoursDate));
+    } else {
+      dateName = DateFormat('EEEE')
+          .format(DateFormat("yyyy-MM-dd").parse(closeopenHoursDate));
     }
 
-   // String data = getWeekdayName(int.parse(closeopenHoursDate));
+    // String data = getWeekdayName(int.parse(closeopenHoursDate));
     print("userdatadate $dateName   $closeopenHoursDate");
     str_Url = singlePageDetails.result!.url!;
 
@@ -682,7 +692,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     Row(
                                       children: [
                                         Text(
-                                          singlePageDetails.result?.openingHours?.openNow == true
+                                          singlePageDetails.result?.openingHours
+                                                      ?.openNow ==
+                                                  true
                                               ? " open:  "
                                               : " close: ",
                                           style: TextStyle(
@@ -690,10 +702,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                               fontSize: 14),
                                         ),
                                         Text(
-                                         singlePageDetails.result?.openingHours?.openNow == true  ? openHours == "" ? "" : " Close  "
-                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}"
-                                            : openHours == "" ? "" : " Open  "
-                                                  "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].open!.time)} $dateName",
+                                          singlePageDetails.result?.openingHours
+                                                      ?.openNow ==
+                                                  true
+                                              ? openHours == ""
+                                                  ? ""
+                                                  : " Close  "
+                                                      "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].close!.time)}"
+                                              : openHours == ""
+                                                  ? ""
+                                                  : " Open  "
+                                                      "${time24to12Format(singlePageDetails.result?.currentOpeningHours!.periods?[0].open!.time)} $dateName",
                                           style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 14),
@@ -711,7 +730,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 Matrix4.translationValues(0.0, -32.0, 0.0),
                             child: Center(
                               child: Wrap(
-                                children: List<Widget>.generate(3,
+                                children: List<Widget>.generate(
+                                  3,
                                   (index) {
                                     return Padding(
                                       padding: const EdgeInsets.fromLTRB(
@@ -733,30 +753,79 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                   ? " open:  "
                                                   : " close";
 
-                                              SharedPreferences pre = await SharedPreferences.getInstance();
-                                              final islogin = pre.getBool("islogin") ?? false;
-                                              final userId = pre.getInt("userId") ?? 0;
-                                              final struserId = userId.toString();
-                                              final strlat = singlePageDetails.result!.geometry?.location?.lat.toString();
-                                              final strlng = singlePageDetails.result!.geometry?.location?.lng.toString();
-                                              final placeid = singlePageDetails.result!.placeId!;
-                                              final photo = singlePageDetails.result?.photos?[0].photoReference ?? "";
+                                              SharedPreferences pre =
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              final islogin =
+                                                  pre.getBool("islogin") ??
+                                                      false;
+                                              final userId =
+                                                  pre.getInt("userId") ?? 0;
+                                              final struserId =
+                                                  userId.toString();
+                                              final strlat = singlePageDetails
+                                                  .result!
+                                                  .geometry
+                                                  ?.location
+                                                  ?.lat
+                                                  .toString();
+                                              final strlng = singlePageDetails
+                                                  .result!
+                                                  .geometry
+                                                  ?.location
+                                                  ?.lng
+                                                  .toString();
+                                              final placeid = singlePageDetails
+                                                  .result!.placeId!;
+                                              final photo = singlePageDetails
+                                                      .result
+                                                      ?.photos?[0]
+                                                      .photoReference ??
+                                                  "";
 
-                                              http.Response response = await PinPlaces().insertPinPlaces(struserId, delightId,
-                                                          singlePageDetails.result!.types![0], placeid, strlat!,
-                                                          strlng!, singlePageDetails.result!.name!, "",
-                                                          singlePageDetails.result!.vicinity!,
-                                                          "", "", "", "", "", "", "", "",
-                                                          photo, singlePageDetails.result!.rating.toString(),
-                                                          "", str_Url, openclose);
+                                              http.Response response =
+                                                  await PinPlaces()
+                                                      .insertPinPlaces(
+                                                          struserId,
+                                                          delightId,
+                                                          singlePageDetails
+                                                              .result!
+                                                              .types![0],
+                                                          placeid,
+                                                          strlat!,
+                                                          strlng!,
+                                                          singlePageDetails
+                                                              .result!.name!,
+                                                          "",
+                                                          singlePageDetails
+                                                              .result!
+                                                              .vicinity!,
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          "",
+                                                          photo,
+                                                          singlePageDetails
+                                                              .result!.rating
+                                                              .toString(),
+                                                          "",
+                                                          str_Url,
+                                                          openclose);
 
                                               print(response);
 
-                                              var pinResponse = jsonDecode(response.body);
-                                              var userResponse = PinThePlace.fromJson(pinResponse);
+                                              var pinResponse =
+                                                  jsonDecode(response.body);
+                                              var userResponse =
+                                                  PinThePlace.fromJson(
+                                                      pinResponse);
 
-                                              if (userResponse.status == "200") {
-
+                                              if (userResponse.status ==
+                                                  "200") {
                                                 ViewDialog(context: context)
                                                     .hideOpenDialog();
                                                 insertPinStatues = "2";
@@ -774,24 +843,34 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                     fontSize: 16.0);
 
                                                 setState(() async {
+                                                  //  str_userinfoPin.add(placeid);
+                                                  //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                  //  pre.setStringList("userinfoPin", str_userinfoPin); //save List
 
-                                                 //  str_userinfoPin.add(placeid);
-                                                 //  SharedPreferences pre = await SharedPreferences.getInstance();
-                                                 //  pre.setStringList("userinfoPin", str_userinfoPin); //save List
+                                                  http.Response response_Count =
+                                                      await PinCoutDetails()
+                                                          .pincoutDetails(
+                                                              placeId);
+                                                  var countresponse =
+                                                      jsonDecode(
+                                                          response_Count.body);
+                                                  var countResponseData =
+                                                      PinCountResponse.fromJson(
+                                                          countresponse);
 
-                                                    http.Response response_Count = await PinCoutDetails().pincoutDetails(placeId);
-                                                     var countresponse = jsonDecode(response_Count.body);
-                                                      var countResponseData = PinCountResponse.fromJson(countresponse);
+                                                  if (countResponseData
+                                                          .status ==
+                                                      "200") {
+                                                    str_count =
+                                                        countResponseData.count
+                                                            .toString();
 
-                                                if (countResponseData.status == "200") {
-                                                  str_count = countResponseData.count.toString();
-
-                                                 item1.add("$str_count pins");
-                                                } else {
-                                                  str_count = "0";
-                                                }
+                                                    item1
+                                                        .add("$str_count pins");
+                                                  } else {
+                                                    str_count = "0";
+                                                  }
                                                 });
-
                                               } else {
                                                 ViewDialog(context: context)
                                                     .hideOpenDialog();
@@ -855,31 +934,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                     fontSize: 16.0);
 
                                                 setState(() async {
-
                                                   // str_userinfoPin.remove(placeid);
-                                                 //  SharedPreferences pre = await SharedPreferences.getInstance();
-                                                //   pre.setStringList("userinfoPin", str_userinfoPin); //save List
+                                                  //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                  //   pre.setStringList("userinfoPin", str_userinfoPin); //save List
 
-                                                    http.Response response_Count =
-                                                    await PinCoutDetails()
-                                                        .pincoutDetails(
-                                                            placeId);
-                                                var countresponse = jsonDecode(
-                                                    response_Count.body);
-                                                var countResponseData =
-                                                    PinCountResponse.fromJson(
-                                                        countresponse);
+                                                  http.Response response_Count =
+                                                      await PinCoutDetails()
+                                                          .pincoutDetails(
+                                                              placeId);
+                                                  var countresponse =
+                                                      jsonDecode(
+                                                          response_Count.body);
+                                                  var countResponseData =
+                                                      PinCountResponse.fromJson(
+                                                          countresponse);
 
-                                                if (countResponseData.status ==
-                                                    "200") {
-                                                  str_count = countResponseData
-                                                      .count
-                                                      .toString();
-                                                } else {
-                                                  str_count = "0";
-                                                }
+                                                  if (countResponseData
+                                                          .status ==
+                                                      "200") {
+                                                    str_count =
+                                                        countResponseData.count
+                                                            .toString();
+                                                  } else {
+                                                    str_count = "0";
+                                                  }
                                                 });
-
                                               } else {
                                                 ViewDialog(context: context)
                                                     .hideOpenDialog();
@@ -900,25 +979,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                           }
 
                                           setState(() async {
+                                            http.Response response_Count =
+                                                await PinCoutDetails()
+                                                    .pincoutDetails(placeId);
+                                            var countresponse =
+                                                jsonDecode(response_Count.body);
+                                            var countResponseData =
+                                                PinCountResponse.fromJson(
+                                                    countresponse);
 
-                                              http.Response response_Count =
-                                                    await PinCoutDetails()
-                                                        .pincoutDetails(
-                                                            placeId);
-                                                var countresponse = jsonDecode(
-                                                    response_Count.body);
-                                                var countResponseData =
-                                                    PinCountResponse.fromJson(
-                                                        countresponse);
-
-                                                if (countResponseData.status ==
-                                                    "200") {
-                                                  str_count = countResponseData
-                                                      .count
-                                                      .toString();
-                                                } else {
-                                                  str_count = "0";
-                                                }
+                                            if (countResponseData.status ==
+                                                "200") {
+                                              str_count = countResponseData
+                                                  .count
+                                                  .toString();
+                                            } else {
+                                              str_count = "0";
+                                            }
                                           });
                                         },
                                         child: Column(
@@ -1513,51 +1590,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                                         .size20),
                                                       ),
                                                       child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .all(
-                                                                  Radius.circular(
-                                                                      Dimensions
-                                                                          .size20),
-                                                                ),
-                                                                image:
-                                                                    DecorationImage(
-                                                                  image: NetworkImage(
-                                                                      videoreviewDet[
-                                                                              index]
-                                                                          .photo!),
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                )),
-                                                        child: Container(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical: 1),
-                                                          child:
-                                                              RatingBarIndicator(
-                                                            rating: double.parse(
-                                                                videoreviewDet[
-                                                                        index]
-                                                                    .rating!),
-                                                            itemBuilder:
-                                                                (context,
-                                                                        index) =>
-                                                                    Icon(
-                                                              Icons.star,
-                                                              color:
-                                                                  Colors.amber,
-                                                            ),
-                                                            itemCount: 5,
-                                                            itemSize: 20.0,
-                                                            direction:
-                                                                Axis.horizontal,
-                                                          ),
-                                                        ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius.circular(
+                                                                        Dimensions
+                                                                            .size20),
+                                                                  ),
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    image: NetworkImage(
+                                                                        videoreviewDet[index]
+                                                                            .photo!),
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  )),
+                                                          child:  Container(
+                                                                alignment: Alignment.center,
+                                                                padding:
+                                                                    const EdgeInsets.symmetric(vertical: 1),
+                                                                child: Container(
+                                                                padding: const EdgeInsets.symmetric(vertical: 1),
+                                                                  height: Dimensions.size35,
+                                                                  width: Dimensions.size35,
+                                                                child: Image.asset('assets/images/play_button.png'),
+                                                              ),
+
+                                                                // RatingBarIndicator(
+                                                                //   rating: double.parse(
+                                                                //       videoreviewDet[index].rating!),
+                                                                //   itemBuilder: (context, index) =>
+                                                                //           Icon(Icons.star, color: Colors.amber,),
+                                                                //   itemCount: 5,
+                                                                //   itemSize: 20.0,
+                                                                //   direction: Axis.horizontal,
+                                                                // ),
+                                                              ),
                                                       ),
                                                     ),
                                                   ),
