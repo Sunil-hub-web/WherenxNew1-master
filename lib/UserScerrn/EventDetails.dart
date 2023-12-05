@@ -14,6 +14,7 @@ import 'package:wherenxnew1/UserScerrn/HomeScreen.dart';
 import 'package:wherenxnew1/UserScerrn/ViewSingleEvent.dart';
 
 import '../ApiCallingPage/ViewEventData.dart';
+import '../Dimension.dart';
 import '../Helper/img.dart';
 import '../modelclass/ViewEventResponse.dart';
 import 'package:http/http.dart' as http;
@@ -33,6 +34,8 @@ class _EventDetailsState extends State<EventDetails> {
   List<XFile>? imagefiles;
   File? galleryFile;
   String filePath1 = "";
+  bool isfavourite = true, isnotfavourite = false;
+  int selectedIndex = -1, selectedIndex1 = -1;
 
   openImages() async {
     try {
@@ -140,44 +143,49 @@ class _EventDetailsState extends State<EventDetails> {
   Widget build(BuildContext context) {
     return ResponsiveSizer(builder: (context, Orientation, ScreenType) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text("Event"),
-          backgroundColor: const Color(0xFF00B8CA),
-          leading: IconButton(
+          appBar: AppBar(
+            title: const Text(
+              "Event",
+              style: TextStyle(color: Colors.black),
+            ),
+            //backgroundColor: const Color(0xFF00B8CA),
+            backgroundColor: const Color(0xFFF8F8F8),
+            leading: IconButton(
               icon: Image.asset(
                 "assets/images/arrow.png",
                 height: 20,
                 width: 20,
-                color: Colors.white,
+                color: Colors.black,
               ),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HomeScreen()),
               ),
             ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            // showDialog(
-            //   barrierColor: Colors.black26,
-            //   context: context,
-            //   builder: (context) {
-            //     return setupAlertDialoadContainer();
-            //   },
-            // );
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddEventsDetails()),
-            );
-          },
-          label: const Text('Upload Event'),
-          icon: const Icon(Icons.add),
-        ),
-        // backgroundColor: Colors.white10,
-        body: Container(
-            height: 100.h,
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              // showDialog(
+              //   barrierColor: Colors.black26,
+              //   context: context,
+              //   builder: (context) {
+              //     return setupAlertDialoadContainer();
+              //   },
+              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddEventsDetails()),
+              );
+            },
+            label: const Text('Upload Event'),
+            icon: const Icon(Icons.add),
+          ),
+          // backgroundColor: Colors.white10,
+          body: Container(
+            height: 85.h,
             width: 100.w,
-            decoration: const BoxDecoration(
+            color: const Color(0xFFF8F8F8),
+            /* decoration: const BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment(6.123234262925839e-17, 1),
                   end: Alignment(-1, 6.123234262925839e-17),
@@ -185,171 +193,354 @@ class _EventDetailsState extends State<EventDetails> {
                     Color.fromRGBO(31, 203, 220, 1),
                     Color.fromRGBO(0, 184, 202, 1)
                   ]),
-            ),
-            child: FutureBuilder(
-                future: showEventData(),
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.hasData) {
-                    return SizedBox(
-                      width: 100.w,
-                      height: 70.h,
-                      child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          itemCount: vieweventdata.length,
-                          itemBuilder: (context, int index) {
-                            return InkWell(
-                              onTap: () {
-                                final route = MaterialPageRoute(
-                                  fullscreenDialog: true,
-                                  builder: (_) =>
-                                      ViewSingleEvent(eventId: vieweventdata[index].id!),
-                                );
-                                Navigator.push(context, route);
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                width: MediaQuery.of(context).size.width,
-                                height: 43.h,
-                                child: Card(
-                                  elevation: 5,
-                                  shadowColor: Colors.black12,
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        height: 20.h,
-                                        width: 100.w,
-                                        margin: const EdgeInsets.only(
-                                          top: 5,
-                                          left: 5,
-                                          right: 5,
+            ),*/
+            child: Container(
+              child: FutureBuilder(
+                  future: showEventData(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.hasData) {
+                      return Container(
+                        height: 60.h,
+                        width: 100.w,
+                        child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount: vieweventdata.length,
+                            itemBuilder: (context, int index) {
+                              return GestureDetector(
+                                child: Container(
+                                    width: 100.w,
+                                    height: 44.h,
+                                    child: Card(
+                                        elevation: 5,
+                                        shadowColor: Colors.black12,
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(12),
-                                          ),
-                                        ),
-                                        child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              // Image border
-                                              child: SizedBox.fromSize(
-                                                size: Size.fromRadius(48),
-                                                // Image radius
-                                                child: Image.network(
-                                                    vieweventdata[index]
-                                                        .peventImage![0]
-                                                        .image!,
-                                                    fit: BoxFit
-                                                        .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
-                                              ),
-                                            )
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.all(10),
                                         child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  width: 7.w,
-                                                  height: 5.h,
-                                                  alignment: Alignment.topRight,
-                                                  margin:
-                                                      const EdgeInsets.fromLTRB(
-                                                          0, 0, 10, 0),
-                                                  decoration: BoxDecoration(
-                                                    image: profileImage == ""
-                                                        ? const DecorationImage(
-                                                            image: AssetImage(
-                                                                'assets/images/profileimage.jpg'), //Your Background image
-                                                          )
-                                                        : DecorationImage(
-                                                            image: NetworkImage(
-                                                                profileImage),
-                                                            fit: BoxFit.cover,
-
-                                                            //Your Background image
-                                                          ),
-                                                    border: Border.all(
-                                                        width: 2.0,
-                                                        color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                final route = MaterialPageRoute(
+                                                  fullscreenDialog: true,
+                                                  builder: (_) =>
+                                                      ViewSingleEvent(
+                                                          eventId: vieweventdata[index].id!),
+                                                );
+                                                Navigator.push(context, route);
+                                              },
+                                              child: Container(
+                                                height: 20.h,
+                                                width: 100.w,
+                                                margin: const EdgeInsets.only(
+                                                  top: 10,
+                                                  left: 5,
+                                                  right: 5,
                                                 ),
-                                                Text(
-                                                    "${vieweventdata[index].userName}",
-                                                style: TextStyle(fontSize: 15.sp),)
-                                              ],
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(
+                                                          Dimensions.size20),
+                                                    ),
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                        vieweventdata[index]
+                                                            .peventImage![0]
+                                                            .image!,
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                              ),
                                             ),
                                             Container(
-                                              margin: EdgeInsets.only(left: 4.h),
+                                              width: 100.w,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 7.w,
+                                                        height: 5.h,
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        margin: const EdgeInsets
+                                                            .fromLTRB(
+                                                            0, 0, 10, 0),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          image: profileImage ==
+                                                                  ""
+                                                              ? const DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/profileimage.jpg'), //Your Background image
+                                                                )
+                                                              : DecorationImage(
+                                                                  image: NetworkImage(
+                                                                      profileImage),
+                                                                  fit: BoxFit
+                                                                      .cover,
+
+                                                                  //Your Background image
+                                                                ),
+                                                          border: Border.all(
+                                                              width: 2.0,
+                                                              color:
+                                                                  Colors.white),
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "${vieweventdata[index].userName}",
+                                                        style: TextStyle(
+                                                            fontSize: 15.sp),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          // isfavourite = false;
+                                                          // isnotfavourite = true;
+                                                          selectedIndex = index;
+
+                                                          setState(() {});
+                                                        },
+                                                        child: Visibility(
+                                                          visible: isfavourite,
+                                                          child: Container(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    5),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        1),
+                                                            child: Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          1),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white12,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .all(
+                                                                  Radius.circular(
+                                                                      Dimensions
+                                                                          .size20),
+                                                                ),
+                                                              ),
+                                                              height: 3.h,
+                                                              width: 8.w,
+                                                              child: selectedIndex ==
+                                                                      index
+                                                                  ? Image.asset(
+                                                                      'assets/images/favourite2.png')
+                                                                  : Image.asset(
+                                                                      'assets/images/favourite1.png'),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      /* InkWell(
+                                                        onTap: () {
+                                                         // isfavourite = true;
+                                                        //  isnotfavourite = false;
+                                                          selectedIndex = index;
+                                                          setState(() {});
+                                                        },
+                                                        child: Visibility(
+                                                          visible: selectedIndex == -1 ? isnotfavourite = false : selectedIndex == index ? isnotfavourite = false :  isfavourite = true,
+                                                          child: Container(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    5),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        1),
+                                                            child: Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          1),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white12,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .all(
+                                                                  Radius.circular(
+                                                                      Dimensions
+                                                                          .size20),
+                                                                ),
+                                                              ),
+                                                              height: 4.h,
+                                                              width: 9.w,
+                                                              child: Image.asset(
+                                                                  'assets/images/favourite2.png'),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )*/
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Column(
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                  Container(
+                                              margin:
+                                                  EdgeInsets.only(left: 4.h),
                                               child: Text(
                                                   "${vieweventdata[index].eventName}",
-                                                  style: TextStyle(fontSize: 15.sp)),
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp)),
                                             ),
                                             Container(
                                               margin:
                                                   EdgeInsets.only(left: 4.h),
                                               child: Text(
                                                   "${vieweventdata[index].eventDatetime}",
-                                                  style: TextStyle(fontSize: 15.sp)),
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp)),
                                             ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  width: 7.w,
-                                                  height: 5.h,
-                                                  alignment: Alignment.topRight,
-                                                  margin:
-                                                      const EdgeInsets.fromLTRB(
-                                                          0, 0, 10, 0),
-                                                  decoration: BoxDecoration(
-                                                    image:
-                                                        const DecorationImage(
-                                                      image: AssetImage(
-                                                          'assets/images/location.png'),
-                                                      //Your Background image
-                                                    ),
-                                                    border: Border.all(
-                                                        width: 2.0,
-                                                        color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                                Text(
-                                                    "${vieweventdata[index].eventAddress}",
-                                                style: TextStyle(fontSize: 15.sp),)
                                               ],
                                             ),
+                                            Container(
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 7.w,
+                                                    height: 5.h,
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    margin: const EdgeInsets
+                                                        .fromLTRB(0, 0, 10, 0),
+                                                    decoration: BoxDecoration(
+                                                      image:
+                                                          const DecorationImage(
+                                                        image: AssetImage(
+                                                            'assets/images/location.png'),
+                                                        //Your Background image
+                                                      ),
+                                                      border: Border.all(
+                                                          width: 2.0,
+                                                          color: Colors.white),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${vieweventdata[index].eventAddress}",
+                                                    style: TextStyle(
+                                                        fontSize: 15.sp),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                 Container(
+                                              height: 4.h,
+                                              width: 18.w,
+                                              margin: EdgeInsets.only(right: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                gradient: const LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
+                                                    colors: [
+                                                      Color.fromRGBO(
+                                                          31, 203, 220, 1),
+                                                      Color.fromRGBO(
+                                                          0, 184, 202, 1)
+                                                    ]),
+                                              ),
+                                              child: TextButton(
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor: Colors.white,
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          top: 5.0,
+                                                          bottom: 5.0),
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 13),
+                                                ),
+                                                onPressed: () {},
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    const Text(
+                                                      "Delete",
+                                                      style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.normal,
+                                                      ),
+                                                    ),
+                                                    // text
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                              ],
+
+                                            )
                                           ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                    );
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                })),
-      );
+                                        ))),
+                              );
+                            }),
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  }),
+            ),
+          ));
     });
   }
 

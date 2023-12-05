@@ -67,7 +67,9 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
         for (int i = 0; i < imagefiles!.length; i++) {
           filepathdet.add(imagefiles![i].path);
         }
-        isImageVisiable = true;
+        if(filepathdet.isNotEmpty){
+            isImageVisiable = true;
+        }
         print("Yourdatafile  $filepathdet");
         Left_indicator_bar_Flushbar1("Image Selected SuccessFully");
         setState(() {});
@@ -281,7 +283,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       },
                       child: Container(
                         width: 60.w,
-                        height: 13.h,
+                        height: 18.h,
                         child: Card(
                         elevation: 5,
                         shadowColor: Colors.black,
@@ -296,8 +298,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                             children: [
                               Image.asset(
                                 'assets/images/images.png',
-                                height: 50,
-                                width: 50,
+                                height: 9.h,
+                                width: 9.h,
                               ),
                               Text("Uplod Image")
                             ],
@@ -348,7 +350,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                           return GestureDetector(
                             onTap: () {},
                             child: Container(
-                              height: 20.h,
+                              height: 25.h,
                               width: (30.w),
                               margin: const EdgeInsets.only(
                                   top: 5, left: 5, right: 5, bottom: 5),
@@ -652,7 +654,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
               ],
             ),
           ),
-        ));
+        )
+    );
   }
 
   void Left_indicator_bar_Flushbar(BuildContext context, String Message) {

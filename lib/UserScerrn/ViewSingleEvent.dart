@@ -12,6 +12,7 @@ import '../ApiCallingPage/ViewSingleEventList.dart';
 import 'package:http/http.dart' as http;
 
 import '../ApiCallingPage/ViewUserProfileImage.dart';
+import '../Dimension.dart';
 import '../modelclass/ProfileImageResponse.dart';
 import '../modelclass/SingleEventResponse.dart';
 
@@ -35,13 +36,14 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
       eventdescription1 = "",
       eventvideo = "";
   int userId = 0;
+  bool isfavourite = true, isnotfavourite = false;
 
   List<PeventImage> eventImageDeta = [];
   late VideoPlayerController _videoPlayerController;
 
   // late Future<void> _initializeVideoPlayerFuture;
 
-  void showEventData() async {
+  Future<String?> showEventData() async {
     String str_eventId = widget.eventId.toString();
 
     http.Response? response =
@@ -74,7 +76,6 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
           "product, a new screen displays details about the product.";
 
       //   _initVideoPlayer(eventvideo);
-
     } else {
       Fluttertoast.showToast(
           msg: eventdataresponse.message ?? "",
@@ -87,6 +88,8 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
     }
 
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+
+    return eventdataresponse.status;
   }
 
   Future _initVideoPlayer(String videopath) async {
@@ -133,7 +136,7 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
   void initState() {
     super.initState();
 
-    showEventData();
+    //showEventData();
     showProfileImage();
   }
 
@@ -168,188 +171,299 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
                 width: MediaQuery.of(context).size.width,
                 height: 100.h,
                 child: Card(
-                  elevation: 5,
-                  shadowColor: Colors.black12,
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Container(
-                      //   height: 25.h,
-                      //   width: 100.w,
-                      //   margin: const EdgeInsets.only(
-                      //     top: 5,
-                      //     left: 5,
-                      //     right: 5,
-                      //   ),
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.white,
-                      //     borderRadius: BorderRadius.all(
-                      //       Radius.circular(12),
-                      //     ),
-                      //   ),
-                      //   child: ClipRRect(
-                      //     borderRadius: BorderRadius.circular(20),
-                      //     // Image border
-                      //     child: SizedBox.fromSize(
-                      //       size: Size.fromRadius(48),
-                      //       // Image radius
-                      //       child: FutureBuilder(
-                      //         future: _initVideoPlayer(eventvideo),
-                      //         builder: (context, snapshot) {
-                      //           if (snapshot.connectionState ==
-                      //               ConnectionState.done) {
-                      //             // If the VideoPlayerController has finished initialization, use
-                      //             // the data it provides to limit the aspect ratio of the video.
-                      //             return AspectRatio(
-                      //               aspectRatio: _videoPlayerController
-                      //                   .value.aspectRatio,
-                      //               // Use the VideoPlayer widget to display the video.
-                      //               child: GestureDetector(
-                      //                   onTap: () {
-                      //                     setState(() {
-                      //                       // If the video is playing, pause it.
-                      //                       if (_videoPlayerController.value.isPlaying) {
-                      //                         _videoPlayerController.pause();
-                      //                       } else {
-                      //                         // If the video is paused, play it.
-                      //                         _videoPlayerController.play();
-                      //                       }
-                      //                     });
-                      //                   },
-                      //                   child: VideoPlayer(_videoPlayerController)),
-                      //             );
-                      //           } else {
-                      //             // If the VideoPlayerController is still initializing, show a
-                      //             // loading spinner.
-                      //             return Center(
-                      //                 child: CircularProgressIndicator());
-                      //           }
-                      //         },
-                      //       ), /*Image.network(nearbyLocations[index].icon!,)*/
-                      //     ),
-                      //   ),
-                      // ),
-                      Container(
-                        height: 25.h,
-                        width: 100.w,
-                        margin: const EdgeInsets.only(
-                          top: 5,
-                          left: 5,
-                          right: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: ListView.builder(
-                          itemCount: eventImageDeta.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              height: 35.h,
-                              width: 80.w,
-                              margin: EdgeInsets.all(5),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                // Image border
-                                child: SizedBox.fromSize(
-                                  size: Size.fromRadius(48),
-                                  // Image radius
-                                  child: Image.network(
-                                      eventImageDeta[index].image!,
-                                      height: 35.h,
-                                      width: 80.w,
-                                      fit: BoxFit
-                                          .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
-                                ),
-                              ),
-                            );
-                          },
-                          scrollDirection: Axis.horizontal,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                    elevation: 5,
+                    shadowColor: Colors.black12,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: FutureBuilder(
+                        future: showEventData(),
+                        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                          if (snapshot.hasData) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Container(
+                                //   height: 25.h,
+                                //   width: 100.w,
+                                //   margin: const EdgeInsets.only(
+                                //     top: 5,
+                                //     left: 5,
+                                //     right: 5,
+                                //   ),
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.white,
+                                //     borderRadius: BorderRadius.all(
+                                //       Radius.circular(12),
+                                //     ),
+                                //   ),
+                                //   child: ClipRRect(
+                                //     borderRadius: BorderRadius.circular(20),
+                                //     // Image border
+                                //     child: SizedBox.fromSize(
+                                //       size: Size.fromRadius(48),
+                                //       // Image radius
+                                //       child: FutureBuilder(
+                                //         future: _initVideoPlayer(eventvideo),
+                                //         builder: (context, snapshot) {
+                                //           if (snapshot.connectionState ==
+                                //               ConnectionState.done) {
+                                //             // If the VideoPlayerController has finished initialization, use
+                                //             // the data it provides to limit the aspect ratio of the video.
+                                //             return AspectRatio(
+                                //               aspectRatio: _videoPlayerController
+                                //                   .value.aspectRatio,
+                                //               // Use the VideoPlayer widget to display the video.
+                                //               child: GestureDetector(
+                                //                   onTap: () {
+                                //                     setState(() {
+                                //                       // If the video is playing, pause it.
+                                //                       if (_videoPlayerController.value.isPlaying) {
+                                //                         _videoPlayerController.pause();
+                                //                       } else {
+                                //                         // If the video is paused, play it.
+                                //                         _videoPlayerController.play();
+                                //                       }
+                                //                     });
+                                //                   },
+                                //                   child: VideoPlayer(_videoPlayerController)),
+                                //             );
+                                //           } else {
+                                //             // If the VideoPlayerController is still initializing, show a
+                                //             // loading spinner.
+                                //             return Center(
+                                //                 child: CircularProgressIndicator());
+                                //           }
+                                //         },
+                                //       ), /*Image.network(nearbyLocations[index].icon!,)*/
+                                //     ),
+                                //   ),
+                                // ),
                                 Container(
-                                  width: 7.w,
-                                  height: 5.h,
-                                  alignment: Alignment.topRight,
-                                  margin:
-                                      const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                  decoration: BoxDecoration(
-                                    image: profileImage == ""
-                                        ? const DecorationImage(
-                                            image: AssetImage(
-                                                'assets/images/profileimage.jpg'), //Your Background image
-                                          )
-                                        : DecorationImage(
-                                            image: NetworkImage(profileImage),
-                                            fit: BoxFit.cover,
-
-                                            //Your Background image
-                                          ),
-                                    border: Border.all(
-                                        width: 2.0, color: Colors.white),
-                                    shape: BoxShape.circle,
+                                  height: 25.h,
+                                  width: 100.w,
+                                  margin: const EdgeInsets.only(
+                                    top: 5,
+                                    left: 5,
+                                    right: 5,
                                   ),
-                                ),
-                                Text("${username}")
-                              ],
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(left: 4.h),
-                              child: Text("${eventname}", style: TextStyle()),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(left: 4.h),
-                              child:
-                                  Text("${eventdatetime}", style: TextStyle()),
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 7.w,
-                                  height: 5.h,
-                                  alignment: Alignment.topRight,
-                                  margin:
-                                      const EdgeInsets.fromLTRB(0, 0, 10, 0),
                                   decoration: BoxDecoration(
-                                    image: const DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/location.png'),
-                                      //Your Background image
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(12),
                                     ),
-                                    border: Border.all(
-                                        width: 2.0, color: Colors.white),
-                                    shape: BoxShape.circle,
+                                  ),
+                                  child: ListView.builder(
+                                    itemCount: eventImageDeta.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Container(
+                                        height: 35.h,
+                                        width: 80.w,
+                                        margin: EdgeInsets.all(5),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          // Image border
+                                          child: SizedBox.fromSize(
+                                            size: Size.fromRadius(48),
+                                            // Image radius
+                                            child: Image.network(
+                                                eventImageDeta[index].image!,
+                                                height: 35.h,
+                                                width: 80.w,
+                                                fit: BoxFit
+                                                    .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    scrollDirection: Axis.horizontal,
                                   ),
                                 ),
-                                Text("${eventaddress}")
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 100.w,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 7.w,
+                                                  height: 5.h,
+                                                  alignment: Alignment.topRight,
+                                                  margin:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    image: profileImage == ""
+                                                        ? const DecorationImage(
+                                                            image: AssetImage(
+                                                                'assets/images/profileimage.jpg'), //Your Background image
+                                                          )
+                                                        : DecorationImage(
+                                                            image: NetworkImage(
+                                                                profileImage),
+                                                            fit: BoxFit.cover,
+
+                                                            //Your Background image
+                                                          ),
+                                                    border: Border.all(
+                                                        width: 2.0,
+                                                        color: Colors.white),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                Text("${username}")
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    isfavourite = false;
+                                                    isnotfavourite = true;
+                                                    setState(() {});
+                                                  },
+                                                  child: Visibility(
+                                                    visible: isfavourite,
+                                                    child: Container(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      margin: EdgeInsets.all(5),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 1),
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .all(5),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 1),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white12,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(
+                                                                Dimensions
+                                                                    .size20),
+                                                          ),
+                                                        ),
+                                                        height: 4.h,
+                                                        width: 9.w,
+                                                        child: Image.asset(
+                                                            'assets/images/favourite1.png'),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    isfavourite = true;
+                                                    isnotfavourite = false;
+                                                    setState(() {});
+                                                  },
+                                                  child: Visibility(
+                                                    visible: isnotfavourite,
+                                                    child: Container(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      margin: EdgeInsets.all(5),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 1),
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .all(5),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 1),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white12,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(
+                                                                Dimensions
+                                                                    .size20),
+                                                          ),
+                                                        ),
+                                                        height: 4.h,
+                                                        width: 9.w,
+                                                        child: Image.asset(
+                                                            'assets/images/favourite2.png'),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 4.h),
+                                        child: Text("${eventname}",
+                                            style: TextStyle()),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 4.h),
+                                        child: Text("${eventdatetime}",
+                                            style: TextStyle()),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 7.w,
+                                            height: 5.h,
+                                            alignment: Alignment.topRight,
+                                            margin: const EdgeInsets.fromLTRB(
+                                                0, 0, 10, 0),
+                                            decoration: BoxDecoration(
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                    'assets/images/location.png'),
+                                                //Your Background image
+                                              ),
+                                              border: Border.all(
+                                                  width: 2.0,
+                                                  color: Colors.white),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          Text("${eventaddress}")
+                                        ],
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 4.h),
+                                        child: Text("${eventdescription}",
+                                            style: TextStyle()),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(left: 4.h),
-                              child: Text("${eventdescription}",
-                                  style: TextStyle()),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                            );
+                          } else {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        })),
               ),
             ),
           ));

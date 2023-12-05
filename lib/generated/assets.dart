@@ -51,6 +51,8 @@ class Assets {
   static const String imagesFamilyB = 'assets/images/family-b.png';
   static const String imagesFamilyG = 'assets/images/family-g.png';
   static const String imagesFamilyW = 'assets/images/family-w.png';
+  static const String imagesFavourite1 = 'assets/images/favourite1.png';
+  static const String imagesFavourite2 = 'assets/images/favourite2.png';
   static const String imagesFilmsB = 'assets/images/films-b.png';
   static const String imagesFilmsG = 'assets/images/films-g.png';
   static const String imagesFilmsW = 'assets/images/films-w.png';

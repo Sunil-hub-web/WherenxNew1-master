@@ -1590,8 +1590,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                                         .size20),
                                                       ),
                                                       child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
+                                                          decoration: BoxDecoration(
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .all(
@@ -1599,14 +1598,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                                         Dimensions
                                                                             .size20),
                                                                   ),
-                                                                  image:
-                                                                      DecorationImage(
+                                                                  image: DecorationImage(
                                                                     image: NetworkImage(
                                                                         videoreviewDet[index]
                                                                             .photo!),
                                                                     fit: BoxFit
                                                                         .cover,
-                                                                  )),
+                                                                  )
+                                                              ),
                                                           child:  Container(
                                                                 alignment: Alignment.center,
                                                                 padding:

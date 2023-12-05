@@ -21,9 +21,9 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
   String profileImage = "";
   List<ViewEventResponse> visereventresponse = [];
   List<Data> vieweventdata = [];
+  bool isfavourite = true, isnotfavourite = false;
 
   Future<List<Data>> showEventData() async {
-
     vieweventdata.clear();
 
     http.Response? response = await ViewEventData().getEventData();
@@ -46,12 +46,12 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
     return ResponsiveSizer(builder: (context, Orientation, ScreenType) {
       return Scaffold(
           body: SizedBox(
-             height: 100.h,
+              height: 100.h,
               width: 100.h,
               child: FutureBuilder(
                   future: showEventData(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<dynamic> snapshot) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.hasData) {
                       return Container(
                         width: 100.w,
@@ -61,12 +61,9 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                             itemCount: vieweventdata.length,
                             itemBuilder: (context, int index) {
                               return Container(
-                                padding: const EdgeInsets.only(
-                                    left: 5, right: 5),
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
+                                padding:
+                                    const EdgeInsets.only(left: 5, right: 5),
+                                width: MediaQuery.of(context).size.width,
                                 height: 38.h,
                                 child: Card(
                                   elevation: 5,
@@ -77,8 +74,8 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                           height: 20.h,
@@ -95,8 +92,8 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                                             ),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                20),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                             // Image border
                                             child: SizedBox.fromSize(
                                               size: Size.fromRadius(48),
@@ -108,36 +105,127 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                                                       .cover) /*Image.network(nearbyLocations[index].icon!,)*/,
                                             ),
                                           )),
-                                      Row(
+                                     Container(
+                                       width: 100.h,
+                                       child:   Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            width: 7.w,
-                                            height: 5.h,
-                                            alignment: Alignment.topRight,
-                                            margin: const EdgeInsets.fromLTRB(
-                                                0, 0, 10, 0),
-                                            decoration: BoxDecoration(
-                                              image: profileImage == ""
-                                                  ? const DecorationImage(
-                                                image: AssetImage(
-                                                    'assets/images/profileimage.jpg'), //Your Background image
-                                              )
-                                                  : DecorationImage(
-                                                image: NetworkImage(
-                                                    profileImage),
-                                                fit: BoxFit.cover,
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 7.w,
+                                                height: 5.h,
+                                                alignment: Alignment.topRight,
+                                                margin:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 0, 10, 0),
+                                                decoration: BoxDecoration(
+                                                  image: profileImage == ""
+                                                      ? const DecorationImage(
+                                                          image: AssetImage(
+                                                              'assets/images/profileimage.jpg'), //Your Background image
+                                                        )
+                                                      : DecorationImage(
+                                                          image: NetworkImage(
+                                                              profileImage),
+                                                          fit: BoxFit.cover,
 
-                                                //Your Background image
+                                                          //Your Background image
+                                                        ),
+                                                  border: Border.all(
+                                                      width: 2.0,
+                                                      color: Colors.white),
+                                                  shape: BoxShape.circle,
+                                                ),
                                               ),
-                                              border: Border.all(
-                                                  width: 2.0,
-                                                  color: Colors.white),
-                                              shape: BoxShape.circle,
-                                            ),
+                                              Text(
+                                                  "${vieweventdata[index].userName}")
+                                            ],
                                           ),
-                                          Text("${vieweventdata[index].userName}")
+                                          Row(
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  isfavourite = false;
+                                                  isnotfavourite = true;
+                                                  setState(() {});
+                                                },
+                                                child: Visibility(
+                                                  visible: isfavourite,
+                                                  child: Container(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    margin: EdgeInsets.all(5),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 1),
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              5),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 1),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white12,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(
+                                                              Dimensions
+                                                                  .size20),
+                                                        ),
+                                                      ),
+                                                      height: 4.h,
+                                                      width: 9.w,
+                                                      child: Image.asset(
+                                                          'assets/images/favourite1.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  isfavourite = true;
+                                                  isnotfavourite = false;
+                                                  setState(() {});
+                                                },
+                                                child: Visibility(
+                                                  visible: isnotfavourite,
+                                                  child: Container(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    margin: EdgeInsets.all(5),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 1),
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              5),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 1),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white12,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(
+                                                              Dimensions
+                                                                  .size20),
+                                                        ),
+                                                      ),
+                                                      height: 4.h,
+                                                      width: 9.w,
+                                                      child: Image.asset(
+                                                          'assets/images/favourite2.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          )
                                         ],
                                       ),
+                                     ),
                                       Container(
                                         margin: EdgeInsets.only(left: 4.h),
                                         child: Text(
@@ -170,7 +258,8 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                                               shape: BoxShape.circle,
                                             ),
                                           ),
-                                          Text("${vieweventdata[index].eventAddress}")
+                                          Text(
+                                              "${vieweventdata[index].eventAddress}")
                                         ],
                                       ),
                                     ],
@@ -182,8 +271,7 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                     } else {
                       return Center(child: CircularProgressIndicator());
                     }
-                  })
-          ));
+                  })));
     });
   }
 }
