@@ -268,7 +268,6 @@ class _EventDetailsState extends State<EventDetails> {
           ),
           // backgroundColor: Colors.white10,
           body: Container(
-              height: 82.h,
               width: 100.w,
               color: const Color(0xFFF8F8F8),
               /* decoration: const BoxDecoration(
@@ -354,7 +353,7 @@ class _EventDetailsState extends State<EventDetails> {
                                     color: selectedIndex1 == "0"
                                         ? Colors.white
                                         : Colors.black,
-                                    fontSize: 15)),
+                                    fontSize: 15.sp)),
                           ),
                         ),
                         Container(
@@ -425,7 +424,7 @@ class _EventDetailsState extends State<EventDetails> {
                                     color: selectedIndex2 == "3"
                                         ? Colors.black
                                         : Colors.white,
-                                    fontSize: 15)),
+                                    fontSize: 15.sp)),
                           ),
                         ),
                       ],
@@ -448,9 +447,9 @@ class _EventDetailsState extends State<EventDetails> {
                                       itemCount: vieweventdata.length,
                                       itemBuilder: (context, int index) {
                                         return GestureDetector(
-                                          child: SizedBox(
-                                              width: 100.w,
-                                              height: 44.h,
+                                          child: Container(
+                                            //  width: 100.w,
+                                             // height: 45.h,
                                               child: Card(
                                                   elevation: 5,
                                                   shadowColor: Colors.black12,
@@ -647,7 +646,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                           textColor: Colors
                                                                               .white,
                                                                           fontSize:
-                                                                              16.0);
+                                                                              16.0.sp);
                                                                     } else {
                                                                       ViewDialog(
                                                                               context: context)
@@ -678,7 +677,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                           textColor: Colors
                                                                               .white,
                                                                           fontSize:
-                                                                              16.0);
+                                                                              16.0.sp);
                                                                     }
 
                                                                     setState(
@@ -807,7 +806,17 @@ class _EventDetailsState extends State<EventDetails> {
                                                                 EdgeInsets.only(
                                                                     left: 4.h),
                                                             child: Text(
-                                                                "${vieweventdata[index].startEventDatetime}   ${vieweventdata[index].endEventDatetime}",
+                                                                "${vieweventdata[index].startEventDatetime}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp)),
+                                                          ),
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 4.h),
+                                                            child: Text(
+                                                                "${vieweventdata[index].endEventDatetime}",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         15.sp)),
@@ -871,7 +880,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                 margin: EdgeInsets
                                                                     .only(
                                                                         right:
-                                                                            10),
+                                                                            10,bottom: 5),
                                                                 decoration:
                                                                     BoxDecoration(
                                                                   borderRadius:
@@ -912,9 +921,9 @@ class _EventDetailsState extends State<EventDetails> {
                                                                             5.0,
                                                                         bottom:
                                                                             5.0),
-                                                                    textStyle: const TextStyle(
+                                                                    textStyle: TextStyle(
                                                                         fontSize:
-                                                                            13),
+                                                                            13.sp),
                                                                   ),
                                                                   onPressed:
                                                                       () async {
@@ -976,14 +985,14 @@ class _EventDetailsState extends State<EventDetails> {
                                                                         width:
                                                                             5,
                                                                       ),
-                                                                      const Text(
-                                                                        "  Edit",
+                                                                      Text(
+                                                                        "    Edit",
                                                                         textAlign:
                                                                             TextAlign.center,
                                                                         style:
                                                                             TextStyle(
                                                                           fontSize:
-                                                                              13,
+                                                                              13.sp,
                                                                           color:
                                                                               Colors.white,
                                                                           fontWeight:
@@ -1001,7 +1010,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                 margin: EdgeInsets
                                                                     .only(
                                                                         right:
-                                                                            10),
+                                                                            10,bottom: 5),
                                                                 decoration:
                                                                     BoxDecoration(
                                                                   borderRadius:
@@ -1042,9 +1051,9 @@ class _EventDetailsState extends State<EventDetails> {
                                                                             5.0,
                                                                         bottom:
                                                                             5.0),
-                                                                    textStyle: const TextStyle(
+                                                                    textStyle: TextStyle(
                                                                         fontSize:
-                                                                            13),
+                                                                            13.sp),
                                                                   ),
                                                                   onPressed:
                                                                       () async {
@@ -1139,12 +1148,12 @@ class _EventDetailsState extends State<EventDetails> {
                                                                         width:
                                                                             5,
                                                                       ),
-                                                                      const Text(
-                                                                        "Delete",
+                                                                      Text(
+                                                                        "    Delete",
                                                                         style:
                                                                             TextStyle(
                                                                           fontSize:
-                                                                              13,
+                                                                              13.sp,
                                                                           color:
                                                                               Colors.white,
                                                                           fontWeight:
@@ -1187,8 +1196,8 @@ class _EventDetailsState extends State<EventDetails> {
                                       itemBuilder: (context, int index) {
                                         return GestureDetector(
                                           child: SizedBox(
-                                              width: 100.w,
-                                              height: 44.h,
+                                             // width: 100.w,
+                                              //height: 44.h,
                                               child: Card(
                                                   elevation: 5,
                                                   shadowColor: Colors.black12,
@@ -1632,7 +1641,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                 margin: EdgeInsets
                                                                     .only(
                                                                         right:
-                                                                            10),
+                                                                            10,bottom: 5),
                                                                 decoration:
                                                                     BoxDecoration(
                                                                   borderRadius:
@@ -1673,9 +1682,9 @@ class _EventDetailsState extends State<EventDetails> {
                                                                             5.0,
                                                                         bottom:
                                                                             5.0),
-                                                                    textStyle: const TextStyle(
+                                                                    textStyle: TextStyle(
                                                                         fontSize:
-                                                                            13),
+                                                                            13.sp),
                                                                   ),
                                                                   onPressed:
                                                                       () async {
@@ -1739,7 +1748,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                           textColor: Colors
                                                                               .white,
                                                                           fontSize:
-                                                                              16.0);
+                                                                              16.0.sp);
                                                                     } else {
                                                                       ViewDialog(
                                                                               context: context)
@@ -1759,7 +1768,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                                           textColor: Colors
                                                                               .white,
                                                                           fontSize:
-                                                                              16.0);
+                                                                              16.0.sp);
                                                                     }
                                                                   },
                                                                   child: Row(
@@ -1768,12 +1777,12 @@ class _EventDetailsState extends State<EventDetails> {
                                                                         width:
                                                                             5,
                                                                       ),
-                                                                      const Text(
-                                                                        "Delete",
+                                                                      Text(
+                                                                        "   Delete",
                                                                         style:
                                                                             TextStyle(
                                                                           fontSize:
-                                                                              13,
+                                                                              13.sp,
                                                                           color:
                                                                               Colors.white,
                                                                           fontWeight:

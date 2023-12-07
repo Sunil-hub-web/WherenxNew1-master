@@ -186,6 +186,7 @@ class _EditEventDetailsState extends State<EditEventDetails> {
   DateTime currentDate = DateTime.now();
 
   Future<void> _selectDate(BuildContext context) async {
+
     final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: currentDate,
@@ -201,6 +202,7 @@ class _EditEventDetailsState extends State<EditEventDetails> {
   }
 
   dateTimePickerWidget(BuildContext context) {
+
     return showDatePicker(
       context: context,
       initialDate: DateTime.now(),
