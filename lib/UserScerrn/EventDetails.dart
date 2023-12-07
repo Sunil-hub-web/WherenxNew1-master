@@ -4,16 +4,27 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 //import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:wherenxnew1/ApiCallingPage/AddFavoriteEvent.dart';
+import 'package:wherenxnew1/ApiCallingPage/EventDelete.dart';
+import 'package:wherenxnew1/ApiCallingPage/FavoriteEventDelete.dart';
+import 'package:wherenxnew1/ApiCallingPage/ViewFavoriteEvent.dart';
 import 'package:wherenxnew1/UserScerrn/AddEventsDetails.dart';
+import 'package:wherenxnew1/UserScerrn/EditEventDetails.dart';
 import 'package:wherenxnew1/UserScerrn/HomeScreen.dart';
 import 'package:wherenxnew1/UserScerrn/ViewSingleEvent.dart';
+import 'package:wherenxnew1/modelclass/DeleteEventResponse.dart';
+import 'package:wherenxnew1/modelclass/EventSuccsessResponse.dart';
+import 'package:wherenxnew1/modelclass/SuccessResponse.dart';
 
 import '../ApiCallingPage/ViewEventData.dart';
+import '../ApiImplement/ViewDialog.dart';
 import '../Dimension.dart';
 import '../Helper/img.dart';
 import '../modelclass/ViewEventResponse.dart';
@@ -33,9 +44,15 @@ class _EventDetailsState extends State<EventDetails> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile>? imagefiles;
   File? galleryFile;
-  String filePath1 = "";
-  bool isfavourite = true, isnotfavourite = false;
-  int selectedIndex = -1, selectedIndex1 = -1;
+  String filePath1 = "",
+      selectedIndex1 = "0",
+      selectedIndex2 = "3",
+      selectClickEvent = "click1";
+  bool isfavourite = true,
+      isnotfavourite = false,
+      eventlistdata = true,
+      faveventdata = false;
+  int selectedIndex = -1;
 
   openImages() async {
     try {
@@ -120,24 +137,93 @@ class _EventDetailsState extends State<EventDetails> {
   List<PeventImage> profileimage = [];
 
   Future<List<Data>> showEventData() async {
+
     vieweventdata.clear();
 
-    http.Response? response = await ViewEventData().getEventData();
-    var jsonResponse = json.decode(response!.body);
-    var eventdataresponse = ViewEventResponse.fromJson(jsonResponse);
+    if (selectClickEvent == "click1") {
 
-    if (eventdataresponse.status == "200") {
-      if (eventdataresponse.data!.isNotEmpty) {
-        for (int i = 0; i < eventdataresponse.data!.length; i++) {
-          vieweventdata.add(eventdataresponse.data![i]);
+     //  vieweventdata.clear();
+
+      eventlistdata = true;
+      faveventdata = false;
+
+      http.Response? response = await ViewEventData().getEventData();
+      var jsonResponse = json.decode(response!.body);
+      var eventdataresponse = ViewEventResponse.fromJson(jsonResponse);
+
+      if (eventdataresponse.status == "200") {
+         vieweventdata.clear();
+        if (eventdataresponse.data!.isNotEmpty) {
+          for (int i = 0; i < eventdataresponse.data!.length; i++) {
+            vieweventdata.add(eventdataresponse.data![i]);
+          }
         }
+      }else{
+
+         Fluttertoast.showToast(
+            msg: "Event Not Exist",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+
+      print("userdatalist ${vieweventdata.toString()}");
+
+    } else {
+
+      // vieweventdata.clear();
+
+      eventlistdata = false;
+      faveventdata = true;
+
+      SharedPreferences pre = await SharedPreferences.getInstance();
+      int userId = pre.getInt("userId") ?? 0;
+      String str_userId = userId.toString();
+
+      http.Response? response =
+          await ViewFavoriteEvent().getFavroitEvents(str_userId);
+      var jsonResponse = json.decode(response!.body);
+      var eventdataresponse = ViewEventResponse.fromJson(jsonResponse);
+
+      if (eventdataresponse.status == "200") {
+        vieweventdata.clear();
+        if (eventdataresponse.data!.isNotEmpty) {
+          for (int i = 0; i < eventdataresponse.data!.length; i++) {
+            vieweventdata.add(eventdataresponse.data![i]);
+          }
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: "Favorite Event Not Exist",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
       }
     }
 
-    print("userdatalist ${vieweventdata.toString()}");
-
     return vieweventdata;
   }
+
+
+
+  Future<bool> removePayment() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.remove("payment");
+  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   initializePreference().whenComplete(() {
+  //     setState(() {});
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -182,10 +268,10 @@ class _EventDetailsState extends State<EventDetails> {
           ),
           // backgroundColor: Colors.white10,
           body: Container(
-            height: 85.h,
-            width: 100.w,
-            color: const Color(0xFFF8F8F8),
-            /* decoration: const BoxDecoration(
+              height: 82.h,
+              width: 100.w,
+              color: const Color(0xFFF8F8F8),
+              /* decoration: const BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment(6.123234262925839e-17, 1),
                   end: Alignment(-1, 6.123234262925839e-17),
@@ -194,353 +280,1530 @@ class _EventDetailsState extends State<EventDetails> {
                     Color.fromRGBO(0, 184, 202, 1)
                   ]),
             ),*/
-            child: Container(
-              child: FutureBuilder(
-                  future: showEventData(),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    if (snapshot.hasData) {
-                      return Container(
-                        height: 60.h,
-                        width: 100.w,
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            itemCount: vieweventdata.length,
-                            itemBuilder: (context, int index) {
-                              return GestureDetector(
-                                child: Container(
-                                    width: 100.w,
-                                    height: 44.h,
-                                    child: Card(
-                                        elevation: 5,
-                                        shadowColor: Colors.black12,
-                                        color: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                        ),
-                                        child: Column(
-                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                final route = MaterialPageRoute(
-                                                  fullscreenDialog: true,
-                                                  builder: (_) =>
-                                                      ViewSingleEvent(
-                                                          eventId: vieweventdata[index].id!),
-                                                );
-                                                Navigator.push(context, route);
-                                              },
-                                              child: Container(
-                                                height: 20.h,
-                                                width: 100.w,
-                                                margin: const EdgeInsets.only(
-                                                  top: 10,
-                                                  left: 5,
-                                                  right: 5,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(
-                                                          Dimensions.size20),
-                                                    ),
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(
-                                                        vieweventdata[index]
-                                                            .peventImage![0]
-                                                            .image!,
-                                                      ),
-                                                      fit: BoxFit.cover,
-                                                    )),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 100.w,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        width: 7.w,
-                                                        height: 5.h,
-                                                        alignment:
-                                                            Alignment.topRight,
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 0, 10, 0),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          image: profileImage ==
-                                                                  ""
-                                                              ? const DecorationImage(
-                                                                  image: AssetImage(
-                                                                      'assets/images/profileimage.jpg'), //Your Background image
-                                                                )
-                                                              : DecorationImage(
-                                                                  image: NetworkImage(
-                                                                      profileImage),
-                                                                  fit: BoxFit
-                                                                      .cover,
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(2),
+                          decoration: selectedIndex1 == "0"
+                              ? ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(12))),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF1FCBDC),
+                                      Color(0xFF00B8CA)
+                                    ],
+                                  ),
+                                )
+                              : ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12)),
+                                    side: BorderSide(
+                                      color: Color(0xFFDDE4E4),
+                                    ),
+                                  ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [Colors.white, Colors.white],
+                                  ),
+                                ),
+                          height: 5.h,
+                          width: 45.w,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              //Get.toNamed(RouteHelper.getotpScreenpage());
+                              // Get.back();
 
+                              if (selectedIndex1 == "0") {
+                                selectedIndex1 = "1";
+                                selectedIndex2 = "2";
+                              } else {
+                                selectedIndex1 = "0";
+                                selectedIndex2 = "3";
+                              }
+
+                              selectClickEvent = "click1";
+
+                                eventlistdata = true;
+                                faveventdata = false;
+
+                              setState(() {});
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              backgroundColor: Colors.transparent,
+                              minimumSize:
+                                  Size(MediaQuery.of(context).size.width, 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12), // <-- Radius
+                              ),
+                            ),
+                            child: Text('Event',
+                                style: TextStyle(
+                                    color: selectedIndex1 == "0"
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 15)),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.all(2),
+                          decoration: selectedIndex2 == "3"
+                              ? ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12)),
+                                    side: BorderSide(
+                                      color: Color(0xFFDDE4E4),
+                                    ),
+                                  ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [Colors.white, Colors.white],
+                                  ),
+                                )
+                              : ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12)),
+                                  ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF1FCBDC),
+                                      Color(0xFF00B8CA)
+                                    ],
+                                  ),
+                                ),
+                          height: 5.h,
+                          width: 45.w,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              //Get.toNamed(RouteHelper.getotpScreenpage());
+                              // Get.back();
+
+                              if (selectedIndex2 == "3") {
+                                selectedIndex1 = "1";
+                                selectedIndex2 = "2";
+                              } else {
+                                selectedIndex1 = "0";
+                                selectedIndex2 = "3";
+                              }
+
+                              selectClickEvent = "click2";
+
+                                eventlistdata = false;
+                                faveventdata = true;
+
+                              setState(() {});
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              backgroundColor: Colors.transparent,
+                              minimumSize:
+                                  Size(MediaQuery.of(context).size.width, 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12), // <-- Radius
+                              ),
+                            ),
+                            child: Text('Favorite Event',
+                                style: TextStyle(
+                                    color: selectedIndex2 == "3"
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontSize: 15)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Visibility(
+                        visible: eventlistdata,
+                        child: FutureBuilder(
+                            future: showEventData(),
+                            builder:
+                                (context, AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.hasData) {
+                                return SizedBox(
+                                  height: 75.h,
+                                  width: 100.w,
+                                  child: ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: vieweventdata.length,
+                                      itemBuilder: (context, int index) {
+                                        return GestureDetector(
+                                          child: SizedBox(
+                                              width: 100.w,
+                                              height: 44.h,
+                                              child: Card(
+                                                  elevation: 5,
+                                                  shadowColor: Colors.black12,
+                                                  color: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          final route =
+                                                              MaterialPageRoute(
+                                                            fullscreenDialog:
+                                                                true,
+                                                            builder: (_) =>
+                                                                ViewSingleEvent(
+                                                                    eventId: vieweventdata[
+                                                                            index]
+                                                                        .id!),
+                                                          );
+                                                          Navigator.push(
+                                                              context, route);
+                                                        },
+                                                        child: Container(
+                                                          height: 20.h,
+                                                          width: 100.w,
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            top: 10,
+                                                            left: 5,
+                                                            right: 5,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius.circular(
+                                                                        Dimensions
+                                                                            .size20),
+                                                                  ),
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    image:
+                                                                        NetworkImage(
+                                                                      vieweventdata[
+                                                                              index]
+                                                                          .peventImage![
+                                                                              0]
+                                                                          .image!,
+                                                                    ),
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  )),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 100.w,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Container(
+                                                                  width: 7.w,
+                                                                  height: 5.h,
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .topRight,
+                                                                  margin: const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      0,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    image: profileImage ==
+                                                                            ""
+                                                                        ? const DecorationImage(
+                                                                            image:
+                                                                                AssetImage('assets/images/profileimage.jpg'), //Your Background image
+                                                                          )
+                                                                        : DecorationImage(
+                                                                            image:
+                                                                                NetworkImage(profileImage),
+                                                                            fit:
+                                                                                BoxFit.cover,
+
+                                                                            //Your Background image
+                                                                          ),
+                                                                    border: Border.all(
+                                                                        width:
+                                                                            2.0,
+                                                                        color: Colors
+                                                                            .white),
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "${vieweventdata[index].userName}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          15.sp),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap:
+                                                                      () async {
+                                                                    // isfavourite = false;
+                                                                    // isnotfavourite = true;
+                                                                    selectedIndex =
+                                                                        index;
+                                                                    int currentIndex =
+                                                                        index;
+
+                                                                    ViewDialog(context: context).showLoadingIndicator(
+                                                                        " Add Favorite Event Request Wait...",
+                                                                        "Event Details",
+                                                                        context);
+
+                                                                    int? ida =
+                                                                        vieweventdata[index]
+                                                                            .id;
+                                                                    String
+                                                                        str_ida =
+                                                                        ida.toString();
+                                                                    int? idb = vieweventdata[
+                                                                            index]
+                                                                        .userId;
+                                                                    String
+                                                                        str_idb =
+                                                                        idb.toString();
+
+                                                                    http.Response
+                                                                        response1 =
+                                                                        await AddFavoriteEvent().addFavoriteEventDet(
+                                                                            str_ida,
+                                                                            str_idb);
+                                                                    print(
+                                                                        response1);
+
+                                                                    var pinResponse =
+                                                                        jsonDecode(
+                                                                            response1.body);
+                                                                    var userResponse =
+                                                                        SuccessResponse.fromJson(
+                                                                            pinResponse);
+
+                                                                    if (userResponse
+                                                                            .status ==
+                                                                        "failed") {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    } else {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      setState(
+                                                                          () {
+                                                                        selectedIndex =
+                                                                            index;
+                                                                        int currentIndex =
+                                                                            index;
+
+                                                                        //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                        // pre.setStringList("userinfoPin", str_userinfoPin);//save List
+                                                                      });
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    }
+
+                                                                    setState(
+                                                                        () {});
+                                                                  },
+                                                                  child:
+                                                                      Visibility(
+                                                                    visible:
+                                                                        isfavourite,
+                                                                    child:
+                                                                        Container(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .topRight,
+                                                                      margin: EdgeInsets
+                                                                          .all(
+                                                                              5),
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              1),
+                                                                      child:
+                                                                          Container(
+                                                                        margin: const EdgeInsets
+                                                                            .all(
+                                                                            5),
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            vertical:
+                                                                                1),
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Colors.white12,
+                                                                          borderRadius:
+                                                                              BorderRadius.all(
+                                                                            Radius.circular(Dimensions.size20),
+                                                                          ),
+                                                                        ),
+                                                                        height:
+                                                                            3.h,
+                                                                        width:
+                                                                            8.w,
+                                                                        child: selectedIndex ==
+                                                                                index
+                                                                            ? Image.asset('assets/images/favourite2.png')
+                                                                            : Image.asset('assets/images/favourite1.png'),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                /* InkWell(
+                                                      onTap: () {
+                                                       // isfavourite = true;
+                                                      //  isnotfavourite = false;
+                                                        selectedIndex = index;
+                                                        setState(() {});
+                                                      },
+                                                      child: Visibility(
+                                                        visible: selectedIndex == -1 ? isnotfavourite = false : selectedIndex == index ? isnotfavourite = false :  isfavourite = true,
+                                                        child: Container(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          margin:
+                                                              EdgeInsets.all(
+                                                                  5),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical:
+                                                                      1),
+                                                          child: Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .all(5),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        1),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors
+                                                                  .white12,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    Dimensions
+                                                                        .size20),
+                                                              ),
+                                                            ),
+                                                            height: 4.h,
+                                                            width: 9.w,
+                                                            child: Image.asset(
+                                                                'assets/images/favourite2.png'),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )*/
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 4.h),
+                                                            child: Text(
+                                                                "${vieweventdata[index].eventName}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp)),
+                                                          ),
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 4.h),
+                                                            child: Text(
+                                                                "${vieweventdata[index].startEventDatetime}   ${vieweventdata[index].endEventDatetime}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp)),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                              width: 7.w,
+                                                              height: 5.h,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      0,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                image:
+                                                                    const DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/location.png'),
                                                                   //Your Background image
                                                                 ),
-                                                          border: Border.all(
-                                                              width: 2.0,
-                                                              color:
-                                                                  Colors.white),
-                                                          shape:
-                                                              BoxShape.circle,
+                                                                border: Border.all(
+                                                                    width: 2.0,
+                                                                    color: Colors
+                                                                        .white),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              "${vieweventdata[index].eventAddress}",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      15.sp),
+                                                            )
+                                                          ],
                                                         ),
                                                       ),
-                                                      Text(
-                                                        "${vieweventdata[index].userName}",
-                                                        style: TextStyle(
-                                                            fontSize: 15.sp),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: () {
-                                                          // isfavourite = false;
-                                                          // isnotfavourite = true;
-                                                          selectedIndex = index;
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Container(
+                                                                height: 4.h,
+                                                                width: 16.w,
+                                                                margin: EdgeInsets
+                                                                    .only(
+                                                                        right:
+                                                                            10),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              25),
+                                                                  gradient: const LinearGradient(
+                                                                      begin: Alignment
+                                                                          .topCenter,
+                                                                      end: Alignment.bottomCenter,
+                                                                      colors: [
+                                                                        Color.fromRGBO(
+                                                                            31,
+                                                                            203,
+                                                                            220,
+                                                                            1),
+                                                                        Color.fromRGBO(
+                                                                            0,
+                                                                            184,
+                                                                            202,
+                                                                            1)
+                                                                      ]),
+                                                                ),
+                                                                child:
+                                                                    TextButton(
+                                                                  style: TextButton
+                                                                      .styleFrom(
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10,
+                                                                        top:
+                                                                            5.0,
+                                                                        bottom:
+                                                                            5.0),
+                                                                    textStyle: const TextStyle(
+                                                                        fontSize:
+                                                                            13),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    List<String>
+                                                                        dataimage =
+                                                                        [];
 
-                                                          setState(() {});
-                                                        },
-                                                        child: Visibility(
-                                                          visible: isfavourite,
-                                                          child: Container(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    5),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical:
-                                                                        1),
-                                                            child: Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          1),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white12,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .all(
-                                                                  Radius.circular(
-                                                                      Dimensions
-                                                                          .size20),
+                                                                    vieweventdata[
+                                                                            index]
+                                                                        .peventImage
+                                                                        ?.forEach(
+                                                                            (item) {
+                                                                      dataimage.add(
+                                                                          "${item.image}");
+                                                                      print(
+                                                                          "${item.id}: ${item.image}");
+                                                                    });
+
+                                                                    SharedPreferences preferences =
+                                                                        await SharedPreferences
+                                                                            .getInstance();
+                                                                    preferences.setInt(
+                                                                        "eventId",
+                                                                        vieweventdata[index].id ?? 0);
+                                                                    preferences.setString(
+                                                                        "userName",
+                                                                        vieweventdata[index].userName ?? "");
+                                                                    preferences.setString(
+                                                                        "eventName",
+                                                                        vieweventdata[index].eventName ?? "");
+                                                                    preferences.setString(
+                                                                        "eventType",
+                                                                        vieweventdata[index].eventType ?? "");
+                                                                    preferences.setString(
+                                                                        "eventDate",
+                                                                        vieweventdata[index].startEventDatetime ?? "");
+                                                                     preferences.setString(
+                                                                        "endeventDate",
+                                                                        vieweventdata[index].endEventDatetime ?? "");
+                                                                    preferences.setString(
+                                                                        "eventAddress",
+                                                                        vieweventdata[index].eventAddress ?? "");
+                                                                    preferences.setString(
+                                                                        "eventDesc",
+                                                                        vieweventdata[index].eventDescription ?? "");
+                                                                    preferences.setStringList(
+                                                                        "evevtimagelist",
+                                                                        dataimage);
+
+                                                                    print("userDetaildataq   ${vieweventdata[index].eventName}");
+
+                                                                    Navigator.push(context,
+                                                                      MaterialPageRoute(builder: (context) =>
+                                                                              const EditEventDetails()),);
+                                                                  },
+                                                                  child: Row(
+                                                                    children: <Widget>[
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            5,
+                                                                      ),
+                                                                      const Text(
+                                                                        "  Edit",
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.normal,
+                                                                        ),
+                                                                      ),
+                                                                      // text
+                                                                    ],
+                                                                  ),
                                                                 ),
                                                               ),
-                                                              height: 3.h,
-                                                              width: 8.w,
-                                                              child: selectedIndex ==
-                                                                      index
-                                                                  ? Image.asset(
-                                                                      'assets/images/favourite2.png')
-                                                                  : Image.asset(
-                                                                      'assets/images/favourite1.png'),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      /* InkWell(
-                                                        onTap: () {
-                                                         // isfavourite = true;
-                                                        //  isnotfavourite = false;
-                                                          selectedIndex = index;
-                                                          setState(() {});
-                                                        },
-                                                        child: Visibility(
-                                                          visible: selectedIndex == -1 ? isnotfavourite = false : selectedIndex == index ? isnotfavourite = false :  isfavourite = true,
-                                                          child: Container(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    5),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical:
-                                                                        1),
-                                                            child: Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          1),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white12,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .all(
-                                                                  Radius.circular(
-                                                                      Dimensions
-                                                                          .size20),
+                                                              Container(
+                                                                height: 4.h,
+                                                                width: 18.w,
+                                                                margin: EdgeInsets
+                                                                    .only(
+                                                                        right:
+                                                                            10),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              25),
+                                                                  gradient: const LinearGradient(
+                                                                      begin: Alignment
+                                                                          .topCenter,
+                                                                      end: Alignment.bottomCenter,
+                                                                      colors: [
+                                                                        Color.fromRGBO(
+                                                                            31,
+                                                                            203,
+                                                                            220,
+                                                                            1),
+                                                                        Color.fromRGBO(
+                                                                            0,
+                                                                            184,
+                                                                            202,
+                                                                            1)
+                                                                      ]),
+                                                                ),
+                                                                child:
+                                                                    TextButton(
+                                                                  style: TextButton
+                                                                      .styleFrom(
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10,
+                                                                        top:
+                                                                            5.0,
+                                                                        bottom:
+                                                                            5.0),
+                                                                    textStyle: const TextStyle(
+                                                                        fontSize:
+                                                                            13),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    int currentIndex =
+                                                                        index;
+
+                                                                    ViewDialog(context: context).showLoadingIndicator(
+                                                                        " Delete Event Request Wait...",
+                                                                        "Event Details",
+                                                                        context);
+
+                                                                    int? ida =
+                                                                        vieweventdata[index]
+                                                                            .id;
+                                                                    String
+                                                                        str_id =
+                                                                        ida.toString();
+
+                                                                    http.Response
+                                                                        response1 =
+                                                                        await EventDelete()
+                                                                            .deleteEventDetails(str_id);
+                                                                    print(
+                                                                        response1);
+
+                                                                    var pinResponse =
+                                                                        jsonDecode(
+                                                                            response1.body);
+                                                                    var userResponse =
+                                                                        DeleteEventResponse.fromJson(
+                                                                            pinResponse);
+
+                                                                    if (userResponse
+                                                                            .status ==
+                                                                        "200") {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      setState(
+                                                                          () {
+                                                                        vieweventdata
+                                                                            .removeAt(currentIndex);
+                                                                        vieweventdata.removeWhere((item) =>
+                                                                            item.id ==
+                                                                            ida);
+
+                                                                        //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                        // pre.setStringList("userinfoPin", str_userinfoPin);//save List
+                                                                      });
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    } else {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    }
+                                                                  },
+                                                                  child: Row(
+                                                                    children: <Widget>[
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            5,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Delete",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.normal,
+                                                                        ),
+                                                                      ),
+                                                                      // text
+                                                                    ],
+                                                                  ),
                                                                 ),
                                                               ),
-                                                              height: 4.h,
-                                                              width: 9.w,
-                                                              child: Image.asset(
-                                                                  'assets/images/favourite2.png'),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )*/
+                                                            ],
+                                                          )
+                                                        ],
+                                                      )
                                                     ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Column(
-                                               crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                  Container(
-                                              margin:
-                                                  EdgeInsets.only(left: 4.h),
-                                              child: Text(
-                                                  "${vieweventdata[index].eventName}",
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp)),
-                                            ),
-                                            Container(
-                                              margin:
-                                                  EdgeInsets.only(left: 4.h),
-                                              child: Text(
-                                                  "${vieweventdata[index].eventDatetime}",
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp)),
-                                            ),
-                                              ],
-                                            ),
-                                            Container(
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 7.w,
-                                                    height: 5.h,
-                                                    alignment:
-                                                        Alignment.topRight,
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(0, 0, 10, 0),
-                                                    decoration: BoxDecoration(
-                                                      image:
-                                                          const DecorationImage(
-                                                        image: AssetImage(
-                                                            'assets/images/location.png'),
-                                                        //Your Background image
-                                                      ),
-                                                      border: Border.all(
-                                                          width: 2.0,
-                                                          color: Colors.white),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    "${vieweventdata[index].eventAddress}",
-                                                    style: TextStyle(
-                                                        fontSize: 15.sp),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Row(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                 Container(
-                                              height: 4.h,
-                                              width: 18.w,
-                                              margin: EdgeInsets.only(right: 10),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(25),
-                                                gradient: const LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                    colors: [
-                                                      Color.fromRGBO(
-                                                          31, 203, 220, 1),
-                                                      Color.fromRGBO(
-                                                          0, 184, 202, 1)
-                                                    ]),
-                                              ),
-                                              child: TextButton(
-                                                style: TextButton.styleFrom(
-                                                  foregroundColor: Colors.white,
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 10,
-                                                          right: 10,
-                                                          top: 5.0,
-                                                          bottom: 5.0),
-                                                  textStyle: const TextStyle(
-                                                      fontSize: 13),
-                                                ),
-                                                onPressed: () {},
-                                                child: Row(
-                                                  children: <Widget>[
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    const Text(
-                                                      "Delete",
-                                                      style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.white,
-                                                          fontWeight: FontWeight.normal,
-                                                      ),
-                                                    ),
-                                                    // text
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                              ],
-
-                                            )
-                                          ],
-                                        ))),
-                              );
+                                                  ))),
+                                        );
+                                      }),
+                                );
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
                             }),
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),
-            ),
-          ));
+                      ),
+                      Visibility(
+                        visible: faveventdata,
+                        child: FutureBuilder(
+                            future: showEventData(),
+                            builder:
+                                (context, AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.hasData) {
+                                return SizedBox(
+                                  height: 75.h,
+                                  width: 100.w,
+                                  child: ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: vieweventdata.length,
+                                      itemBuilder: (context, int index) {
+                                        return GestureDetector(
+                                          child: SizedBox(
+                                              width: 100.w,
+                                              height: 44.h,
+                                              child: Card(
+                                                  elevation: 5,
+                                                  shadowColor: Colors.black12,
+                                                  color: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          final route =
+                                                              MaterialPageRoute(
+                                                            fullscreenDialog:
+                                                                true,
+                                                            builder: (_) =>
+                                                                ViewSingleEvent(
+                                                                    eventId: vieweventdata[
+                                                                            index]
+                                                                        .id!),
+                                                          );
+                                                          Navigator.push(
+                                                              context, route);
+                                                        },
+                                                        child: Container(
+                                                          height: 20.h,
+                                                          width: 100.w,
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            top: 10,
+                                                            left: 5,
+                                                            right: 5,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius.circular(
+                                                                        Dimensions
+                                                                            .size20),
+                                                                  ),
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    image:
+                                                                        NetworkImage(
+                                                                      vieweventdata[
+                                                                              index]
+                                                                          .peventImage![
+                                                                              0]
+                                                                          .image!,
+                                                                    ),
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  )),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 100.w,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Container(
+                                                                  width: 7.w,
+                                                                  height: 5.h,
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .topRight,
+                                                                  margin: const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      0,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    image: profileImage ==
+                                                                            ""
+                                                                        ? const DecorationImage(
+                                                                            image:
+                                                                                AssetImage('assets/images/profileimage.jpg'), //Your Background image
+                                                                          )
+                                                                        : DecorationImage(
+                                                                            image:
+                                                                                NetworkImage(profileImage),
+                                                                            fit:
+                                                                                BoxFit.cover,
+
+                                                                            //Your Background image
+                                                                          ),
+                                                                    border: Border.all(
+                                                                        width:
+                                                                            2.0,
+                                                                        color: Colors
+                                                                            .white),
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "${vieweventdata[index].userName}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          15.sp),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: () async {},
+                                                                  child: Visibility(
+                                                                    child:
+                                                                        Container(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .topRight,
+                                                                      margin: EdgeInsets
+                                                                          .all(
+                                                                              5),
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              1),
+                                                                      child:
+                                                                          Container(
+                                                                        margin: const EdgeInsets
+                                                                            .all(
+                                                                            5),
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            vertical:
+                                                                                1),
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Colors.white12,
+                                                                          borderRadius:
+                                                                              BorderRadius.all(
+                                                                            Radius.circular(Dimensions.size20),
+                                                                          ),
+                                                                        ),
+                                                                        height:
+                                                                            3.h,
+                                                                        width:
+                                                                            8.w,
+                                                                        child: Image.asset(
+                                                                            'assets/images/favourite2.png'),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                /* InkWell(
+                                                      onTap: () {
+                                                       // isfavourite = true;
+                                                      //  isnotfavourite = false;
+                                                        selectedIndex = index;
+                                                        setState(() {});
+                                                      },
+                                                      child: Visibility(
+                                                        visible: selectedIndex == -1 ? isnotfavourite = false : selectedIndex == index ? isnotfavourite = false :  isfavourite = true,
+                                                        child: Container(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          margin:
+                                                              EdgeInsets.all(
+                                                                  5),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical:
+                                                                      1),
+                                                          child: Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .all(5),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        1),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors
+                                                                  .white12,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    Dimensions
+                                                                        .size20),
+                                                              ),
+                                                            ),
+                                                            height: 4.h,
+                                                            width: 9.w,
+                                                            child: Image.asset(
+                                                                'assets/images/favourite2.png'),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )*/
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 4.h),
+                                                            child: Text(
+                                                                "${vieweventdata[index].eventName}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp)),
+                                                          ),
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 4.h),
+                                                            child: Text(
+                                                                "${vieweventdata[index].startEventDatetime}  ${vieweventdata[index].endEventDatetime}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp)),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                              width: 7.w,
+                                                              height: 5.h,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      0,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                image:
+                                                                    const DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/location.png'),
+                                                                  //Your Background image
+                                                                ),
+                                                                border: Border.all(
+                                                                    width: 2.0,
+                                                                    color: Colors
+                                                                        .white),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              "${vieweventdata[index].eventAddress}",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      15.sp),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              // Container(
+                                                              //   height: 4.h,
+                                                              //   width: 16.w,
+                                                              //   margin:
+                                                              //       EdgeInsets.only(
+                                                              //           right: 10),
+                                                              //   decoration:
+                                                              //       BoxDecoration(
+                                                              //     borderRadius:
+                                                              //         BorderRadius
+                                                              //             .circular(
+                                                              //                 25),
+                                                              //     gradient: const LinearGradient(
+                                                              //         begin: Alignment
+                                                              //             .topCenter,
+                                                              //         end: Alignment
+                                                              //             .bottomCenter,
+                                                              //         colors: [
+                                                              //           Color
+                                                              //               .fromRGBO(
+                                                              //                   31,
+                                                              //                   203,
+                                                              //                   220,
+                                                              //                   1),
+                                                              //           Color
+                                                              //               .fromRGBO(
+                                                              //                   0,
+                                                              //                   184,
+                                                              //                   202,
+                                                              //                   1)
+                                                              //         ]),
+                                                              //   ),
+                                                              //   child: TextButton(
+                                                              //     style: TextButton
+                                                              //         .styleFrom(
+                                                              //       foregroundColor:
+                                                              //           Colors.white,
+                                                              //       padding:
+                                                              //           const EdgeInsets
+                                                              //               .only(
+                                                              //               left: 10,
+                                                              //               right: 10,
+                                                              //               top: 5.0,
+                                                              //               bottom:
+                                                              //                   5.0),
+                                                              //       textStyle:
+                                                              //           const TextStyle(
+                                                              //               fontSize:
+                                                              //                   13),
+                                                              //     ),
+                                                              //     onPressed:
+                                                              //         () async {
+                                                              //       List<String>
+                                                              //           dataimage =
+                                                              //           [];
+                                                              //
+                                                              //       vieweventdata[
+                                                              //               index]
+                                                              //           .peventImage
+                                                              //           ?.forEach(
+                                                              //               (item) {
+                                                              //         dataimage.add(
+                                                              //             "${item.image}");
+                                                              //         print(
+                                                              //             "${item.id}: ${item.image}");
+                                                              //       });
+                                                              //
+                                                              //       preferences =
+                                                              //           await SharedPreferences
+                                                              //               .getInstance();
+                                                              //       preferences?.setString(
+                                                              //           "userName",
+                                                              //           "${vieweventdata[index].userName}");
+                                                              //       preferences?.setString(
+                                                              //           "eventName",
+                                                              //           "${vieweventdata[index].eventName}");
+                                                              //       preferences?.setString(
+                                                              //           "eventType",
+                                                              //           "${vieweventdata[index].eventType}");
+                                                              //       preferences?.setString(
+                                                              //           "eventDate",
+                                                              //           "${vieweventdata[index].eventDatetime}");
+                                                              //       preferences?.setString(
+                                                              //           "eventAddress",
+                                                              //           "${vieweventdata[index].eventAddress}");
+                                                              //       preferences?.setString(
+                                                              //           "eventDesc",
+                                                              //           "${vieweventdata[index].eventDescription}");
+                                                              //       preferences
+                                                              //           ?.setStringList(
+                                                              //               "evevtimagelist",
+                                                              //               dataimage);
+                                                              //
+                                                              //       Navigator.push(
+                                                              //         context,
+                                                              //         MaterialPageRoute(
+                                                              //             builder:
+                                                              //                 (context) =>
+                                                              //                     const EventDetails()),
+                                                              //       );
+                                                              //     },
+                                                              //     child: Row(
+                                                              //       children: <Widget>[
+                                                              //         const SizedBox(
+                                                              //           width: 5,
+                                                              //         ),
+                                                              //         const Text(
+                                                              //           "  Edit",
+                                                              //           textAlign:
+                                                              //               TextAlign
+                                                              //                   .center,
+                                                              //           style:
+                                                              //               TextStyle(
+                                                              //             fontSize:
+                                                              //                 13,
+                                                              //             color: Colors
+                                                              //                 .white,
+                                                              //             fontWeight:
+                                                              //                 FontWeight
+                                                              //                     .normal,
+                                                              //           ),
+                                                              //         ),
+                                                              //         // text
+                                                              //       ],
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                              Container(
+                                                                height: 4.h,
+                                                                width: 18.w,
+                                                                margin: EdgeInsets
+                                                                    .only(
+                                                                        right:
+                                                                            10),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              25),
+                                                                  gradient: const LinearGradient(
+                                                                      begin: Alignment
+                                                                          .topCenter,
+                                                                      end: Alignment.bottomCenter,
+                                                                      colors: [
+                                                                        Color.fromRGBO(
+                                                                            31,
+                                                                            203,
+                                                                            220,
+                                                                            1),
+                                                                        Color.fromRGBO(
+                                                                            0,
+                                                                            184,
+                                                                            202,
+                                                                            1)
+                                                                      ]),
+                                                                ),
+                                                                child:
+                                                                    TextButton(
+                                                                  style: TextButton
+                                                                      .styleFrom(
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10,
+                                                                        top:
+                                                                            5.0,
+                                                                        bottom:
+                                                                            5.0),
+                                                                    textStyle: const TextStyle(
+                                                                        fontSize:
+                                                                            13),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    int currentIndex =
+                                                                        index;
+
+                                                                    ViewDialog(context: context).showLoadingIndicator(
+                                                                        " Delete Favroit Event Request Wait...",
+                                                                        "Event Details",
+                                                                        context);
+
+                                                                    int? ida = vieweventdata[index].id;
+                                                                    String str_ida = ida.toString();
+                                                                    int? idb = vieweventdata[index].userId;
+                                                                    String str_idb = idb.toString();
+
+                                                                    http.Response
+                                                                        response1 =
+                                                                        await FavoriteEventDelete()
+                                                                            .deleteFavoriteEventDetails(str_ida,str_idb);
+                                                                    print(
+                                                                        response1);
+
+                                                                    var pinResponse =
+                                                                        jsonDecode(
+                                                                            response1.body);
+                                                                    var userResponse =
+                                                                        EventSuccsessResponse.fromJson(
+                                                                            pinResponse);
+
+                                                                    if (userResponse
+                                                                            .status ==
+                                                                        "200") {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      setState(
+                                                                          () {
+                                                                        vieweventdata
+                                                                            .removeAt(currentIndex);
+                                                                        vieweventdata.removeWhere((item) =>
+                                                                            item.id ==
+                                                                            ida);
+
+                                                                        //  SharedPreferences pre = await SharedPreferences.getInstance();
+                                                                        // pre.setStringList("userinfoPin", str_userinfoPin);//save List
+                                                                      });
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    } else {
+                                                                      ViewDialog(
+                                                                              context: context)
+                                                                          .hideOpenDialog();
+
+                                                                      Fluttertoast.showToast(
+                                                                          msg: userResponse
+                                                                              .message!,
+                                                                          toastLength: Toast
+                                                                              .LENGTH_SHORT,
+                                                                          gravity: ToastGravity
+                                                                              .BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              1,
+                                                                          backgroundColor: Colors
+                                                                              .green,
+                                                                          textColor: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16.0);
+                                                                    }
+                                                                  },
+                                                                  child: Row(
+                                                                    children: <Widget>[
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            5,
+                                                                      ),
+                                                                      const Text(
+                                                                        "Delete",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.normal,
+                                                                        ),
+                                                                      ),
+                                                                      // text
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ))),
+                                        );
+                                      }),
+                                );
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            }),
+                      )
+                    ],
+                  )
+                ],
+              )));
     });
   }
 

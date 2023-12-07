@@ -31,6 +31,7 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
       eventname = "",
       eventtype = "",
       eventdatetime = "",
+      endeventdatetime = "",
       eventaddress = "",
       eventdescription = "",
       eventdescription1 = "",
@@ -64,7 +65,8 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
       username = eventdataresponse.data?[0].userName ?? "";
       eventname = eventdataresponse.data?[0].eventName ?? "";
       eventtype = eventdataresponse.data?[0].eventType ?? "";
-      eventdatetime = eventdataresponse.data?[0].eventDatetime ?? "";
+      eventdatetime = eventdataresponse.data?[0].startEventDatetime ?? "";
+      endeventdatetime = eventdataresponse.data?[0].endEventDatetime ?? "";
       eventaddress = eventdataresponse.data?[0].eventAddress ?? "";
       eventdescription = eventdataresponse.data?[0].eventDescription ?? "";
       eventvideo = eventdataresponse.data?[0].eventVideo ?? "";
@@ -87,7 +89,7 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
           fontSize: 16.0);
     }
 
-    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+    //Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
 
     return eventdataresponse.status;
   }
@@ -423,7 +425,7 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
                                       ),
                                       Container(
                                         margin: EdgeInsets.only(left: 4.h),
-                                        child: Text("${eventdatetime}",
+                                        child: Text("${eventdatetime} ${endeventdatetime}",
                                             style: TextStyle()),
                                       ),
                                       Row(
@@ -454,6 +456,141 @@ class _ViewSingleEventState extends State<ViewSingleEvent> {
                                         child: Text("${eventdescription}",
                                             style: TextStyle()),
                                       ),
+                                      SizedBox(height: 5.h,),
+                                      Container(
+                                        child:  Row(
+                                          crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    // Container(
+                                                    //   height: 4.h,
+                                                    //   width: 30.w,
+                                                    //   margin: EdgeInsets.only(
+                                                    //       right: 10),
+                                                    //   decoration: BoxDecoration(
+                                                    //     borderRadius:
+                                                    //         BorderRadius
+                                                    //             .circular(25),
+                                                    //     gradient: const LinearGradient(
+                                                    //         begin: Alignment
+                                                    //             .topCenter,
+                                                    //         end: Alignment
+                                                    //             .bottomCenter,
+                                                    //         colors: [
+                                                    //           Color.fromRGBO(31,
+                                                    //               203, 220, 1),
+                                                    //           Color.fromRGBO(0,
+                                                    //               184, 202, 1)
+                                                    //         ]),
+                                                    //   ),
+                                                    //   child: TextButton(
+                                                    //     style: TextButton
+                                                    //         .styleFrom(
+                                                    //       foregroundColor:
+                                                    //           Colors.white,
+                                                    //       padding:
+                                                    //           const EdgeInsets
+                                                    //               .only(
+                                                    //               left: 10,
+                                                    //               right: 10,
+                                                    //               top: 5.0,
+                                                    //               bottom: 5.0),
+                                                    //       textStyle:
+                                                    //           const TextStyle(
+                                                    //               fontSize: 13),
+                                                    //     ),
+                                                    //     onPressed: () {},
+                                                    //     child: Row(
+                                                    //       children: <Widget>[
+                                                    //         const SizedBox(
+                                                    //           width: 5,
+                                                    //         ),
+                                                    //         Text(
+                                                    //           "          Edit",
+                                                    //           textAlign: TextAlign.center,
+                                                    //           style: TextStyle(
+                                                    //             fontSize: 15.sp,
+                                                    //             color: Colors
+                                                    //                 .white,
+                                                    //             fontWeight:
+                                                    //                 FontWeight
+                                                    //                     .normal,
+                                                    //           ),
+                                                    //         ),
+                                                    //         // text
+                                                    //       ],
+                                                    //     ),
+                                                    //   ),
+                                                    // ),
+                                                    Container(
+                                                      height: 4.h,
+                                                      width: 30.w,
+                                                      margin: EdgeInsets.only(
+                                                          right: 10),
+                                                      padding: EdgeInsets.only(right: 10.0, bottom: 1.0, top: 1.0),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(25),
+                                                        gradient: const LinearGradient(
+                                                            begin: Alignment
+                                                                .topCenter,
+                                                            end: Alignment
+                                                                .bottomCenter,
+                                                            colors: [
+                                                              Color.fromRGBO(31,
+                                                                  203, 220, 1),
+                                                              Color.fromRGBO(0,
+                                                                  184, 202, 1)
+                                                            ]),
+                                                      ),
+                                                      child: TextButton(
+                                                        style: TextButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 5.0,
+                                                                  bottom: 5.0),
+                                                          textStyle:
+                                                              const TextStyle(
+                                                                  fontSize: 13),
+                                                        ),
+                                                        onPressed: () {},
+                                                        child: Row(
+                                                          children: <Widget>[
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                        Text(
+                                                              "      Delete",
+                                                              style: TextStyle(
+                                                                fontSize: 15.sp,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            // text
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                      )
                                     ],
                                   ),
                                 )

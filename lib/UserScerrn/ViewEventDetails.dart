@@ -235,7 +235,7 @@ class _ViewEventDetailsState extends State<ViewEventDetails> {
                                       Container(
                                         margin: EdgeInsets.only(left: 4.h),
                                         child: Text(
-                                            "${vieweventdata[index].eventDatetime}",
+                                            "${vieweventdata[index].startEventDatetime} +"  "+${vieweventdata[index].endEventDatetime}",
                                             style: TextStyle()),
                                       ),
                                       Row(

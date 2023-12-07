@@ -11,6 +11,7 @@ class Addevent {
       eventname,
       eventtype,
       eventdatetime,
+      endeventTime,
       eventaddress,
       eventdescription,
       eventvideo,
@@ -24,13 +25,14 @@ class Addevent {
          Uri.parse('https://www.profileace.com/wherenx_user/public/api/business/business-event-create'));
       request.fields.addAll({
              'user_id' : userId,
-            'user_name' : userName,
-            'event_name' : eventname,
-            'event_type' : eventtype,
-            'event_datetime' : eventdatetime,
-            'event_address' : eventaddress,
-            'event_description' : eventdescription,
-             'event_video' : eventvideo,});
+             'user_name' : userName,
+             'event_name' : eventname,
+             'event_type' : eventtype,
+             'start_event_datetime' : eventdatetime,
+             'end_event_datetime' : endeventTime,
+             'event_address' : eventaddress,
+             'event_description' : eventdescription,
+              'event_video' : eventvideo,});
 
      // request.files.add(await http.MultipartFile.fromPath('event_video', eventvideo));
       for(int i=0; i<eventimage.length;i++){

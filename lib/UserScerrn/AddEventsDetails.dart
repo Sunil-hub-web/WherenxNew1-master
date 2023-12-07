@@ -18,6 +18,7 @@ import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:wherenxnew1/ApiCallingPage/Addevent.dart';
+import 'package:wherenxnew1/UserScerrn/EventDetails.dart';
 
 import '../ApiImplement/ViewDialog.dart';
 import '../Helper/img.dart';
@@ -33,12 +34,14 @@ class AddEventsDetails extends StatefulWidget {
 }
 
 class _AddEventsDetailsState extends State<AddEventsDetails> {
+
   TextEditingController textYouName = TextEditingController();
   TextEditingController textYourEventName = TextEditingController();
   TextEditingController textEventType = TextEditingController();
   TextEditingController textEventAddress = TextEditingController();
   TextEditingController textEventDescription = TextEditingController();
   TextEditingController currentDateTime = TextEditingController();
+  TextEditingController endingDateTime = TextEditingController();
 
   final ImagePicker imgpicker = ImagePicker();
   List<XFile>? imagefiles;
@@ -67,8 +70,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
         for (int i = 0; i < imagefiles!.length; i++) {
           filepathdet.add(imagefiles![i].path);
         }
-        if(filepathdet.isNotEmpty){
-            isImageVisiable = true;
+        if (filepathdet.isNotEmpty) {
+          isImageVisiable = true;
         }
         print("Yourdatafile  $filepathdet");
         Left_indicator_bar_Flushbar1("Image Selected SuccessFully");
@@ -177,6 +180,41 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
     });
   }
 
+  dateTimePickerWidget1(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ).then((selectedDate) {
+      // After selecting the date, display the time picker.
+      if (selectedDate != null) {
+        showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        ).then((selectedTime) {
+          // Handle the selected date and time here.
+          if (selectedTime != null) {
+            DateTime selectedDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+            print(selectedDateTime);
+            setState(() {
+              currentDate = selectedDateTime;
+              String formattedDate =
+                  DateFormat('d MMM, yyyy  hh:mm aaa').format(selectedDateTime);
+              endingDateTime.text = formattedDate.toString();
+            }); // You can use the selectedDateTime as needed.
+          }
+        });
+      }
+    });
+  }
+
   Future genThumbnailFile(String? filePath) async {
     var imagefilepath = await VideoThumbnail.thumbnailFile(
       video: filePath!,
@@ -197,7 +235,9 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ResponsiveSizer(builder: (context, orientation, screenType){
+
+      return Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Image.asset(
@@ -274,40 +314,40 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     InkWell(
-                      onTap: () {
-                        openImages();
-                        if (kDebugMode) {
-                          print("imagedetails$imagefiles");
-                          // Navigator.of(context).pop();
-                        }
-                      },
-                      child: Container(
-                        width: 60.w,
-                        height: 18.h,
-                        child: Card(
-                        elevation: 5,
-                        shadowColor: Colors.black,
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
+                        onTap: () {
+                          openImages();
+                          if (kDebugMode) {
+                            print("imagedetails$imagefiles");
+                            // Navigator.of(context).pop();
+                          }
+                        },
                         child: Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Image.asset(
-                                'assets/images/images.png',
-                                height: 9.h,
-                                width: 9.h,
+                          width: 60.w,
+                          height: 18.h,
+                          child: Card(
+                            elevation: 5,
+                            shadowColor: Colors.black,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/images.png',
+                                    height: 9.h,
+                                    width: 9.h,
+                                  ),
+                                  Text("Uplod Image")
+                                ],
                               ),
-                              Text("Uplod Image")
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      )
-                    ),
+                        )),
                     // InkWell(
                     //   onTap: () async {
                     //     getVideo(ImageSource.gallery);
@@ -473,7 +513,35 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          hintText: 'Select Date And Time',
+                          hintText: 'Select Start Date And Time',
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          )),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(1),
+                  child: Card(
+                    elevation: 5,
+                    shadowColor: Colors.black,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextFormField(
+                      onTap: () {
+                        // _selectDate(context);
+                        dateTimePickerWidget1(context);
+                        FocusScope.of(context).requestFocus(new FocusNode());
+                      },
+                      controller: endingDateTime,
+                      minLines: 1,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                          hintText: 'Select End Date And Time',
                           hintStyle: TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -561,6 +629,9 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                       } else if (currentDateTime.text.toString().isEmpty) {
                         Left_indicator_bar_Flushbar(
                             context, "Select Event Date Time");
+                      } else if (endingDateTime.text.toString().isEmpty) {
+                        Left_indicator_bar_Flushbar(
+                            context, "Select end event Date Time");
                       } else if (filepathdet.isEmpty) {
                         Left_indicator_bar_Flushbar(
                             context, "Select Your Event Image");
@@ -582,6 +653,7 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                                 textYourEventName.text.toString(),
                                 textEventType.text.toString(),
                                 currentDateTime.text.toString(),
+                                endingDateTime.text.toString(),
                                 textEventAddress.text.toString(),
                                 textEventDescription.text.toString(),
                                 videofilepath1,
@@ -617,13 +689,18 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
                           textYourEventName.text = "";
                           textEventType.text = "";
                           currentDateTime.text = "";
+                          endingDateTime.text = "";
                           textEventAddress.text = "";
                           textEventDescription.text = "";
                           videofilepath = "";
                           filepathdet.clear();
 
-                        } else {
+                          final route = MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => const EventDetails(),);
+                          Navigator.push(context, route);
 
+                        } else {
                           ViewDialog(context: context).hideOpenDialog();
 
                           print("show your message1${response?.reasonPhrase}");
@@ -654,8 +731,8 @@ class _AddEventsDetailsState extends State<AddEventsDetails> {
               ],
             ),
           ),
-        )
-    );
+        ));
+    });
   }
 
   void Left_indicator_bar_Flushbar(BuildContext context, String Message) {

@@ -36,13 +36,14 @@ class Data {
   String? userName;
   String? eventName;
   String? eventType;
-  String? eventDatetime;
+  String? startEventDatetime;
   String? eventAddress;
   String? eventDescription;
-  String? eventVideo;
+  Null? eventVideo;
   int? status;
   String? createdAt;
   String? updatedAt;
+  String? endEventDatetime;
   List<PeventImage>? peventImage;
 
   Data(
@@ -51,13 +52,14 @@ class Data {
       this.userName,
       this.eventName,
       this.eventType,
-      this.eventDatetime,
+      this.startEventDatetime,
       this.eventAddress,
       this.eventDescription,
       this.eventVideo,
       this.status,
       this.createdAt,
       this.updatedAt,
+      this.endEventDatetime,
       this.peventImage});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -66,13 +68,14 @@ class Data {
     userName = json['user_name'];
     eventName = json['event_name'];
     eventType = json['event_type'];
-    eventDatetime = json['event_datetime'];
+    startEventDatetime = json['start_event_datetime'];
     eventAddress = json['event_address'];
     eventDescription = json['event_description'];
     eventVideo = json['event_video'];
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    endEventDatetime = json['end_event_datetime'];
     if (json['pevent_image'] != null) {
       peventImage = <PeventImage>[];
       json['pevent_image'].forEach((v) {
@@ -88,13 +91,14 @@ class Data {
     data['user_name'] = this.userName;
     data['event_name'] = this.eventName;
     data['event_type'] = this.eventType;
-    data['event_datetime'] = this.eventDatetime;
+    data['start_event_datetime'] = this.startEventDatetime;
     data['event_address'] = this.eventAddress;
     data['event_description'] = this.eventDescription;
     data['event_video'] = this.eventVideo;
     data['status'] = this.status;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    data['end_event_datetime'] = this.endEventDatetime;
     if (this.peventImage != null) {
       data['pevent_image'] = this.peventImage!.map((v) => v.toJson()).toList();
     }

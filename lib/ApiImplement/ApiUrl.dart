@@ -29,5 +29,11 @@ class ApiUrl {
   static String business_event_create = "${baseUrl}business-event-create";
   static String business_event_show = "${baseUrl}business-event-show";
   static String business_event_by_id = "${baseUrl}business-event-by-id";
+  static String business_event_delete = "${baseUrl}business-event-delete";
+  static String business_favorite_event_create = "${baseUrl}business-favorite-event-create";
+  static String business_event_edit = "${baseUrl}business-event-edit";
+  static String business_favorite_event_show = "${baseUrl}business-favorite-event-show";
+  static String business_favorite_event_delete = "${baseUrl}business-favorite-event-delete";
+  static String business_event_image_edit = "${baseUrl}business-event-image-edit";
 
 }
