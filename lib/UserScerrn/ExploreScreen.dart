@@ -1543,7 +1543,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                                             Expanded(
                                                                               child: Text(
                                                                                 nearbyLocations[index].name!,
-                                                                                style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.normal),
+                                                                                style: const TextStyle(
+                                                                                    fontSize: 14,
+                                                                                    color: Colors.black, fontWeight: FontWeight.normal),
                                                                               ),
                                                                             ),
                                                                             Container(

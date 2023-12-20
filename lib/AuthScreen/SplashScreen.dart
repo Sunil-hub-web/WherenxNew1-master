@@ -278,7 +278,7 @@ class _SplashScreenState extends State<SplashScreen> {
 //     SharedPreferences pre = await SharedPreferences.getInstance();
 //     bool islogin = pre.getBool("islogin") ?? false;
 //
-//     Timer(const Duration(seconds: 2),
+//       Timer(const Duration(seconds: 2),
 //             () => islogin == false ? Get.offNamed(RouteHelper.getIntroScreen()) : Get.offNamed(RouteHelper.getHomeScreenpage()));
 //   }
 // }

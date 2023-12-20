@@ -56,6 +56,7 @@ class RouteHelper {
   static String getdetailsScreen() => '$detailsScreen';
   static String getaddreviewScreen() => '$reviewaddScreen';
   static String getVideoReviewDetailsScreen() => '$videoReviewDetailsScreen';
+
   static List<GetPage> routes = [
     // GetPage(name: MyHomePagepage, page: (){
     //   return AnimatedXYZ();
